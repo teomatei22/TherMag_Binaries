@@ -112,7 +112,7 @@ Materials live in `materials/default_materials.json`. Each entry can classify:
 ### External tools
 
 - **GMSH**, **ElmerFEM 9.0**, **ParaView** (pvpython)
-- Windows installer and binaries: [`TherMag_Setup.exe`](https://github.com/teomatei22/ESA_wrapper_binaries/releases) in the [ESA_wrapper_binaries](https://github.com/teomatei22/ESA_wrapper_binaries) repo
+- Windows installer and binaries: [`TherMag_Setup.exe`](https://github.com/teomatei22/ESA_wrapper_binaries/releases) in the [ESA_wrapper_binaries]([https://teomatei22.github.io/TherMag_Binaries](https://teomatei22.github.io/TherMag_Binaries)) repo
 
 ## License
 
