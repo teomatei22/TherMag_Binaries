@@ -1,0 +1,7 @@
+materials.database module
+=========================
+
+.. automodule:: materials.database
+   :members:
+   :show-inheritance:
+   :undoc-members:

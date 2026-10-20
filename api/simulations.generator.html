@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>simulations.generator module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="simulations.material_params module" href="simulations.material_params.html" />
+    <link rel="prev" title="simulations package" href="simulations.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="simulations.material_params.html" title="simulations.material_params module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="simulations.html" title="simulations package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="simulations.html" accesskey="U">simulations package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.generator module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-simulations.generator">
+<span id="simulations-generator-module"></span><h1>simulations.generator module<a class="headerlink" href="#module-simulations.generator" title="Link to this heading">¶</a></h1>
+<p>Assemble Elmer SIF files from topology, driver, and material snippets.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="simulations.generator.BoundaryConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">simulations.generator.</span></span><span class="sig-name descname"><span class="pre">BoundaryConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bc_hot_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_hot_boundary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_cold_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_cold_boundary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_infinity_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_infinity_boundary</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#BoundaryConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.BoundaryConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Map hot/cold/infinity BC numbers onto mesh physical surface IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bc_hot_num</strong> – Elmer Boundary Condition number for the hot end.</p></li>
+<li><p><strong>bc_hot_boundary</strong> – Target mesh boundary tag for the hot end.</p></li>
+<li><p><strong>bc_cold_num</strong> – Elmer Boundary Condition number for the cold end.</p></li>
+<li><p><strong>bc_cold_boundary</strong> – Target mesh boundary tag for the cold end.</p></li>
+<li><p><strong>bc_infinity_num</strong> – Elmer Boundary Condition number for infinity.</p></li>
+<li><p><strong>bc_infinity_boundary</strong> – Target mesh boundary tag for infinity.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>BoundaryConfig</strong> – Topology BC numbering used when filling SIF placeholders.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bc_hot_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>bc_hot_boundary</strong> (<em>int</em>)</p></li>
+<li><p><strong>bc_cold_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>bc_cold_boundary</strong> (<em>int</em>)</p></li>
+<li><p><strong>bc_infinity_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>bc_infinity_boundary</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.BoundaryConfig.bc_cold_boundary">
+<span class="sig-name descname"><span class="pre">bc_cold_boundary</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.BoundaryConfig.bc_cold_boundary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.BoundaryConfig.bc_cold_num">
+<span class="sig-name descname"><span class="pre">bc_cold_num</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.BoundaryConfig.bc_cold_num" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.BoundaryConfig.bc_hot_boundary">
+<span class="sig-name descname"><span class="pre">bc_hot_boundary</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.BoundaryConfig.bc_hot_boundary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.BoundaryConfig.bc_hot_num">
+<span class="sig-name descname"><span class="pre">bc_hot_num</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.BoundaryConfig.bc_hot_num" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.BoundaryConfig.bc_infinity_boundary">
+<span class="sig-name descname"><span class="pre">bc_infinity_boundary</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.BoundaryConfig.bc_infinity_boundary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.BoundaryConfig.bc_infinity_num">
+<span class="sig-name descname"><span class="pre">bc_infinity_num</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.BoundaryConfig.bc_infinity_num" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">simulations.generator.</span></span><span class="sig-name descname"><span class="pre">DriverParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_cold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_hot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep_intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">physical_total_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#DriverParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.DriverParams" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Temperatures and time-stepping values substituted into driver SIFs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t_cold</strong> – Cold-end boundary temperature [K].</p></li>
+<li><p><strong>t_hot</strong> – Hot-end boundary temperature [K].</p></li>
+<li><p><strong>t_mean</strong> – Mean temperature for harmonic drives [K].</p></li>
+<li><p><strong>t_amplitude</strong> – Half-range amplitude for harmonic drives [K].</p></li>
+<li><p><strong>frequency</strong> – Harmonic frequency if used [Hz].</p></li>
+<li><p><strong>t_min</strong> – Minimum sawtooth temperature [K].</p></li>
+<li><p><strong>t_max</strong> – Maximum sawtooth temperature [K].</p></li>
+<li><p><strong>period</strong> – Sawtooth/harmonic period if used [s].</p></li>
+<li><p><strong>timestep_size</strong> – Elmer timestep size [s].</p></li>
+<li><p><strong>timestep_intervals</strong> – Number of timesteps [dimensionless].</p></li>
+<li><p><strong>output_intervals</strong> – Result output interval in steps [dimensionless].</p></li>
+<li><p><strong>physical_total_time</strong> – Optional physical duration overriding interval count [s].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>DriverParams</strong> – Dataclass consumed by driver block substitution.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t_cold</strong> (<em>float</em>)</p></li>
+<li><p><strong>t_hot</strong> (<em>float</em>)</p></li>
+<li><p><strong>t_mean</strong> (<em>float</em>)</p></li>
+<li><p><strong>t_amplitude</strong> (<em>float</em>)</p></li>
+<li><p><strong>frequency</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>t_min</strong> (<em>float</em>)</p></li>
+<li><p><strong>t_max</strong> (<em>float</em>)</p></li>
+<li><p><strong>period</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>timestep_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>timestep_intervals</strong> (<em>int</em>)</p></li>
+<li><p><strong>output_intervals</strong> (<em>int</em>)</p></li>
+<li><p><strong>physical_total_time</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.frequency">
+<span class="sig-name descname"><span class="pre">frequency</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#simulations.generator.DriverParams.frequency" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.output_intervals">
+<span class="sig-name descname"><span class="pre">output_intervals</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.DriverParams.output_intervals" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.period">
+<span class="sig-name descname"><span class="pre">period</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#simulations.generator.DriverParams.period" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.physical_total_time">
+<span class="sig-name descname"><span class="pre">physical_total_time</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#simulations.generator.DriverParams.physical_total_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.t_amplitude">
+<span class="sig-name descname"><span class="pre">t_amplitude</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#simulations.generator.DriverParams.t_amplitude" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.t_cold">
+<span class="sig-name descname"><span class="pre">t_cold</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#simulations.generator.DriverParams.t_cold" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.t_hot">
+<span class="sig-name descname"><span class="pre">t_hot</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#simulations.generator.DriverParams.t_hot" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.t_max">
+<span class="sig-name descname"><span class="pre">t_max</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#simulations.generator.DriverParams.t_max" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.t_mean">
+<span class="sig-name descname"><span class="pre">t_mean</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#simulations.generator.DriverParams.t_mean" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.t_min">
+<span class="sig-name descname"><span class="pre">t_min</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#simulations.generator.DriverParams.t_min" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.timestep_intervals">
+<span class="sig-name descname"><span class="pre">timestep_intervals</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.DriverParams.timestep_intervals" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverParams.timestep_size">
+<span class="sig-name descname"><span class="pre">timestep_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#simulations.generator.DriverParams.timestep_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simulations.generator.DriverType">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">simulations.generator.</span></span><span class="sig-name descname"><span class="pre">DriverType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#DriverType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.DriverType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Thermal/electrical driving transient used for BC and timestepping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – enumeration of steady, harmonic, and sawtooth drivers.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>DriverType</strong> – Enum member selecting a drivers <code class="docutils literal notranslate"><span class="pre">*.sif.inc</span></code> snippet.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverType.HARMONIC">
+<span class="sig-name descname"><span class="pre">HARMONIC</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'harmonic'</span></span><a class="headerlink" href="#simulations.generator.DriverType.HARMONIC" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverType.SAWTOOTH">
+<span class="sig-name descname"><span class="pre">SAWTOOTH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sawtooth'</span></span><a class="headerlink" href="#simulations.generator.DriverType.SAWTOOTH" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.DriverType.STEADY">
+<span class="sig-name descname"><span class="pre">STEADY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'steady'</span></span><a class="headerlink" href="#simulations.generator.DriverType.STEADY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simulations.generator.GeometryTopology">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">simulations.generator.</span></span><span class="sig-name descname"><span class="pre">GeometryTopology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boundary_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_air_body</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_air_body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material_bodies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#GeometryTopology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.GeometryTopology" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Body and boundary topology for one SIF base geometry family.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boundary_config</strong> – Hot/cold/infinity BC numbering for this topology.</p></li>
+<li><p><strong>outer_air_body</strong> – Target body ID of the surrounding air region.</p></li>
+<li><p><strong>inner_air_body</strong> – Optional inner cavity air body ID.</p></li>
+<li><p><strong>material_bodies</strong> – Ordered conductor body IDs (outer, then inner if layered).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryTopology</strong> – Frozen topology record keyed by <code class="docutils literal notranslate"><span class="pre">SifBaseType</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boundary_config</strong> (<a class="reference internal" href="#simulations.generator.BoundaryConfig" title="simulations.generator.BoundaryConfig"><em>BoundaryConfig</em></a>)</p></li>
+<li><p><strong>outer_air_body</strong> (<em>int</em>)</p></li>
+<li><p><strong>inner_air_body</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>material_bodies</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.GeometryTopology.boundary_config">
+<span class="sig-name descname"><span class="pre">boundary_config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#simulations.generator.BoundaryConfig" title="simulations.generator.BoundaryConfig"><span class="pre">BoundaryConfig</span></a></span><a class="headerlink" href="#simulations.generator.GeometryTopology.boundary_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.GeometryTopology.inner_air_body">
+<span class="sig-name descname"><span class="pre">inner_air_body</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#simulations.generator.GeometryTopology.inner_air_body" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.GeometryTopology.material_bodies">
+<span class="sig-name descname"><span class="pre">material_bodies</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></span><a class="headerlink" href="#simulations.generator.GeometryTopology.material_bodies" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.GeometryTopology.outer_air_body">
+<span class="sig-name descname"><span class="pre">outer_air_body</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#simulations.generator.GeometryTopology.outer_air_body" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simulations.generator.MaterialModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">simulations.generator.</span></span><span class="sig-name descname"><span class="pre">MaterialModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#MaterialModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.MaterialModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Supported thermoelectric/magnetic material constitutive models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – enumeration of SIF material snippet kinds.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MaterialModel</strong> – Enum member selecting a materials <code class="docutils literal notranslate"><span class="pre">*.sif.inc</span></code> snippet.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.MaterialModel.ANISOTROPY">
+<span class="sig-name descname"><span class="pre">ANISOTROPY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'anisotropy'</span></span><a class="headerlink" href="#simulations.generator.MaterialModel.ANISOTROPY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.MaterialModel.HYSTERESIS">
+<span class="sig-name descname"><span class="pre">HYSTERESIS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hysteresis'</span></span><a class="headerlink" href="#simulations.generator.MaterialModel.HYSTERESIS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.MaterialModel.SIMPLE">
+<span class="sig-name descname"><span class="pre">SIMPLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'simple'</span></span><a class="headerlink" href="#simulations.generator.MaterialModel.SIMPLE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.MaterialModel.TDEP">
+<span class="sig-name descname"><span class="pre">TDEP</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Tdep'</span></span><a class="headerlink" href="#simulations.generator.MaterialModel.TDEP" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simulations.generator.SifBaseType">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">simulations.generator.</span></span><span class="sig-name descname"><span class="pre">SifBaseType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifBaseType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifBaseType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>SIF base topology matching geometry variants (bodies and BCs).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – enumeration aligned with full/hollow/layered mesh topologies.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SifBaseType</strong> – Enum member selecting a templates <code class="docutils literal notranslate"><span class="pre">*_base.sif</span></code> file.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.SifBaseType.FULL">
+<span class="sig-name descname"><span class="pre">FULL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full'</span></span><a class="headerlink" href="#simulations.generator.SifBaseType.FULL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.SifBaseType.HOLLOW">
+<span class="sig-name descname"><span class="pre">HOLLOW</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hollow'</span></span><a class="headerlink" href="#simulations.generator.SifBaseType.HOLLOW" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.SifBaseType.LAYER_OVER_FULL">
+<span class="sig-name descname"><span class="pre">LAYER_OVER_FULL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'layer_over_full'</span></span><a class="headerlink" href="#simulations.generator.SifBaseType.LAYER_OVER_FULL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simulations.generator.SifBaseType.LAYER_OVER_HOLLOW">
+<span class="sig-name descname"><span class="pre">LAYER_OVER_HOLLOW</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'layer_over_hollow'</span></span><a class="headerlink" href="#simulations.generator.SifBaseType.LAYER_OVER_HOLLOW" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">simulations.generator.</span></span><span class="sig-name descname"><span class="pre">SifGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Compose complete Elmer SIF text from templates, drivers, and materials.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_dir</strong> – Optional simulations package root holding snippets [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SifGenerator</strong> – Assembler that can write SIF content to memory or disk.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_dir</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._assert_driver_runtime_policy">
+<span class="sig-name descname"><span class="pre">_assert_driver_runtime_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sif_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_intervals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._assert_driver_runtime_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._assert_driver_runtime_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Verify generated SIF runtime keywords match application defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sif_content</strong> – Time-dependent SIF text to inspect.</p></li>
+<li><p><strong>expected_intervals</strong> – Required <code class="docutils literal notranslate"><span class="pre">Timestep</span> <span class="pre">Intervals</span></code> value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Raises <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> when policy is violated.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sif_content</strong> (<em>str</em>)</p></li>
+<li><p><strong>expected_intervals</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._build_solver_blocks">
+<span class="sig-name descname"><span class="pre">_build_solver_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._build_solver_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._build_solver_blocks" title="Link to this definition">¶</a></dt>
+<dd><p>Load all required solver blocks and fill the result filename.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_name</strong> – Elmer result file stem substituted into output solvers.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, str]</strong> – Mapping of solver name to filled block text.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._enforce_driver_runtime_policy">
+<span class="sig-name descname"><span class="pre">_enforce_driver_runtime_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sif_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._enforce_driver_runtime_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._enforce_driver_runtime_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Force timestep size/intervals/output intervals to backend policy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sif_content</strong> – Generated time-dependent SIF text.</p></li>
+<li><p><strong>params</strong> – Driver params providing expected timestep interval count.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – SIF text with runtime keywords rewritten and asserted.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sif_content</strong> (<em>str</em>)</p></li>
+<li><p><strong>params</strong> (<a class="reference internal" href="#simulations.generator.DriverParams" title="simulations.generator.DriverParams"><em>DriverParams</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._extract_solver_block">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_extract_solver_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sif_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_num</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._extract_solver_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._extract_solver_block" title="Link to this definition">¶</a></dt>
+<dd><p>Extract a numbered <code class="docutils literal notranslate"><span class="pre">Solver</span> <span class="pre">N</span> <span class="pre">...</span> <span class="pre">End</span></code> block from SIF text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sif_content</strong> – Full SIF source.</p></li>
+<li><p><strong>solver_num</strong> – Solver header number to locate [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Exact solver block text including header and <code class="docutils literal notranslate"><span class="pre">End</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sif_content</strong> (<em>str</em>)</p></li>
+<li><p><strong>solver_num</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._format_sif_number">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_format_sif_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._format_sif_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._format_sif_number" title="Link to this definition">¶</a></dt>
+<dd><p>Format a numeric value for Elmer Simulation-block assignment lines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Int/float-like value, or fallback string [mixed].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Compact SIF-friendly numeric literal.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._generate_driver_blocks">
+<span class="sig-name descname"><span class="pre">_generate_driver_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc1_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc2_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._generate_driver_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._generate_driver_blocks" title="Link to this definition">¶</a></dt>
+<dd><p>Split a driver snippet into Simulation and hot/cold BC blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> – Driver selecting the snippet file.</p></li>
+<li><p><strong>params</strong> – Temperatures and timestep values for placeholder substitution.</p></li>
+<li><p><strong>bc_config</strong> – Boundary numbering for hot/cold target surfaces.</p></li>
+<li><p><strong>bc1_potential</strong> – Optional hot-end Potential line value [V].</p></li>
+<li><p><strong>bc2_potential</strong> – Optional cold-end Potential line value [V].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(sim_block,</span> <span class="pre">bc_hot_block,</span> <span class="pre">bc_cold_block)</span></code> filled SIF sections.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<a class="reference internal" href="#simulations.generator.DriverType" title="simulations.generator.DriverType"><em>DriverType</em></a>)</p></li>
+<li><p><strong>params</strong> (<a class="reference internal" href="#simulations.generator.DriverParams" title="simulations.generator.DriverParams"><em>DriverParams</em></a>)</p></li>
+<li><p><strong>bc_config</strong> (<a class="reference internal" href="#simulations.generator.BoundaryConfig" title="simulations.generator.BoundaryConfig"><em>BoundaryConfig</em></a>)</p></li>
+<li><p><strong>bc1_potential</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>bc2_potential</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._generate_material_block">
+<span class="sig-name descname"><span class="pre">_generate_material_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mat_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cylinder'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._generate_material_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._generate_material_block" title="Link to this definition">¶</a></dt>
+<dd><p>Fill a material snippet with properties and optional anisotropy tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – Constitutive model selecting the material snippet.</p></li>
+<li><p><strong>mat_num</strong> – Elmer Material number to assign.</p></li>
+<li><p><strong>params</strong> – Property map including scalars, tables, and tensor principals.</p></li>
+<li><p><strong>geometry_shape</strong> – Shape controlling anisotropic tensor orientation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Complete Material block ready for SIF insertion.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#simulations.generator.MaterialModel" title="simulations.generator.MaterialModel"><em>MaterialModel</em></a>)</p></li>
+<li><p><strong>mat_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_shape</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._generate_output_name">
+<span class="sig-name descname"><span class="pre">_generate_output_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._generate_output_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._generate_output_name" title="Link to this definition">¶</a></dt>
+<dd><p>Provide the Elmer result file stem used in output solvers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – fixed naming policy for generated SIFs.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Output file stem (currently <code class="docutils literal notranslate"><span class="pre">result</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._generate_property_def">
+<span class="sig-name descname"><span class="pre">_generate_property_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_prefix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._generate_property_def"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._generate_property_def" title="Link to this definition">¶</a></dt>
+<dd><p>Emit a Real scalar or Temperature-table property definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – Material parameter map that may include <code class="docutils literal notranslate"><span class="pre">*_table</span></code> data.</p></li>
+<li><p><strong>key_prefix</strong> – Base property key such as <code class="docutils literal notranslate"><span class="pre">heat_conductivity</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Elmer property RHS (<code class="docutils literal notranslate"><span class="pre">Real</span> <span class="pre">...</span></code> or <code class="docutils literal notranslate"><span class="pre">Variable</span> <span class="pre">Temperature</span></code> table).</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>key_prefix</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._generate_scalar_current_body_force">
+<span class="sig-name descname"><span class="pre">_generate_scalar_current_body_force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_force_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seebeck</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._generate_scalar_current_body_force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._generate_scalar_current_body_force" title="Link to this definition">¶</a></dt>
+<dd><p>Emit isotropic Seebeck body-force Current Density / SourceCurrent terms.</p>
+<p>Combines <code class="docutils literal notranslate"><span class="pre">Potential</span> <span class="pre">Flux</span></code> from the OhmicCurrent FluxSolver with
+<code class="docutils literal notranslate"><span class="pre">Temperature</span> <span class="pre">Flux</span></code> from the SeebeckCurrent FluxSolver scaled by a scalar
+Seebeck coefficient.</p>
+<p>Inputs:
+body_force_num: Elmer Body Force index to write [dimensionless].
+seebeck: Isotropic Seebeck coefficient [V/K].</p>
+<p>Outputs:
+str: Complete <code class="docutils literal notranslate"><span class="pre">Body</span> <span class="pre">Force</span> <span class="pre">N</span> <span class="pre">...</span> <span class="pre">End</span></code> block for the SIF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body_force_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>seebeck</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._generate_tensor_current_body_force">
+<span class="sig-name descname"><span class="pre">_generate_tensor_current_body_force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_force_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_perp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._generate_tensor_current_body_force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._generate_tensor_current_body_force" title="Link to this definition">¶</a></dt>
+<dd><p>Emit anisotropic Seebeck body-force terms via shape-aware MATC.</p>
+<p>Uses <code class="docutils literal notranslate"><span class="pre">generate_tensor_vector_product</span></code> so <code class="docutils literal notranslate"><span class="pre">J</span> <span class="pre">=</span> <span class="pre">PotentialFlux</span> <span class="pre">+</span> <span class="pre">S</span> <span class="pre">grad(T)</span></code> with
+the same cylinder/prism/sphere Seebeck tensor orientation as material blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body_force_num</strong> – Elmer Body Force index to write [dimensionless].</p></li>
+<li><p><strong>geometry_shape</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code> [dimensionless].</p></li>
+<li><p><strong>s_par</strong> – Parallel/radial Seebeck principal value [V/K].</p></li>
+<li><p><strong>s_perp</strong> – Perpendicular/tangential Seebeck principal value [V/K].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Complete <code class="docutils literal notranslate"><span class="pre">Body</span> <span class="pre">Force</span> <span class="pre">N</span> <span class="pre">...</span> <span class="pre">End</span></code> block for the SIF.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body_force_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>geometry_shape</strong> (<em>str</em>)</p></li>
+<li><p><strong>s_par</strong> (<em>float</em>)</p></li>
+<li><p><strong>s_perp</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._load_base_template">
+<span class="sig-name descname"><span class="pre">_load_base_template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._load_base_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._load_base_template" title="Link to this definition">¶</a></dt>
+<dd><p>Read the base SIF template matching a topology variant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_type</strong> – Topology selecting <code class="docutils literal notranslate"><span class="pre">*_base.sif</span></code> under <code class="docutils literal notranslate"><span class="pre">templates/</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Raw base template text with placeholders intact.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_type</strong> (<a class="reference internal" href="#simulations.generator.SifBaseType" title="simulations.generator.SifBaseType"><em>SifBaseType</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._load_driver_snippet">
+<span class="sig-name descname"><span class="pre">_load_driver_snippet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._load_driver_snippet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._load_driver_snippet" title="Link to this definition">¶</a></dt>
+<dd><p>Load a driver Simulation/BC snippet for the given driver type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>driver</strong> – Driver type selecting <code class="docutils literal notranslate"><span class="pre">drivers/&lt;name&gt;.sif.inc</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Raw driver snippet containing Simulation and BC sections.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>driver</strong> (<a class="reference internal" href="#simulations.generator.DriverType" title="simulations.generator.DriverType"><em>DriverType</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._load_material_snippet">
+<span class="sig-name descname"><span class="pre">_load_material_snippet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._load_material_snippet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._load_material_snippet" title="Link to this definition">¶</a></dt>
+<dd><p>Load a material constitutive snippet file for the given model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model</strong> – Material model selecting <code class="docutils literal notranslate"><span class="pre">materials/*.sif.inc</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Raw material snippet with placeholders.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model</strong> (<a class="reference internal" href="#simulations.generator.MaterialModel" title="simulations.generator.MaterialModel"><em>MaterialModel</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._load_solver_block">
+<span class="sig-name descname"><span class="pre">_load_solver_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._load_solver_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._load_solver_block" title="Link to this definition">¶</a></dt>
+<dd><p>Load a named solver-block include from <code class="docutils literal notranslate"><span class="pre">solver_blocks/</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>block_key</strong> – Snippet stem such as <code class="docutils literal notranslate"><span class="pre">thermoelectric</span></code> [dimensionless].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Raw solver block text, possibly with placeholders.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>block_key</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._remove_solver_comment_header">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_remove_solver_comment_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sif_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_num</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._remove_solver_comment_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._remove_solver_comment_header" title="Link to this definition">¶</a></dt>
+<dd><p>Remove a comment header for a solver block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sif_content</strong> – Full SIF source.</p></li>
+<li><p><strong>solver_num</strong> – Solver header number to remove [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – SIF text with the solver header removed.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sif_content</strong> (<em>str</em>)</p></li>
+<li><p><strong>solver_num</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._renumber_solver_header">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_renumber_solver_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_num</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._renumber_solver_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._renumber_solver_header" title="Link to this definition">¶</a></dt>
+<dd><p>Rewrite the first <code class="docutils literal notranslate"><span class="pre">Solver</span> <span class="pre">N</span></code> header line to a new index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block</strong> – Solver block text beginning with <code class="docutils literal notranslate"><span class="pre">Solver</span> <span class="pre">&lt;n&gt;</span></code>.</p></li>
+<li><p><strong>new_num</strong> – Replacement solver number [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Block with updated solver header.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block</strong> (<em>str</em>)</p></li>
+<li><p><strong>new_num</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._replace_or_insert_simulation_line">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_replace_or_insert_simulation_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert_after_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._replace_or_insert_simulation_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._replace_or_insert_simulation_line" title="Link to this definition">¶</a></dt>
+<dd><p>Replace a Simulation key or insert it after an anchor line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – Full or partial SIF text containing a Simulation block.</p></li>
+<li><p><strong>key</strong> – Simulation keyword such as <code class="docutils literal notranslate"><span class="pre">Timestep</span> <span class="pre">Sizes</span></code> [dimensionless].</p></li>
+<li><p><strong>value</strong> – Numeric value to assign [matches key units].</p></li>
+<li><p><strong>insert_after_key</strong> – Existing keyword after which to insert if missing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Updated SIF text with the key present and set.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>value</strong> (<em>Any</em>)</p></li>
+<li><p><strong>insert_after_key</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._solver_comment_header">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_solver_comment_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._solver_comment_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._solver_comment_header" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a comment header for a solver block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>solver_num</strong> – Solver number [dimensionless].</p></li>
+<li><p><strong>comment</strong> – Comment text.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Comment header text.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>solver_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>label</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._tune_post_warm_whitney">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_tune_post_warm_whitney</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nonlinear_whitney</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._tune_post_warm_whitney"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._tune_post_warm_whitney" title="Link to this definition">¶</a></dt>
+<dd><p>Retune nonlinear WhitneyAV settings after a linear warm-start.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nonlinear_whitney</strong> – Renumbered WhitneyAV solver block text.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Solver block with After-Timestep exec and relaxed Newton limits.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nonlinear_whitney</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator._validate_base_template">
+<span class="sig-name descname"><span class="pre">_validate_base_template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator._validate_base_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator._validate_base_template" title="Link to this definition">¶</a></dt>
+<dd><p>Assert base template body IDs and infinity/IC placeholders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> – Loaded base SIF template text.</p></li>
+<li><p><strong>base_type</strong> – Topology whose expected outer-air body ID is checked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when the template contract is broken.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_type</strong> (<a class="reference internal" href="#simulations.generator.SifBaseType" title="simulations.generator.SifBaseType"><em>SifBaseType</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator.build_magnetic_warm_start_sif">
+<span class="sig-name descname"><span class="pre">build_magnetic_warm_start_sif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_sif</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator.build_magnetic_warm_start_sif"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator.build_magnetic_warm_start_sif" title="Link to this definition">¶</a></dt>
+<dd><p>Insert a linear WhitneyAV precursor before the nonlinear H-B solve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_sif</strong> – SIF that already defines at least one <code class="docutils literal notranslate"><span class="pre">H-B</span> <span class="pre">Curve</span></code> material.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Modified SIF with precursor Solver 4 and renumbered trailing solvers.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_sif</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator.generate">
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_material_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_material_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_material_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_material_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">air_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cylinder'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc1_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc2_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator.generate" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a complete coupled thermoelectric-magnetic Elmer SIF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_type</strong> – Mesh topology selecting base template and BC/body IDs.</p></li>
+<li><p><strong>driver</strong> – Steady/harmonic/sawtooth driving schedule.</p></li>
+<li><p><strong>outer_material_model</strong> – Constitutive model for the outer conductor.</p></li>
+<li><p><strong>outer_material_params</strong> – Outer material property map.</p></li>
+<li><p><strong>inner_material_model</strong> – Inner conductor model for layered topologies.</p></li>
+<li><p><strong>inner_material_params</strong> – Inner material property map.</p></li>
+<li><p><strong>driver_params</strong> – Optional temperatures/runtime; defaults if omitted.</p></li>
+<li><p><strong>air_params</strong> – Required Air material property map.</p></li>
+<li><p><strong>output_path</strong> – Optional filesystem path to write the SIF.</p></li>
+<li><p><strong>geometry_shape</strong> – Shape used for anisotropic tensor orientation.</p></li>
+<li><p><strong>bc1_potential</strong> – Optional electrode electric potential if set [V].</p></li>
+<li><p><strong>bc2_potential</strong> – Cold electrode electric potential if set [V].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Fully substituted SIF source text.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_type</strong> (<a class="reference internal" href="#simulations.generator.SifBaseType" title="simulations.generator.SifBaseType"><em>SifBaseType</em></a>)</p></li>
+<li><p><strong>driver</strong> (<a class="reference internal" href="#simulations.generator.DriverType" title="simulations.generator.DriverType"><em>DriverType</em></a>)</p></li>
+<li><p><strong>outer_material_model</strong> (<a class="reference internal" href="#simulations.generator.MaterialModel" title="simulations.generator.MaterialModel"><em>MaterialModel</em></a>)</p></li>
+<li><p><strong>outer_material_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>inner_material_model</strong> (<a class="reference internal" href="#simulations.generator.MaterialModel" title="simulations.generator.MaterialModel"><em>MaterialModel</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>inner_material_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>driver_params</strong> (<a class="reference internal" href="#simulations.generator.DriverParams" title="simulations.generator.DriverParams"><em>DriverParams</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>air_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>output_path</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>geometry_shape</strong> (<em>str</em>)</p></li>
+<li><p><strong>bc1_potential</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>bc2_potential</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator.get_driver_params_defaults">
+<span class="sig-name descname"><span class="pre">get_driver_params_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator.get_driver_params_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator.get_driver_params_defaults" title="Link to this definition">¶</a></dt>
+<dd><p>Build default driver temperatures and runtime from app defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>driver</strong> – Driver kind selecting defaults subsection [dimensionless].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>DriverParams</strong> – Defaults including derived mean/amplitude and timesteps.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>driver</strong> (<a class="reference internal" href="#simulations.generator.DriverType" title="simulations.generator.DriverType"><em>DriverType</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#simulations.generator.DriverParams" title="simulations.generator.DriverParams"><em>DriverParams</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator.runtime_defaults">
+<span class="sig-name descname"><span class="pre">runtime_defaults</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator.runtime_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator.runtime_defaults" title="Link to this definition">¶</a></dt>
+<dd><p>Return backend-enforced timestep/output defaults from config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – loads <code class="docutils literal notranslate"><span class="pre">application_defaults.json</span></code> driver runtime section.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – <code class="docutils literal notranslate"><span class="pre">timestep_size</span></code>, <code class="docutils literal notranslate"><span class="pre">timestep_intervals</span></code>, <code class="docutils literal notranslate"><span class="pre">output_intervals</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simulations.generator.SifGenerator.with_backend_runtime_defaults">
+<span class="sig-name descname"><span class="pre">with_backend_runtime_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#SifGenerator.with_backend_runtime_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.SifGenerator.with_backend_runtime_defaults" title="Link to this definition">¶</a></dt>
+<dd><p>Overlay backend runtime policy onto caller-supplied driver params.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – Caller driver params; may set <code class="docutils literal notranslate"><span class="pre">physical_total_time</span></code> [s].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>DriverParams</strong> – Copy with enforced timestep size/intervals/output intervals.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<a class="reference internal" href="#simulations.generator.DriverParams" title="simulations.generator.DriverParams"><em>DriverParams</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#simulations.generator.DriverParams" title="simulations.generator.DriverParams"><em>DriverParams</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.generator.get_sif_generator">
+<span class="sig-prename descclassname"><span class="pre">simulations.generator.</span></span><span class="sig-name descname"><span class="pre">get_sif_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/generator.html#get_sif_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.generator.get_sif_generator" title="Link to this definition">¶</a></dt>
+<dd><p>Return the process-wide <code class="docutils literal notranslate"><span class="pre">SifGenerator</span></code> singleton.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_dir</strong> – Optional package root used on first construction [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SifGenerator</strong> – Shared generator instance.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_dir</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#simulations.generator.SifGenerator" title="simulations.generator.SifGenerator"><em>SifGenerator</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">simulations.generator module</a><ul>
+<li><a class="reference internal" href="#simulations.generator.BoundaryConfig"><code class="docutils literal notranslate"><span class="pre">BoundaryConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simulations.generator.BoundaryConfig.bc_cold_boundary"><code class="docutils literal notranslate"><span class="pre">BoundaryConfig.bc_cold_boundary</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.BoundaryConfig.bc_cold_num"><code class="docutils literal notranslate"><span class="pre">BoundaryConfig.bc_cold_num</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.BoundaryConfig.bc_hot_boundary"><code class="docutils literal notranslate"><span class="pre">BoundaryConfig.bc_hot_boundary</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.BoundaryConfig.bc_hot_num"><code class="docutils literal notranslate"><span class="pre">BoundaryConfig.bc_hot_num</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.BoundaryConfig.bc_infinity_boundary"><code class="docutils literal notranslate"><span class="pre">BoundaryConfig.bc_infinity_boundary</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.BoundaryConfig.bc_infinity_num"><code class="docutils literal notranslate"><span class="pre">BoundaryConfig.bc_infinity_num</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams"><code class="docutils literal notranslate"><span class="pre">DriverParams</span></code></a><ul>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.frequency"><code class="docutils literal notranslate"><span class="pre">DriverParams.frequency</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.output_intervals"><code class="docutils literal notranslate"><span class="pre">DriverParams.output_intervals</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.period"><code class="docutils literal notranslate"><span class="pre">DriverParams.period</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.physical_total_time"><code class="docutils literal notranslate"><span class="pre">DriverParams.physical_total_time</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.t_amplitude"><code class="docutils literal notranslate"><span class="pre">DriverParams.t_amplitude</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.t_cold"><code class="docutils literal notranslate"><span class="pre">DriverParams.t_cold</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.t_hot"><code class="docutils literal notranslate"><span class="pre">DriverParams.t_hot</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.t_max"><code class="docutils literal notranslate"><span class="pre">DriverParams.t_max</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.t_mean"><code class="docutils literal notranslate"><span class="pre">DriverParams.t_mean</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.t_min"><code class="docutils literal notranslate"><span class="pre">DriverParams.t_min</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.timestep_intervals"><code class="docutils literal notranslate"><span class="pre">DriverParams.timestep_intervals</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverParams.timestep_size"><code class="docutils literal notranslate"><span class="pre">DriverParams.timestep_size</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulations.generator.DriverType"><code class="docutils literal notranslate"><span class="pre">DriverType</span></code></a><ul>
+<li><a class="reference internal" href="#simulations.generator.DriverType.HARMONIC"><code class="docutils literal notranslate"><span class="pre">DriverType.HARMONIC</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverType.SAWTOOTH"><code class="docutils literal notranslate"><span class="pre">DriverType.SAWTOOTH</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.DriverType.STEADY"><code class="docutils literal notranslate"><span class="pre">DriverType.STEADY</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulations.generator.GeometryTopology"><code class="docutils literal notranslate"><span class="pre">GeometryTopology</span></code></a><ul>
+<li><a class="reference internal" href="#simulations.generator.GeometryTopology.boundary_config"><code class="docutils literal notranslate"><span class="pre">GeometryTopology.boundary_config</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.GeometryTopology.inner_air_body"><code class="docutils literal notranslate"><span class="pre">GeometryTopology.inner_air_body</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.GeometryTopology.material_bodies"><code class="docutils literal notranslate"><span class="pre">GeometryTopology.material_bodies</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.GeometryTopology.outer_air_body"><code class="docutils literal notranslate"><span class="pre">GeometryTopology.outer_air_body</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulations.generator.MaterialModel"><code class="docutils literal notranslate"><span class="pre">MaterialModel</span></code></a><ul>
+<li><a class="reference internal" href="#simulations.generator.MaterialModel.ANISOTROPY"><code class="docutils literal notranslate"><span class="pre">MaterialModel.ANISOTROPY</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.MaterialModel.HYSTERESIS"><code class="docutils literal notranslate"><span class="pre">MaterialModel.HYSTERESIS</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.MaterialModel.SIMPLE"><code class="docutils literal notranslate"><span class="pre">MaterialModel.SIMPLE</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.MaterialModel.TDEP"><code class="docutils literal notranslate"><span class="pre">MaterialModel.TDEP</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulations.generator.SifBaseType"><code class="docutils literal notranslate"><span class="pre">SifBaseType</span></code></a><ul>
+<li><a class="reference internal" href="#simulations.generator.SifBaseType.FULL"><code class="docutils literal notranslate"><span class="pre">SifBaseType.FULL</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifBaseType.HOLLOW"><code class="docutils literal notranslate"><span class="pre">SifBaseType.HOLLOW</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifBaseType.LAYER_OVER_FULL"><code class="docutils literal notranslate"><span class="pre">SifBaseType.LAYER_OVER_FULL</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifBaseType.LAYER_OVER_HOLLOW"><code class="docutils literal notranslate"><span class="pre">SifBaseType.LAYER_OVER_HOLLOW</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator"><code class="docutils literal notranslate"><span class="pre">SifGenerator</span></code></a><ul>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._assert_driver_runtime_policy"><code class="docutils literal notranslate"><span class="pre">SifGenerator._assert_driver_runtime_policy()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._build_solver_blocks"><code class="docutils literal notranslate"><span class="pre">SifGenerator._build_solver_blocks()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._enforce_driver_runtime_policy"><code class="docutils literal notranslate"><span class="pre">SifGenerator._enforce_driver_runtime_policy()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._extract_solver_block"><code class="docutils literal notranslate"><span class="pre">SifGenerator._extract_solver_block()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._format_sif_number"><code class="docutils literal notranslate"><span class="pre">SifGenerator._format_sif_number()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._generate_driver_blocks"><code class="docutils literal notranslate"><span class="pre">SifGenerator._generate_driver_blocks()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._generate_material_block"><code class="docutils literal notranslate"><span class="pre">SifGenerator._generate_material_block()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._generate_output_name"><code class="docutils literal notranslate"><span class="pre">SifGenerator._generate_output_name()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._generate_property_def"><code class="docutils literal notranslate"><span class="pre">SifGenerator._generate_property_def()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._generate_scalar_current_body_force"><code class="docutils literal notranslate"><span class="pre">SifGenerator._generate_scalar_current_body_force()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._generate_tensor_current_body_force"><code class="docutils literal notranslate"><span class="pre">SifGenerator._generate_tensor_current_body_force()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._load_base_template"><code class="docutils literal notranslate"><span class="pre">SifGenerator._load_base_template()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._load_driver_snippet"><code class="docutils literal notranslate"><span class="pre">SifGenerator._load_driver_snippet()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._load_material_snippet"><code class="docutils literal notranslate"><span class="pre">SifGenerator._load_material_snippet()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._load_solver_block"><code class="docutils literal notranslate"><span class="pre">SifGenerator._load_solver_block()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._remove_solver_comment_header"><code class="docutils literal notranslate"><span class="pre">SifGenerator._remove_solver_comment_header()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._renumber_solver_header"><code class="docutils literal notranslate"><span class="pre">SifGenerator._renumber_solver_header()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._replace_or_insert_simulation_line"><code class="docutils literal notranslate"><span class="pre">SifGenerator._replace_or_insert_simulation_line()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._solver_comment_header"><code class="docutils literal notranslate"><span class="pre">SifGenerator._solver_comment_header()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._tune_post_warm_whitney"><code class="docutils literal notranslate"><span class="pre">SifGenerator._tune_post_warm_whitney()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator._validate_base_template"><code class="docutils literal notranslate"><span class="pre">SifGenerator._validate_base_template()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator.build_magnetic_warm_start_sif"><code class="docutils literal notranslate"><span class="pre">SifGenerator.build_magnetic_warm_start_sif()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator.generate"><code class="docutils literal notranslate"><span class="pre">SifGenerator.generate()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator.get_driver_params_defaults"><code class="docutils literal notranslate"><span class="pre">SifGenerator.get_driver_params_defaults()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator.runtime_defaults"><code class="docutils literal notranslate"><span class="pre">SifGenerator.runtime_defaults()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.generator.SifGenerator.with_backend_runtime_defaults"><code class="docutils literal notranslate"><span class="pre">SifGenerator.with_backend_runtime_defaults()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulations.generator.get_sif_generator"><code class="docutils literal notranslate"><span class="pre">get_sif_generator()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="simulations.html"
+                          title="previous chapter">simulations package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="simulations.material_params.html"
+                          title="next chapter">simulations.material_params module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/simulations.generator.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="simulations.material_params.html" title="simulations.material_params module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="simulations.html" title="simulations package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="simulations.html" >simulations package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.generator module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

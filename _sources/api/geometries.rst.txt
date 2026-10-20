@@ -1,0 +1,20 @@
+geometries package
+==================
+
+.. automodule:: geometries
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   geometries.base
+   geometries.cylinder
+   geometries.defaults
+   geometries.prism
+   geometries.registry
+   geometries.sphere

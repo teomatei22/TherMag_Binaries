@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>simulations.tensor_utils &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.tensor_utils</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for simulations.tensor_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Build Elmer MATC anisotropic conductivity/Seebeck tensor blocks by shape."""</span>
+
+
+<div class="viewcode-block" id="_fmt">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils._fmt">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fmt</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Format a scalar for compact Elmer MATC expressions.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        v: Numeric value to stringify [matches property SI unit].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Compact decimal or scientific representation without excess digits.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"0"</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e15</span><span class="p">:</span>
+        <span class="n">iv</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">s_int</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">iv</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">iv</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="n">exp</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">iv</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">t</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">//=</span> <span class="mi">10</span>
+                <span class="n">exp</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">s_sci</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'-'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">iv</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">''</span><span class="si">}{</span><span class="n">t</span><span class="si">}</span><span class="s2">e</span><span class="si">{</span><span class="n">exp</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">return</span> <span class="n">s_sci</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_sci</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_int</span><span class="p">)</span> <span class="k">else</span> <span class="n">s_int</span>
+        <span class="k">return</span> <span class="n">s_int</span>
+
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">prec</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">prec</span><span class="si">}</span><span class="s2">g</span><span class="si">}</span><span class="s2">"</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"e+0"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"e-0"</span><span class="p">,</span> <span class="s2">"e-"</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"e+"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">)</span>
+        <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_add">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils._add">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Format a signed addend for inline MATC arithmetic (leading ``+``/``-``).</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        v: Numeric addend [matches property SI unit].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Signed token such as ``+1.2`` or ``-3``.</span>
+<span class="sd">    """</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"-"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>
+    <span class="k">return</span> <span class="s2">"+"</span> <span class="o">+</span> <span class="n">s</span></div>
+
+
+
+<div class="viewcode-block" id="_sub">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils._sub">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sub</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Format the difference ``a - b`` as a compact MATC literal expression.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        a: Minuend [matches property SI unit].</span>
+<span class="sd">        b: Subtrahend [matches property SI unit].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Literal difference string embedded in MATC source.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_fmt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="si">}{</span><span class="n">_add</span><span class="p">(</span><span class="o">-</span><span class="n">b</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+
+<div class="viewcode-block" id="_matc_ident">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils._matc_ident">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_matc_ident</span><span class="p">(</span><span class="o">*</span><span class="n">parts</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build a safe Elmer MATC function identifier from name fragments.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        parts: Fragments such as property name and numeric tokens [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Alphanumeric MATC identifier that does not start with a digit.</span>
+<span class="sd">    """</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="s2">"_"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalnum</span><span class="p">():</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ch</span> <span class="o">==</span> <span class="s2">"-"</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"m"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"p"</span> <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s2">"."</span> <span class="k">else</span> <span class="s2">"_"</span><span class="p">)</span>
+    <span class="n">ident</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ident</span> <span class="ow">or</span> <span class="n">ident</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="n">ident</span> <span class="o">=</span> <span class="s2">"f"</span> <span class="o">+</span> <span class="n">ident</span>
+    <span class="k">return</span> <span class="n">ident</span></div>
+
+
+
+<div class="viewcode-block" id="_matc_cylinder">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils._matc_cylinder">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_matc_cylinder</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: MATC expression for axial/radial anisotropy about the cylinder axis.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        par: Parallel (axial) principal value [SI property unit].</span>
+<span class="sd">        perp: Perpendicular (radial/tangential) principal value [SI property unit].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Single-line MATC body returning a flattened 3x3 tensor.</span>
+<span class="sd">    """</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">_add</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
+
+    <span class="n">sub</span> <span class="o">=</span> <span class="n">_sub</span><span class="p">(</span><span class="n">perp</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"y=tx(1);z=tx(2);"</span>
+        <span class="sa">f</span><span class="s2">"s=(</span><span class="si">{</span><span class="n">sub</span><span class="si">}</span><span class="s2">)/(y*y+z*z+1e-9);"</span>
+        <span class="sa">f</span><span class="s2">"r=zeros(1,9);r(0)=</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">;"</span>
+        <span class="sa">f</span><span class="s2">"r(4)=s*y*y</span><span class="si">{</span><span class="n">ap</span><span class="si">}</span><span class="s2">;r(5)=s*y*z;r(7)=r(5);"</span>
+        <span class="sa">f</span><span class="s2">"r(8)=s*z*z</span><span class="si">{</span><span class="n">ap</span><span class="si">}</span><span class="s2">;r"</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">expr</span></div>
+
+
+
+<div class="viewcode-block" id="_matc_prism">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils._matc_prism">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_matc_prism</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: MATC expression for orthotropic prism tensors aligned to axes.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        par: Parallel (length-axis) principal value [SI property unit].</span>
+<span class="sd">        perp: Perpendicular (transverse) principal value [SI property unit].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Single-line MATC body returning a diagonal 3x3 tensor.</span>
+<span class="sd">    """</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">perp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"r=zeros(1,9);r(0)=</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">;r(4)=</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">;r(8)=</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">;r"</span></div>
+
+
+
+<div class="viewcode-block" id="_sphere_radial_function_body">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils._sphere_radial_function_body">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sphere_radial_function_body</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">,</span> <span class="n">fname</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: MATC function body for radially anisotropic spherical tensors.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        par: Parallel (tangential) principal value [SI property unit].</span>
+<span class="sd">        perp: Perpendicular (radial) principal value [SI property unit].</span>
+<span class="sd">        fname: MATC function name assigned to the return variable [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: MATC function body computing the local radial 3x3 tensor.</span>
+<span class="sd">    """</span>
+    <span class="n">aq</span> <span class="o">=</span> <span class="n">_add</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">_sub</span><span class="p">(</span><span class="n">perp</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'format(4,"rowform");'</span>
+        <span class="sa">f</span><span class="s2">"a=x(0);b=x(1);c=x(2);"</span>
+        <span class="sa">f</span><span class="s2">"s=(</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)/(a*a+b*b+c*c+1e-9);"</span>
+        <span class="sa">f</span><span class="s2">"r=zeros(1,9);"</span>
+        <span class="sa">f</span><span class="s2">"r(0)=s*a*a</span><span class="si">{</span><span class="n">aq</span><span class="si">}</span><span class="s2">;r(1)=s*a*b;r(2)=s*a*c;"</span>
+        <span class="sa">f</span><span class="s2">"r(3)=r(1);r(4)=s*b*b</span><span class="si">{</span><span class="n">aq</span><span class="si">}</span><span class="s2">;r(5)=s*b*c;"</span>
+        <span class="sa">f</span><span class="s2">"r(6)=r(2);r(7)=r(5);r(8)=s*c*c</span><span class="si">{</span><span class="n">aq</span><span class="si">}</span><span class="s2">;"</span>
+        <span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">=r"</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_cylinder_tensor">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils.generate_cylinder_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_cylinder_tensor</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Emit an Elmer SIF anisotropic tensor block for cylinder geometry.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        par: Parallel principal conductivity/Seebeck value [SI].</span>
+<span class="sd">        perp: Perpendicular principal value [SI].</span>
+<span class="sd">        prop_name: Elmer property name such as ``Heat Conductivity`` [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: SIF lines defining ``prop_name(3,3)`` via MATC.</span>
+<span class="sd">    """</span>
+    <span class="n">matc</span> <span class="o">=</span> <span class="n">_matc_cylinder</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">prop_name</span><span class="si">}</span><span class="s1">(3,3) = Variable Coordinate</span><span class="se">\n</span><span class="s1">    Real MATC "</span><span class="si">{</span><span class="n">matc</span><span class="si">}</span><span class="s1">"'</span></div>
+
+
+
+<div class="viewcode-block" id="generate_prism_tensor">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils.generate_prism_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_prism_tensor</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Emit an Elmer SIF anisotropic tensor block for prism geometry.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        par: Parallel principal conductivity/Seebeck value [SI].</span>
+<span class="sd">        perp: Perpendicular principal value [SI].</span>
+<span class="sd">        prop_name: Elmer property name such as ``Electric Conductivity`` [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: SIF lines defining ``prop_name(3,3)`` via MATC.</span>
+<span class="sd">    """</span>
+    <span class="n">matc</span> <span class="o">=</span> <span class="n">_matc_prism</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">prop_name</span><span class="si">}</span><span class="s1">(3,3) = Variable Coordinate</span><span class="se">\n</span><span class="s1">    Real MATC "</span><span class="si">{</span><span class="n">matc</span><span class="si">}</span><span class="s1">"'</span></div>
+
+
+
+<div class="viewcode-block" id="generate_sphere_tensor">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils.generate_sphere_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_sphere_tensor</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Emit an Elmer SIF anisotropic tensor block for sphere geometry.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        par: Parallel (tangential) principal conductivity/Seebeck value [SI].</span>
+<span class="sd">        perp: Perpendicular (radial) principal value [SI].</span>
+<span class="sd">        prop_name: Elmer property name such as ``Seebeck Coefficient`` [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: SIF ``$ function`` plus ``prop_name(3,3)`` MATC call (≤127 chars).</span>
+<span class="sd">    """</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">_matc_ident</span><span class="p">(</span><span class="s2">"sph"</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">,</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">par</span><span class="p">),</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">perp</span><span class="p">))</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">_sphere_radial_function_body</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="n">call</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">(tx)"</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">call</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">127</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Sphere MATC call exceeds Elmer limit 127: </span><span class="si">{</span><span class="n">call</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"$ function </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">(x) </span><span class="se">{{</span><span class="si">{</span><span class="n">body</span><span class="si">}</span><span class="se">}}\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">prop_name</span><span class="si">}</span><span class="s2">(3,3) = Variable Coordinate</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s1">'    Real MATC "</span><span class="si">{</span><span class="n">call</span><span class="si">}</span><span class="s1">"'</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_tensor_block">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils.generate_tensor_block">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_tensor_block</span><span class="p">(</span><span class="n">geometry_shape</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">,</span> <span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Dispatch tensor-block generation by conductor geometry shape.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_shape: ``cylinder``, ``sphere``, or other (prism) [dimensionless].</span>
+<span class="sd">        prop_name: Elmer property name for the tensor [dimensionless].</span>
+<span class="sd">        par: Parallel principal value [SI].</span>
+<span class="sd">        perp: Perpendicular principal value [SI].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Shape-appropriate anisotropic SIF property block.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">geometry_shape</span> <span class="o">==</span> <span class="s2">"cylinder"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">generate_cylinder_tensor</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">geometry_shape</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">generate_sphere_tensor</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">generate_prism_tensor</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_tensor_vector_product">
+<a class="viewcode-back" href="../../api/simulations.tensor_utils.html#simulations.tensor_utils.generate_tensor_vector_product">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_tensor_vector_product</span><span class="p">(</span><span class="n">geometry_shape</span><span class="p">,</span> <span class="n">par</span><span class="p">,</span> <span class="n">perp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Emit MATC expression with shape-aware Seebeck anisotropy.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_shape: ``cylinder``, ``prism``, or ``sphere`` [dimensionless].</span>
+<span class="sd">        par: Parallel Seebeck principal value [V/K].</span>
+<span class="sd">        perp: Perpendicular Seebeck principal value [V/K].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        tuple[str, str, str]: MATC expressions for the three Cartesian product</span>
+<span class="sd">            components ``(Jx_seebeck, Jy_seebeck, Jz_seebeck)``.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">geometry_shape</span> <span class="o">==</span> <span class="s2">"cylinder"</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">_sub</span><span class="p">(</span><span class="n">perp</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
+
+        <span class="n">denom</span> <span class="o">=</span> <span class="s2">"(tx(1)*tx(1)+tx(2)*tx(2)+1e-9)"</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">*tx(3)"</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">+(</span><span class="si">{</span><span class="n">sub</span><span class="si">}</span><span class="s2">)*tx(1)*tx(1)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(4)"</span>
+                <span class="sa">f</span><span class="s2">"+((</span><span class="si">{</span><span class="n">sub</span><span class="si">}</span><span class="s2">)*tx(1)*tx(2)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(5)"</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"((</span><span class="si">{</span><span class="n">sub</span><span class="si">}</span><span class="s2">)*tx(1)*tx(2)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(4)"</span>
+                <span class="sa">f</span><span class="s2">"+(</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">+(</span><span class="si">{</span><span class="n">sub</span><span class="si">}</span><span class="s2">)*tx(2)*tx(2)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(5)"</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">geometry_shape</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">perp</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">*tx(3)"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">*tx(4)"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">*tx(5)"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">geometry_shape</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">_fmt</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">_sub</span><span class="p">(</span><span class="n">perp</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
+
+        <span class="n">denom</span> <span class="o">=</span> <span class="s2">"(tx(0)*tx(0)+tx(1)*tx(1)+tx(2)*tx(2)+1e-9)"</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">+(</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(0)*tx(0)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(3)"</span>
+                <span class="sa">f</span><span class="s2">"+((</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(0)*tx(1)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(4)"</span>
+                <span class="sa">f</span><span class="s2">"+((</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(0)*tx(2)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(5)"</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"((</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(0)*tx(1)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(3)"</span>
+                <span class="sa">f</span><span class="s2">"+(</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">+(</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(1)*tx(1)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(4)"</span>
+                <span class="sa">f</span><span class="s2">"+((</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(1)*tx(2)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(5)"</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"((</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(0)*tx(2)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(3)"</span>
+                <span class="sa">f</span><span class="s2">"+((</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(1)*tx(2)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(4)"</span>
+                <span class="sa">f</span><span class="s2">"+(</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">+(</span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">)*tx(2)*tx(2)/</span><span class="si">{</span><span class="n">denom</span><span class="si">}</span><span class="s2">)*tx(5)"</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"Tensor-vector product not yet implemented for </span><span class="si">{</span><span class="n">geometry_shape</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.tensor_utils</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

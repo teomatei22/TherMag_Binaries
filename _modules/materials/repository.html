@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>materials.repository &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">materials.repository</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for materials.repository</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: JSON repository for loading and saving FEM material definitions."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">Material</span>
+
+
+
+<div class="viewcode-block" id="MaterialRepository">
+<a class="viewcode-back" href="../../api/materials.repository.html#materials.repository.MaterialRepository">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaterialRepository</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load and persist material JSON files from a configuration directory.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        configs_dir: Directory containing ``*.json`` material definition files.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        MaterialRepository: Repository for loading and saving material JSON files.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configs_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Bind the repository to a materials configuration directory.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            configs_dir: Directory containing ``*.json`` material definition files.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span> <span class="o">=</span> <span class="n">configs_dir</span>
+
+
+<div class="viewcode-block" id="MaterialRepository.load_all">
+<a class="viewcode-back" href="../../api/materials.repository.html#materials.repository.MaterialRepository.load_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"Material"</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Load every material definition found under ``configs_dir``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Reads ``*.json`` files from ``self.configs_dir``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[Material]: Materials from all JSON files (empty if directory missing).</span>
+<span class="sd">        """</span>
+        <span class="n">materials</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Material</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">materials</span>
+        <span class="k">for</span> <span class="n">json_file</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.json"</span><span class="p">)):</span>
+            <span class="n">materials</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">(</span><span class="n">json_file</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">materials</span></div>
+
+
+
+
+<div class="viewcode-block" id="MaterialRepository._load_file">
+<a class="viewcode-back" href="../../api/materials.repository.html#materials.repository.MaterialRepository._load_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"Material"</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Parse one JSON file as a single material or a list of materials.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            json_file: Path to a material JSON file (object or array root).</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[Material]: One or more materials deserialized from the file.</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">Material</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Material</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">json_file</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Material</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">json_file</span><span class="p">)]</span></div>
+
+
+
+
+<div class="viewcode-block" id="MaterialRepository.save">
+<a class="viewcode-back" href="../../api/materials.repository.html#materials.repository.MaterialRepository.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">material</span><span class="p">:</span> <span class="s2">"Material"</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Persist a material to JSON, creating parent directories as needed.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            material: Material instance to write.</span>
+<span class="sd">            file_path: Destination JSON path.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes the file and updates the material's ``source_file`` via ``save``.</span>
+<span class="sd">        """</span>
+        <span class="n">file_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">material</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
+</div>
+
+
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">materials.repository</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

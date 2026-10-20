@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>geometries.sphere module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="materials package" href="materials.html" />
+    <link rel="prev" title="geometries.registry module" href="geometries.registry.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="materials.html" title="materials package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="geometries.registry.html" title="geometries.registry module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="geometries.html" accesskey="U">geometries package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.sphere module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-geometries.sphere">
+<span id="geometries-sphere-module"></span><h1>geometries.sphere module<a class="headerlink" href="#module-geometries.sphere" title="Link to this heading">¶</a></h1>
+<p>Spherical conductor geometries with hot/cold caps and air domain.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="geometries.sphere.SphereGeometry">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometries.sphere.</span></span><span class="sig-name descname"><span class="pre">SphereGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#SphereGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.SphereGeometry" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="geometries.base.html#geometries.base.BaseGeometry" title="geometries.base.BaseGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGeometry</span></code></a></p>
+<p>Gmsh sphere geometry with caps, layers, and surrounding air.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variant</strong> – Topology selecting solid/hollow/layered templates.</p></li>
+<li><p><strong>template_dir</strong> – Optional directory containing <code class="docutils literal notranslate"><span class="pre">.geo</span></code> templates [path].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SphereGeometry</strong> – Configured geometry with physical volume/surface IDs.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variant</strong> (<a class="reference internal" href="#geometries.sphere.SphereVariant" title="geometries.sphere.SphereVariant"><em>SphereVariant</em></a>)</p></li>
+<li><p><strong>template_dir</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.sphere.SphereGeometry.VARIANT_CONFIGS">
+<span class="sig-name descname"><span class="pre">VARIANT_CONFIGS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{SphereVariant.FULL:</span> <span class="pre">{'description':</span> <span class="pre">'Solid</span> <span class="pre">sphere</span> <span class="pre">with</span> <span class="pre">hot/cold</span> <span class="pre">cap</span> <span class="pre">patches</span> <span class="pre">and</span> <span class="pre">surrounding</span> <span class="pre">spherical</span> <span class="pre">air',</span> <span class="pre">'name':</span> <span class="pre">'Full</span> <span class="pre">Sphere',</span> <span class="pre">'surfaces':</span> <span class="pre">{'cold':</span> <span class="pre">4,</span> <span class="pre">'hot':</span> <span class="pre">3,</span> <span class="pre">'infinity':</span> <span class="pre">5},</span> <span class="pre">'template_name':</span> <span class="pre">'full_sphere.geo',</span> <span class="pre">'volumes':</span> <span class="pre">{'outer_air':</span> <span class="pre">2,</span> <span class="pre">'outer_material':</span> <span class="pre">1}},</span> <span class="pre">SphereVariant.HOLLOW:</span> <span class="pre">{'description':</span> <span class="pre">'Hollow</span> <span class="pre">sphere</span> <span class="pre">shell</span> <span class="pre">with</span> <span class="pre">inner</span> <span class="pre">air</span> <span class="pre">cavity</span> <span class="pre">and</span> <span class="pre">surrounding</span> <span class="pre">spherical</span> <span class="pre">air',</span> <span class="pre">'name':</span> <span class="pre">'Hollow</span> <span class="pre">Sphere',</span> <span class="pre">'surfaces':</span> <span class="pre">{'cold':</span> <span class="pre">5,</span> <span class="pre">'hot':</span> <span class="pre">4,</span> <span class="pre">'infinity':</span> <span class="pre">6},</span> <span class="pre">'template_name':</span> <span class="pre">'hollow_sphere.geo',</span> <span class="pre">'volumes':</span> <span class="pre">{'inner_air':</span> <span class="pre">2,</span> <span class="pre">'outer_air':</span> <span class="pre">3,</span> <span class="pre">'outer_material':</span> <span class="pre">1}},</span> <span class="pre">SphereVariant.LAYER_OVER_FULL:</span> <span class="pre">{'description':</span> <span class="pre">'Outer</span> <span class="pre">shell</span> <span class="pre">wrapping</span> <span class="pre">a</span> <span class="pre">solid</span> <span class="pre">inner</span> <span class="pre">sphere',</span> <span class="pre">'name':</span> <span class="pre">'Layer</span> <span class="pre">Over</span> <span class="pre">Full</span> <span class="pre">Shape',</span> <span class="pre">'surfaces':</span> <span class="pre">{'cold':</span> <span class="pre">5,</span> <span class="pre">'hot':</span> <span class="pre">4,</span> <span class="pre">'infinity':</span> <span class="pre">6},</span> <span class="pre">'template_name':</span> <span class="pre">'layer_over_full_sphere.geo',</span> <span class="pre">'volumes':</span> <span class="pre">{'inner_material':</span> <span class="pre">2,</span> <span class="pre">'outer_air':</span> <span class="pre">3,</span> <span class="pre">'outer_material':</span> <span class="pre">1}},</span> <span class="pre">SphereVariant.LAYER_OVER_HOLLOW:</span> <span class="pre">{'description':</span> <span class="pre">'Outer</span> <span class="pre">shell</span> <span class="pre">wrapping</span> <span class="pre">a</span> <span class="pre">hollow</span> <span class="pre">inner</span> <span class="pre">sphere',</span> <span class="pre">'name':</span> <span class="pre">'Layer</span> <span class="pre">Over</span> <span class="pre">Hollow</span> <span class="pre">Shape',</span> <span class="pre">'surfaces':</span> <span class="pre">{'cold':</span> <span class="pre">6,</span> <span class="pre">'hot':</span> <span class="pre">5,</span> <span class="pre">'infinity':</span> <span class="pre">7},</span> <span class="pre">'template_name':</span> <span class="pre">'layer_over_hollow_sphere.geo',</span> <span class="pre">'volumes':</span> <span class="pre">{'inner_air':</span> <span class="pre">3,</span> <span class="pre">'inner_material':</span> <span class="pre">2,</span> <span class="pre">'outer_air':</span> <span class="pre">4,</span> <span class="pre">'outer_material':</span> <span class="pre">1}}}</span></span><a class="headerlink" href="#geometries.sphere.SphereGeometry.VARIANT_CONFIGS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.sphere.SphereGeometry._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#geometries.sphere.SphereGeometry._abc_impl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.sphere.SphereGeometry._init_parameters">
+<span class="sig-name descname"><span class="pre">_init_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#SphereGeometry._init_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.SphereGeometry._init_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>Load sphere parameter specs for the selected variant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – uses <code class="docutils literal notranslate"><span class="pre">self.variant.value</span></code> against geometry defaults.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Assigns <code class="docutils literal notranslate"><span class="pre">self._parameters</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.sphere.SphereGeometry.geometry_type">
+<span class="sig-name descname"><span class="pre">geometry_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sphere'</span></span><a class="headerlink" href="#geometries.sphere.SphereGeometry.geometry_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.sphere.SphereGeometry.get_physical_surfaces">
+<span class="sig-name descname"><span class="pre">get_physical_surfaces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#SphereGeometry.get_physical_surfaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.SphereGeometry.get_physical_surfaces" title="Link to this definition">¶</a></dt>
+<dd><p>Return physical surface IDs for hot, cold, and infinity BCs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – reads <code class="docutils literal notranslate"><span class="pre">self.config['surfaces']</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, int]</strong> – Copy of role-to-Gmsh physical surface mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.sphere.SphereGeometry.get_physical_volumes">
+<span class="sig-name descname"><span class="pre">get_physical_volumes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#SphereGeometry.get_physical_volumes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.SphereGeometry.get_physical_volumes" title="Link to this definition">¶</a></dt>
+<dd><p>Return physical volume IDs for material and air regions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – reads <code class="docutils literal notranslate"><span class="pre">self.config['volumes']</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, int]</strong> – Copy of role-to-Gmsh physical volume mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.sphere.SphereGeometry.validate_parameters">
+<span class="sig-name descname"><span class="pre">validate_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#SphereGeometry.validate_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.SphereGeometry.validate_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>Enforce sphere cap, air, thickness, and non-overlap constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – Candidate sphere parameters including <code class="docutils literal notranslate"><span class="pre">R_sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">R_cap</span></code>, angles [m/deg].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(valid,</span> <span class="pre">errors)</span></code> where errors lists geometric violations.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="geometries.sphere.SphereVariant">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometries.sphere.</span></span><span class="sig-name descname"><span class="pre">SphereVariant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#SphereVariant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.SphereVariant" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Topology variants for spherical geometries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – enumeration of solid, hollow, and layered sphere layouts.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SphereVariant</strong> – Enum member whose <code class="docutils literal notranslate"><span class="pre">value</span></code> is the registry variant key.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.sphere.SphereVariant.FULL">
+<span class="sig-name descname"><span class="pre">FULL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full'</span></span><a class="headerlink" href="#geometries.sphere.SphereVariant.FULL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.sphere.SphereVariant.HOLLOW">
+<span class="sig-name descname"><span class="pre">HOLLOW</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'hollow'</span></span><a class="headerlink" href="#geometries.sphere.SphereVariant.HOLLOW" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.sphere.SphereVariant.LAYER_OVER_FULL">
+<span class="sig-name descname"><span class="pre">LAYER_OVER_FULL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'layer_over_full'</span></span><a class="headerlink" href="#geometries.sphere.SphereVariant.LAYER_OVER_FULL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.sphere.SphereVariant.LAYER_OVER_HOLLOW">
+<span class="sig-name descname"><span class="pre">LAYER_OVER_HOLLOW</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'layer_over_hollow'</span></span><a class="headerlink" href="#geometries.sphere.SphereVariant.LAYER_OVER_HOLLOW" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="geometries.sphere.sphere_cap_radius_m">
+<span class="sig-prename descclassname"><span class="pre">geometries.sphere.</span></span><span class="sig-name descname"><span class="pre">sphere_cap_radius_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#sphere_cap_radius_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.sphere_cap_radius_m" title="Link to this definition">¶</a></dt>
+<dd><p>Hot/cold contact-cap radius from parameter <code class="docutils literal notranslate"><span class="pre">R_cap</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – Sphere parameter map containing <code class="docutils literal notranslate"><span class="pre">R_cap</span></code> [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Cap patch radius used for electrode footprints [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="geometries.sphere.sphere_metal_radius_m">
+<span class="sig-prename descclassname"><span class="pre">geometries.sphere.</span></span><span class="sig-name descname"><span class="pre">sphere_metal_radius_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#sphere_metal_radius_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.sphere_metal_radius_m" title="Link to this definition">¶</a></dt>
+<dd><p>Metal sphere radius from stored parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – Sphere parameter map containing <code class="docutils literal notranslate"><span class="pre">R_sphere</span></code> [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Outer metal radius [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="geometries.sphere.swept_geometry_key">
+<span class="sig-prename descclassname"><span class="pre">geometries.sphere.</span></span><span class="sig-name descname"><span class="pre">swept_geometry_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swept_param</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/sphere.html#swept_geometry_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.sphere.swept_geometry_key" title="Link to this definition">¶</a></dt>
+<dd><p>Map a sweep axis choice onto the primary geometry parameter name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_type</strong> – Shape family <code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">cylinder</span></code> [dimensionless].</p></li>
+<li><p><strong>swept_param</strong> – Requested sweep parameter hint such as <code class="docutils literal notranslate"><span class="pre">L</span></code> or <code class="docutils literal notranslate"><span class="pre">R</span></code> [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Canonical parameter key to sweep (<code class="docutils literal notranslate"><span class="pre">L</span></code>, <code class="docutils literal notranslate"><span class="pre">W</span></code>, or <code class="docutils literal notranslate"><span class="pre">R</span></code>).</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>swept_param</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">geometries.sphere module</a><ul>
+<li><a class="reference internal" href="#geometries.sphere.SphereGeometry"><code class="docutils literal notranslate"><span class="pre">SphereGeometry</span></code></a><ul>
+<li><a class="reference internal" href="#geometries.sphere.SphereGeometry.VARIANT_CONFIGS"><code class="docutils literal notranslate"><span class="pre">SphereGeometry.VARIANT_CONFIGS</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereGeometry._abc_impl"><code class="docutils literal notranslate"><span class="pre">SphereGeometry._abc_impl</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereGeometry._init_parameters"><code class="docutils literal notranslate"><span class="pre">SphereGeometry._init_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereGeometry.geometry_type"><code class="docutils literal notranslate"><span class="pre">SphereGeometry.geometry_type</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereGeometry.get_physical_surfaces"><code class="docutils literal notranslate"><span class="pre">SphereGeometry.get_physical_surfaces()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereGeometry.get_physical_volumes"><code class="docutils literal notranslate"><span class="pre">SphereGeometry.get_physical_volumes()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereGeometry.validate_parameters"><code class="docutils literal notranslate"><span class="pre">SphereGeometry.validate_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geometries.sphere.SphereVariant"><code class="docutils literal notranslate"><span class="pre">SphereVariant</span></code></a><ul>
+<li><a class="reference internal" href="#geometries.sphere.SphereVariant.FULL"><code class="docutils literal notranslate"><span class="pre">SphereVariant.FULL</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereVariant.HOLLOW"><code class="docutils literal notranslate"><span class="pre">SphereVariant.HOLLOW</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereVariant.LAYER_OVER_FULL"><code class="docutils literal notranslate"><span class="pre">SphereVariant.LAYER_OVER_FULL</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.SphereVariant.LAYER_OVER_HOLLOW"><code class="docutils literal notranslate"><span class="pre">SphereVariant.LAYER_OVER_HOLLOW</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geometries.sphere.sphere_cap_radius_m"><code class="docutils literal notranslate"><span class="pre">sphere_cap_radius_m()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.sphere_metal_radius_m"><code class="docutils literal notranslate"><span class="pre">sphere_metal_radius_m()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.sphere.swept_geometry_key"><code class="docutils literal notranslate"><span class="pre">swept_geometry_key()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="geometries.registry.html"
+                          title="previous chapter">geometries.registry module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="materials.html"
+                          title="next chapter">materials package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/geometries.sphere.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="materials.html" title="materials package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="geometries.registry.html" title="geometries.registry module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="geometries.html" >geometries package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.sphere module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

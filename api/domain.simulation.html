@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>domain.simulation module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="domain.sweep module" href="domain.sweep.html" />
+    <link rel="prev" title="domain.run_manifest module" href="domain.run_manifest.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.sweep.html" title="domain.sweep module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="domain.run_manifest.html" title="domain.run_manifest module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="domain.html" accesskey="U">domain package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.simulation module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-domain.simulation">
+<span id="domain-simulation-module"></span><h1>domain.simulation module<a class="headerlink" href="#module-domain.simulation" title="Link to this heading">¶</a></h1>
+<p>Simulation configuration models for thermal, electric BC, and solver options.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.simulation.</span></span><span class="sig-name descname"><span class="pre">ElectricBCConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bc1_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc1_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc2_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc2_potential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#ElectricBCConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.ElectricBCConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Optional Dirichlet electric potentials on two named boundaries [V].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bc1_enabled</strong> – Whether the first electric BC is active.</p></li>
+<li><p><strong>bc1_potential</strong> – First boundary potential [V], or <code class="docutils literal notranslate"><span class="pre">None</span></code> when free.</p></li>
+<li><p><strong>bc2_enabled</strong> – Whether the second electric BC is active.</p></li>
+<li><p><strong>bc2_potential</strong> – Second boundary potential [V], or <code class="docutils literal notranslate"><span class="pre">None</span></code> when free.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ElectricBCConfig</strong> – Immutable electric Dirichlet BC enable flags and potentials.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bc1_enabled</strong> (<em>bool</em>)</p></li>
+<li><p><strong>bc1_potential</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>bc2_enabled</strong> (<em>bool</em>)</p></li>
+<li><p><strong>bc2_potential</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig._parse_potential">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_parse_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">enabled</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#ElectricBCConfig._parse_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.ElectricBCConfig._parse_potential" title="Link to this definition">¶</a></dt>
+<dd><p>Parse a potential value, treating free/empty markers as unset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raw</strong> – Raw potential (number, <code class="docutils literal notranslate"><span class="pre">None</span></code>, or free/null string).</p></li>
+<li><p><strong>enabled</strong> – Whether the corresponding electric BC is active.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float | None</strong> – Potential in volts, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when disabled or free.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raw</strong> (<em>Any</em>)</p></li>
+<li><p><strong>enabled</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig._serialize_potential">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_serialize_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#ElectricBCConfig._serialize_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.ElectricBCConfig._serialize_potential" title="Link to this definition">¶</a></dt>
+<dd><p>Encode an optional potential for JSON (<code class="docutils literal notranslate"><span class="pre">free</span></code> when unset).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Potential in volts, or <code class="docutils literal notranslate"><span class="pre">None</span></code> for a free boundary.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float | str</strong> – Numeric potential or the string <code class="docutils literal notranslate"><span class="pre">free</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig.bc1_enabled">
+<span class="sig-name descname"><span class="pre">bc1_enabled</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#domain.simulation.ElectricBCConfig.bc1_enabled" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig.bc1_potential">
+<span class="sig-name descname"><span class="pre">bc1_potential</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#domain.simulation.ElectricBCConfig.bc1_potential" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig.bc1_value">
+<span class="sig-name descname"><span class="pre">bc1_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#ElectricBCConfig.bc1_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.ElectricBCConfig.bc1_value" title="Link to this definition">¶</a></dt>
+<dd><p>Return the first boundary electric potential if set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.bc1_potential</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float | None</strong> – Potential [V], or <code class="docutils literal notranslate"><span class="pre">None</span></code> when free/disabled.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig.bc2_enabled">
+<span class="sig-name descname"><span class="pre">bc2_enabled</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#domain.simulation.ElectricBCConfig.bc2_enabled" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig.bc2_potential">
+<span class="sig-name descname"><span class="pre">bc2_potential</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#domain.simulation.ElectricBCConfig.bc2_potential" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig.bc2_value">
+<span class="sig-name descname"><span class="pre">bc2_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#ElectricBCConfig.bc2_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.ElectricBCConfig.bc2_value" title="Link to this definition">¶</a></dt>
+<dd><p>Return the second boundary electric potential if set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.bc2_potential</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float | None</strong> – Potential [V], or <code class="docutils literal notranslate"><span class="pre">None</span></code> when free/disabled.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#ElectricBCConfig.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.ElectricBCConfig.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize electric BC enable flags and potentials.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Mapping with <code class="docutils literal notranslate"><span class="pre">bc1_/bc2_enabled</span></code> and <code class="docutils literal notranslate"><span class="pre">bc1_/bc2_potential</span></code>.</p></li>
+<li><p><strong>defaults</strong> – Optional application defaults for missing fields.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ElectricBCConfig</strong> – Immutable electric BC configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="config.defaults.html#config.defaults.ApplicationDefaults" title="config.defaults.ApplicationDefaults"><em>ApplicationDefaults</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.simulation.ElectricBCConfig" title="domain.simulation.ElectricBCConfig"><em>ElectricBCConfig</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.ElectricBCConfig.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#ElectricBCConfig.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.ElectricBCConfig.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize electric BC settings, encoding unset potentials as <code class="docutils literal notranslate"><span class="pre">free</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – JSON-serializable electric BC mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.simulation.</span></span><span class="sig-name descname"><span class="pre">SimulationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'steady'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'steady'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_material_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'simple'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_material_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_twolayer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_material_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_material_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electric_bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_dependent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#SimulationConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.SimulationConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Full FEM case config: materials, thermal/electric BCs, driver, and solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_type</strong> – Geometry/base case type label (e.g. <code class="docutils literal notranslate"><span class="pre">full</span></code>).</p></li>
+<li><p><strong>driver_type</strong> – Thermal driver kind (<code class="docutils literal notranslate"><span class="pre">steady</span></code>, <code class="docutils literal notranslate"><span class="pre">harmonic</span></code>, <code class="docutils literal notranslate"><span class="pre">sawtooth</span></code>).</p></li>
+<li><p><strong>simulation_type</strong> – <code class="docutils literal notranslate"><span class="pre">steady</span></code> or <code class="docutils literal notranslate"><span class="pre">time_dependent</span></code> simulation mode.</p></li>
+<li><p><strong>outer_material_model</strong> – Constitutive model name for the outer material.</p></li>
+<li><p><strong>outer_material_name</strong> – Display name of the outer material.</p></li>
+<li><p><strong>is_twolayer</strong> – Whether an inner material layer is present.</p></li>
+<li><p><strong>inner_material_model</strong> – Optional constitutive model for the inner material.</p></li>
+<li><p><strong>inner_material_name</strong> – Optional display name of the inner material.</p></li>
+<li><p><strong>temperature</strong> – Thermal BC temperatures and optional frequency.</p></li>
+<li><p><strong>electric_bc</strong> – Electric Dirichlet BC configuration.</p></li>
+<li><p><strong>time_dependent</strong> – Transient settings when <code class="docutils literal notranslate"><span class="pre">simulation_type</span></code> is time-dependent.</p></li>
+<li><p><strong>solver</strong> – MPI process counts and stage timeouts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SimulationConfig</strong> – Immutable full FEM case configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>driver_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>simulation_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>outer_material_model</strong> (<em>str</em>)</p></li>
+<li><p><strong>outer_material_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>is_twolayer</strong> (<em>bool</em>)</p></li>
+<li><p><strong>inner_material_model</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>inner_material_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>temperature</strong> (<a class="reference internal" href="#domain.simulation.TemperatureConfig" title="domain.simulation.TemperatureConfig"><em>TemperatureConfig</em></a>)</p></li>
+<li><p><strong>electric_bc</strong> (<a class="reference internal" href="#domain.simulation.ElectricBCConfig" title="domain.simulation.ElectricBCConfig"><em>ElectricBCConfig</em></a>)</p></li>
+<li><p><strong>time_dependent</strong> (<a class="reference internal" href="#domain.simulation.TimeDependentConfig" title="domain.simulation.TimeDependentConfig"><em>TimeDependentConfig</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>solver</strong> (<a class="reference internal" href="#domain.simulation.SolverOptions" title="domain.simulation.SolverOptions"><em>SolverOptions</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.base_type">
+<span class="sig-name descname"><span class="pre">base_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full'</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.base_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.driver_type">
+<span class="sig-name descname"><span class="pre">driver_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'steady'</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.driver_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.electric_bc">
+<span class="sig-name descname"><span class="pre">electric_bc</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#domain.simulation.ElectricBCConfig" title="domain.simulation.ElectricBCConfig"><span class="pre">ElectricBCConfig</span></a></span><a class="headerlink" href="#domain.simulation.SimulationConfig.electric_bc" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#SimulationConfig.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.SimulationConfig.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize a complete simulation configuration from a mapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Nested mapping of materials, temperature, electric BC, time-dependent, and solver sections.</p></li>
+<li><p><strong>requested_processes</strong> – Optional override forwarded to <code class="docutils literal notranslate"><span class="pre">SolverOptions</span></code>.</p></li>
+<li><p><strong>defaults</strong> – Optional application defaults for nested sections.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SimulationConfig</strong> – Immutable simulation configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>requested_processes</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="config.defaults.html#config.defaults.ApplicationDefaults" title="config.defaults.ApplicationDefaults"><em>ApplicationDefaults</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.simulation.SimulationConfig" title="domain.simulation.SimulationConfig"><em>SimulationConfig</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.inner_material_model">
+<span class="sig-name descname"><span class="pre">inner_material_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.inner_material_model" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.inner_material_name">
+<span class="sig-name descname"><span class="pre">inner_material_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.inner_material_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.is_twolayer">
+<span class="sig-name descname"><span class="pre">is_twolayer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.is_twolayer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.outer_material_model">
+<span class="sig-name descname"><span class="pre">outer_material_model</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'simple'</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.outer_material_model" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.outer_material_name">
+<span class="sig-name descname"><span class="pre">outer_material_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.outer_material_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.simulation_type">
+<span class="sig-name descname"><span class="pre">simulation_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'steady'</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.simulation_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.solver">
+<span class="sig-name descname"><span class="pre">solver</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#domain.simulation.SolverOptions" title="domain.simulation.SolverOptions"><span class="pre">SolverOptions</span></a></span><a class="headerlink" href="#domain.simulation.SimulationConfig.solver" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.temperature">
+<span class="sig-name descname"><span class="pre">temperature</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#domain.simulation.TemperatureConfig" title="domain.simulation.TemperatureConfig"><span class="pre">TemperatureConfig</span></a></span><a class="headerlink" href="#domain.simulation.SimulationConfig.temperature" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.time_dependent">
+<span class="sig-name descname"><span class="pre">time_dependent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#domain.simulation.TimeDependentConfig" title="domain.simulation.TimeDependentConfig"><span class="pre">TimeDependentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#domain.simulation.SimulationConfig.time_dependent" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.SimulationConfig.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#SimulationConfig.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.SimulationConfig.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize the simulation configuration for manifest persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – JSON-serializable simulation mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.simulation.SolverOptions">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.simulation.</span></span><span class="sig-name descname"><span class="pre">SolverOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requested_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_partitions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#SolverOptions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.SolverOptions" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>MPI process counts and stage timeouts for mesh, solve, and post-processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>requested_processes</strong> – Number of MPI processes to request.</p></li>
+<li><p><strong>max_partitions</strong> – Legacy manifest field; runtime MPI count uses GUI Threads
+clamped by host CPU count (see <code class="docutils literal notranslate"><span class="pre">ElmerAdapter.resolve_solver_processes</span></code>).</p></li>
+<li><p><strong>mesh_timeout</strong> – Mesh-generation stage timeout [s].</p></li>
+<li><p><strong>solve_timeout</strong> – Solver stage timeout [s].</p></li>
+<li><p><strong>post_timeout</strong> – Post-processing stage timeout [s].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SolverOptions</strong> – Immutable MPI process counts and pipeline stage timeouts.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>requested_processes</strong> (<em>int</em>)</p></li>
+<li><p><strong>max_partitions</strong> (<em>int</em>)</p></li>
+<li><p><strong>mesh_timeout</strong> (<em>int</em>)</p></li>
+<li><p><strong>solve_timeout</strong> (<em>int</em>)</p></li>
+<li><p><strong>post_timeout</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.SolverOptions.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#SolverOptions.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.SolverOptions.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize solver options with optional process-count override.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Mapping of solver integer fields (processes, partitions, timeouts [s]).</p></li>
+<li><p><strong>requested_processes</strong> – Optional override for default process count.</p></li>
+<li><p><strong>defaults</strong> – Optional application defaults for missing fields.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SolverOptions</strong> – Immutable solver options.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>requested_processes</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="config.defaults.html#config.defaults.ApplicationDefaults" title="config.defaults.ApplicationDefaults"><em>ApplicationDefaults</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.simulation.SolverOptions" title="domain.simulation.SolverOptions"><em>SolverOptions</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SolverOptions.max_partitions">
+<span class="sig-name descname"><span class="pre">max_partitions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#domain.simulation.SolverOptions.max_partitions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SolverOptions.mesh_timeout">
+<span class="sig-name descname"><span class="pre">mesh_timeout</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#domain.simulation.SolverOptions.mesh_timeout" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SolverOptions.post_timeout">
+<span class="sig-name descname"><span class="pre">post_timeout</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#domain.simulation.SolverOptions.post_timeout" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SolverOptions.requested_processes">
+<span class="sig-name descname"><span class="pre">requested_processes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#domain.simulation.SolverOptions.requested_processes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.SolverOptions.solve_timeout">
+<span class="sig-name descname"><span class="pre">solve_timeout</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#domain.simulation.SolverOptions.solve_timeout" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.SolverOptions.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#SolverOptions.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.SolverOptions.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize solver options for manifest persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, int]</strong> – Mapping of process counts and timeouts.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.simulation.TemperatureConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.simulation.</span></span><span class="sig-name descname"><span class="pre">TemperatureConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_hot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_cold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#TemperatureConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.TemperatureConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Hot/cold thermal BC temperatures and optional driving frequency [K, Hz].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t_hot</strong> – Hot-side boundary temperature [K].</p></li>
+<li><p><strong>t_cold</strong> – Cold-side boundary temperature [K].</p></li>
+<li><p><strong>frequency</strong> – Optional thermal-driver frequency [Hz]; <code class="docutils literal notranslate"><span class="pre">None</span></code> for steady.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TemperatureConfig</strong> – Immutable thermal BC temperatures and optional frequency.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t_hot</strong> (<em>float</em>)</p></li>
+<li><p><strong>t_cold</strong> (<em>float</em>)</p></li>
+<li><p><strong>frequency</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.TemperatureConfig.frequency">
+<span class="sig-name descname"><span class="pre">frequency</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#domain.simulation.TemperatureConfig.frequency" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.TemperatureConfig.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#TemperatureConfig.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.TemperatureConfig.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Build temperature config; frequency is inverse of driver period when set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Mapping with optional <code class="docutils literal notranslate"><span class="pre">t_hot</span></code> and <code class="docutils literal notranslate"><span class="pre">t_cold</span></code> [K].</p></li>
+<li><p><strong>defaults</strong> – Optional application defaults for missing temperatures.</p></li>
+<li><p><strong>driver_period</strong> – Optional thermal-driver period [s]; sets <code class="docutils literal notranslate"><span class="pre">frequency</span> <span class="pre">=</span> <span class="pre">1/period</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TemperatureConfig</strong> – Immutable temperature configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="config.defaults.html#config.defaults.ApplicationDefaults" title="config.defaults.ApplicationDefaults"><em>ApplicationDefaults</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>driver_period</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.simulation.TemperatureConfig" title="domain.simulation.TemperatureConfig"><em>TemperatureConfig</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.TemperatureConfig.t_cold">
+<span class="sig-name descname"><span class="pre">t_cold</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.simulation.TemperatureConfig.t_cold" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.TemperatureConfig.t_hot">
+<span class="sig-name descname"><span class="pre">t_hot</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.simulation.TemperatureConfig.t_hot" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.TemperatureConfig.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#TemperatureConfig.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.TemperatureConfig.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize temperature settings for manifest persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, float | None]</strong> – Mapping of <code class="docutils literal notranslate"><span class="pre">t_hot</span></code>, <code class="docutils literal notranslate"><span class="pre">t_cold</span></code>, and <code class="docutils literal notranslate"><span class="pre">frequency</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, float | None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.simulation.TimeDependentConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.simulation.</span></span><span class="sig-name descname"><span class="pre">TimeDependentConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#TimeDependentConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.TimeDependentConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Transient simulation duration, driver period, and derived integration steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>total_time</strong> – Simulated physical duration [s].</p></li>
+<li><p><strong>driver_period</strong> – Thermal-driver period [s].</p></li>
+<li><p><strong>integration_steps</strong> – Derived number of transient integration steps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TimeDependentConfig</strong> – Immutable transient duration and integration settings.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>total_time</strong> (<em>int</em>)</p></li>
+<li><p><strong>driver_period</strong> (<em>float</em>)</p></li>
+<li><p><strong>integration_steps</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.TimeDependentConfig.driver_period">
+<span class="sig-name descname"><span class="pre">driver_period</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.simulation.TimeDependentConfig.driver_period" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.TimeDependentConfig.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#TimeDependentConfig.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.TimeDependentConfig.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize time-dependent settings and derive integration steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Mapping with optional <code class="docutils literal notranslate"><span class="pre">total_time</span></code> [s] and <code class="docutils literal notranslate"><span class="pre">driver_period</span></code> [s].</p></li>
+<li><p><strong>defaults</strong> – Optional application defaults for missing fields.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TimeDependentConfig</strong> – Immutable time-dependent configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="config.defaults.html#config.defaults.ApplicationDefaults" title="config.defaults.ApplicationDefaults"><em>ApplicationDefaults</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.simulation.TimeDependentConfig" title="domain.simulation.TimeDependentConfig"><em>TimeDependentConfig</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.TimeDependentConfig.integration_steps">
+<span class="sig-name descname"><span class="pre">integration_steps</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#domain.simulation.TimeDependentConfig.integration_steps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.simulation.TimeDependentConfig.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#TimeDependentConfig.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation.TimeDependentConfig.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize time-dependent settings for manifest persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – Mapping of total time, period, and integration steps.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.simulation.TimeDependentConfig.total_time">
+<span class="sig-name descname"><span class="pre">total_time</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#domain.simulation.TimeDependentConfig.total_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="domain.simulation._default_integration_steps">
+<span class="sig-prename descclassname"><span class="pre">domain.simulation.</span></span><span class="sig-name descname"><span class="pre">_default_integration_steps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#_default_integration_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation._default_integration_steps" title="Link to this definition">¶</a></dt>
+<dd><p>Default integration-step count from packaged time-dependent defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Loads application defaults.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>int</strong> – Integration steps for the default total time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="domain.simulation._defaults">
+<span class="sig-prename descclassname"><span class="pre">domain.simulation.</span></span><span class="sig-name descname"><span class="pre">_defaults</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation._defaults" title="Link to this definition">¶</a></dt>
+<dd><p>Load cached application defaults for config field factories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – No parameters.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ApplicationDefaults</strong> – Validated application defaults.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="config.defaults.html#config.defaults.ApplicationDefaults" title="config.defaults.ApplicationDefaults"><em>ApplicationDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="domain.simulation._integration_steps">
+<span class="sig-prename descclassname"><span class="pre">domain.simulation.</span></span><span class="sig-name descname"><span class="pre">_integration_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/simulation.html#_integration_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.simulation._integration_steps" title="Link to this definition">¶</a></dt>
+<dd><p>Compute transient integration steps from total time and timestep size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>total_time</strong> – Simulated physical duration [s].</p></li>
+<li><p><strong>defaults</strong> – Application defaults providing <code class="docutils literal notranslate"><span class="pre">driver_runtime.timestep_size</span></code> [s].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>int</strong> – Number of integration steps (at least 1).</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>total_time</strong> (<em>int</em>)</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="config.defaults.html#config.defaults.ApplicationDefaults" title="config.defaults.ApplicationDefaults"><em>ApplicationDefaults</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">domain.simulation module</a><ul>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig</span></code></a><ul>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig._parse_potential"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig._parse_potential()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig._serialize_potential"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig._serialize_potential()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig.bc1_enabled"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc1_enabled</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig.bc1_potential"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc1_potential</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig.bc1_value"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc1_value()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig.bc2_enabled"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc2_enabled</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig.bc2_potential"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc2_potential</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig.bc2_value"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc2_value()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.ElectricBCConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig"><code class="docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a><ul>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.base_type"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.base_type</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.driver_type"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.driver_type</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.electric_bc"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.electric_bc</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.inner_material_model"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.inner_material_model</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.inner_material_name"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.inner_material_name</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.is_twolayer"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.is_twolayer</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.outer_material_model"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.outer_material_model</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.outer_material_name"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.outer_material_name</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.simulation_type"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.simulation_type</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.solver"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.solver</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.temperature"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.temperature</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.time_dependent"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.time_dependent</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SimulationConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#domain.simulation.SolverOptions"><code class="docutils literal notranslate"><span class="pre">SolverOptions</span></code></a><ul>
+<li><a class="reference internal" href="#domain.simulation.SolverOptions.from_dict"><code class="docutils literal notranslate"><span class="pre">SolverOptions.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SolverOptions.max_partitions"><code class="docutils literal notranslate"><span class="pre">SolverOptions.max_partitions</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SolverOptions.mesh_timeout"><code class="docutils literal notranslate"><span class="pre">SolverOptions.mesh_timeout</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SolverOptions.post_timeout"><code class="docutils literal notranslate"><span class="pre">SolverOptions.post_timeout</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SolverOptions.requested_processes"><code class="docutils literal notranslate"><span class="pre">SolverOptions.requested_processes</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SolverOptions.solve_timeout"><code class="docutils literal notranslate"><span class="pre">SolverOptions.solve_timeout</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.SolverOptions.to_dict"><code class="docutils literal notranslate"><span class="pre">SolverOptions.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#domain.simulation.TemperatureConfig"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig</span></code></a><ul>
+<li><a class="reference internal" href="#domain.simulation.TemperatureConfig.frequency"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.frequency</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.TemperatureConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.TemperatureConfig.t_cold"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.t_cold</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.TemperatureConfig.t_hot"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.t_hot</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.TemperatureConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#domain.simulation.TimeDependentConfig"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig</span></code></a><ul>
+<li><a class="reference internal" href="#domain.simulation.TimeDependentConfig.driver_period"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.driver_period</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.TimeDependentConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.TimeDependentConfig.integration_steps"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.integration_steps</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.TimeDependentConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.to_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation.TimeDependentConfig.total_time"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.total_time</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#domain.simulation._default_integration_steps"><code class="docutils literal notranslate"><span class="pre">_default_integration_steps()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation._defaults"><code class="docutils literal notranslate"><span class="pre">_defaults()</span></code></a></li>
+<li><a class="reference internal" href="#domain.simulation._integration_steps"><code class="docutils literal notranslate"><span class="pre">_integration_steps()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="domain.run_manifest.html"
+                          title="previous chapter">domain.run_manifest module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="domain.sweep.html"
+                          title="next chapter">domain.sweep module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/domain.simulation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.sweep.html" title="domain.sweep module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="domain.run_manifest.html" title="domain.run_manifest module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="domain.html" >domain package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.simulation module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

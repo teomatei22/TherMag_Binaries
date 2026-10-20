@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>simulations.material_params &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.material_params</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for simulations.material_params</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Convert material records into Elmer SIF generator parameter dicts."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
+
+
+<div class="viewcode-block" id="_require_tensor">
+<a class="viewcode-back" href="../../api/simulations.material_params.html#simulations.material_params._require_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_require_tensor</span><span class="p">(</span><span class="n">material_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attribute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tensor</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a 3x3-style tensor sequence with at least five entries.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        material_name: Material label used in error messages.</span>
+<span class="sd">        attribute: Property attribute name being validated.</span>
+<span class="sd">        tensor: Flattened tensor values; index 0 is parallel, 4 perpendicular.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        Sequence[float]: The same tensor when it has length &gt;= 5.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">tensor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Material '</span><span class="si">{</span><span class="n">material_name</span><span class="si">}</span><span class="s2">' is anisotropic but has no valid </span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tensor</span></div>
+
+
+
+<div class="viewcode-block" id="build_material_params">
+<a class="viewcode-back" href="../../api/simulations.material_params.html#simulations.material_params.build_material_params">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_material_params</span><span class="p">(</span><span class="n">material</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build validated SIF generator parameters for a material/model pair.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        material: Material record exposing ``name`` and ``properties`` [mixed SI].</span>
+<span class="sd">        model: Material model enum or string (``simple``, ``anisotropy``, …) [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        dict[str, Any]: Parameter map consumed by ``SifGenerator`` material blocks.</span>
+<span class="sd">    """</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">properties</span>
+    <span class="n">model_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="n">material</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s2">"density"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+        <span class="s2">"heat_capacity"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">heat_capacity</span><span class="p">,</span>
+        <span class="s2">"heat_conductivity"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">heat_conductivity</span><span class="p">,</span>
+        <span class="s2">"electric_conductivity"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">electric_conductivity</span><span class="p">,</span>
+        <span class="s2">"seebeck_coefficient"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">seebeck_coefficient</span><span class="p">,</span>
+        <span class="s2">"relative_permittivity"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">relative_permittivity</span><span class="p">,</span>
+        <span class="s2">"relative_permeability"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">relative_permeability</span><span class="p">,</span>
+        <span class="s2">"heat_conductivity_table"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">heat_conductivity_table</span><span class="p">,</span>
+        <span class="s2">"electric_conductivity_table"</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">electric_conductivity_table</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">"anisotropy"</span><span class="p">:</span>
+        <span class="n">tensor_fields</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"heat_conductivity_tensor"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"k_par"</span><span class="p">,</span> <span class="s2">"k_perp"</span><span class="p">),</span>
+            <span class="s2">"electric_conductivity_tensor"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"sigma_par"</span><span class="p">,</span> <span class="s2">"sigma_perp"</span><span class="p">),</span>
+            <span class="s2">"seebeck_coefficient_tensor"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"s_par"</span><span class="p">,</span> <span class="s2">"s_perp"</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">attribute</span><span class="p">,</span> <span class="p">(</span><span class="n">parallel_key</span><span class="p">,</span> <span class="n">perpendicular_key</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tensor_fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">tensor</span> <span class="o">=</span> <span class="n">_require_tensor</span><span class="p">(</span>
+                <span class="n">material</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">attribute</span><span class="p">,</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">props</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">parallel_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">perpendicular_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tensor</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">"hysteresis"</span><span class="p">:</span>
+        <span class="n">hb_curve</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">props</span><span class="p">,</span> <span class="s2">"hb_curve"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hb_curve</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"  H-B Curve = Variable"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Real"</span><span class="p">]</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    </span><span class="si">{</span><span class="n">h_value</span><span class="si">}</span><span class="s2">       </span><span class="si">{</span><span class="n">b_value</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">h_value</span><span class="p">,</span> <span class="n">b_value</span> <span class="ow">in</span> <span class="n">hb_curve</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\t</span><span class="s2">End"</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">"hb_curve_block"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">"hb_curve_block"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"  ! No H-B curve data available"</span>
+
+    <span class="k">return</span> <span class="n">params</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.material_params</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

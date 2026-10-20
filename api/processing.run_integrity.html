@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.run_integrity module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.sampling module" href="processing.sampling.html" />
+    <link rel="prev" title="processing.probe_scaling module" href="processing.probe_scaling.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.sampling.html" title="processing.sampling module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.probe_scaling.html" title="processing.probe_scaling module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" accesskey="U">processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.run_integrity module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.run_integrity">
+<span id="processing-run-integrity-module"></span><h1>processing.run_integrity module<a class="headerlink" href="#module-processing.run_integrity" title="Link to this heading">¶</a></h1>
+<p>Append concrete run-integrity evidence to logs without aggregate status.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.run_integrity._log_path">
+<span class="sig-prename descclassname"><span class="pre">processing.run_integrity.</span></span><span class="sig-name descname"><span class="pre">_log_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cwd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/run_integrity.html#_log_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.run_integrity._log_path" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve and ensure the run-integrity log file path under the run directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cwd</strong> – FEM run working directory containing <code class="docutils literal notranslate"><span class="pre">logs/</span></code> [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Path</strong> – Absolute path to <code class="docutils literal notranslate"><span class="pre">logs/run_integrity.log</span></code> (parent created if missing).</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cwd</strong> (<em>str</em><em> | </em><em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Path</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.run_integrity.append_run_integrity">
+<span class="sig-prename descclassname"><span class="pre">processing.run_integrity.</span></span><span class="sig-name descname"><span class="pre">append_run_integrity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cwd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/run_integrity.html#append_run_integrity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.run_integrity.append_run_integrity" title="Link to this definition">¶</a></dt>
+<dd><p>Append one timestamped integrity check line to the run log.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> – FEM run working directory [path].</p></li>
+<li><p><strong>check_name</strong> – Short check identifier (e.g. <code class="docutils literal notranslate"><span class="pre">solver_completion</span></code>).</p></li>
+<li><p><strong>detail</strong> – Free-text evidence for the check.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Appends a UTC-stamped TSV line to <code class="docutils literal notranslate"><span class="pre">run_integrity.log</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>check_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>detail</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.run_integrity.log_geometry_interpretation">
+<span class="sig-prename descclassname"><span class="pre">processing.run_integrity.</span></span><span class="sig-name descname"><span class="pre">log_geometry_interpretation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cwd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/run_integrity.html#log_geometry_interpretation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.run_integrity.log_geometry_interpretation" title="Link to this definition">¶</a></dt>
+<dd><p>Record interpreted geometry family and hollow/layer variant for the run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> – FEM run working directory [path].</p></li>
+<li><p><strong>family</strong> – Geometry family (<code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, <code class="docutils literal notranslate"><span class="pre">sphere</span></code>).</p></li>
+<li><p><strong>variant</strong> – Topology variant (<code class="docutils literal notranslate"><span class="pre">full</span></code>, <code class="docutils literal notranslate"><span class="pre">hollow</span></code>, <code class="docutils literal notranslate"><span class="pre">layer_over_*</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Appends a <code class="docutils literal notranslate"><span class="pre">geometry_interpretation</span></code> integrity line.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>family</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.run_integrity.log_solver_completion">
+<span class="sig-prename descclassname"><span class="pre">processing.run_integrity.</span></span><span class="sig-name descname"><span class="pre">log_solver_completion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cwd</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_done</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/run_integrity.html#log_solver_completion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.run_integrity.log_solver_completion" title="Link to this definition">¶</a></dt>
+<dd><p>Record Elmer/solver exit evidence and fail on unclean completion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> – FEM run working directory [path].</p></li>
+<li><p><strong>return_code</strong> – Process return code, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if unknown.</p></li>
+<li><p><strong>all_done</strong> – Whether the solver emitted an ALL DONE / success marker.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Logs completion; raises <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> when exit is unclean.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>return_code</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>all_done</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.run_integrity.log_time_coverage">
+<span class="sig-prename descclassname"><span class="pre">processing.run_integrity.</span></span><span class="sig-name descname"><span class="pre">log_time_coverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cwd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_time_dependent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/run_integrity.html#log_time_coverage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.run_integrity.log_time_coverage" title="Link to this definition">¶</a></dt>
+<dd><p>Record and validate probe/time-series coverage against VTU steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> – FEM run working directory [path].</p></li>
+<li><p><strong>source</strong> – Probe or script name used as the check key prefix.</p></li>
+<li><p><strong>times</strong> – Sampled physical times written by the probe [s].</p></li>
+<li><p><strong>expected_time_dependent</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> when the run has multiple VTU steps.</p></li>
+<li><p><strong>n_steps</strong> – Number of VTU timesteps expected for unique-time coverage.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Logs coverage detail; raises <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> if coverage is insufficient.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>source</strong> (<em>str</em>)</p></li>
+<li><p><strong>times</strong> (<em>Iterable</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>expected_time_dependent</strong> (<em>bool</em>)</p></li>
+<li><p><strong>n_steps</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.run_integrity module</a><ul>
+<li><a class="reference internal" href="#processing.run_integrity._log_path"><code class="docutils literal notranslate"><span class="pre">_log_path()</span></code></a></li>
+<li><a class="reference internal" href="#processing.run_integrity.append_run_integrity"><code class="docutils literal notranslate"><span class="pre">append_run_integrity()</span></code></a></li>
+<li><a class="reference internal" href="#processing.run_integrity.log_geometry_interpretation"><code class="docutils literal notranslate"><span class="pre">log_geometry_interpretation()</span></code></a></li>
+<li><a class="reference internal" href="#processing.run_integrity.log_solver_completion"><code class="docutils literal notranslate"><span class="pre">log_solver_completion()</span></code></a></li>
+<li><a class="reference internal" href="#processing.run_integrity.log_time_coverage"><code class="docutils literal notranslate"><span class="pre">log_time_coverage()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.probe_scaling.html"
+                          title="previous chapter">processing.probe_scaling module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.sampling.html"
+                          title="next chapter">processing.sampling module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.run_integrity.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.sampling.html" title="processing.sampling module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.probe_scaling.html" title="processing.probe_scaling module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.run_integrity module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

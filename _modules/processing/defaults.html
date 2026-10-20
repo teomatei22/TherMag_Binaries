@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.defaults &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.defaults</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.defaults</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Validated access to user-editable post-processing defaults (glyphs, IDW, probe bands)."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MappingProxyType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="n">DEFAULTS_FILENAME</span> <span class="o">=</span> <span class="s2">"post_processing_defaults.json"</span>
+
+
+<div class="viewcode-block" id="_object">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._object">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_object</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a nested JSON object field during defaults validation.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping being validated.</span>
+<span class="sd">        key: Child key that must map to a dict.</span>
+<span class="sd">        path: Dot-path prefix used in error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        Mapping[str, Any]: The nested object value.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be an object"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span></div>
+
+
+
+<div class="viewcode-block" id="_number">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._number">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_number</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a numeric (non-bool) JSON field and coerce to float.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping being validated.</span>
+<span class="sd">        key: Child key that must be int/float.</span>
+<span class="sd">        path: Dot-path prefix used in error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Parsed numeric value.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be a number"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_integer">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._integer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_integer</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require an integer-valued numeric JSON field.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping being validated.</span>
+<span class="sd">        key: Child key that must be an integer number.</span>
+<span class="sd">        path: Dot-path prefix used in error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        int: Parsed integer value.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be an integer"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_optional_integer">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._optional_integer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_optional_integer</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Parse an optional integer JSON field, preserving ``None``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping being validated.</span>
+<span class="sd">        key: Child key that may be ``None`` or an integer.</span>
+<span class="sd">        path: Dot-path prefix used in error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        int | None: Parsed integer, or ``None`` when the field is null/absent as ``None``.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">_integer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_string_list">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._string_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_string_list</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a non-empty-string list JSON field.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping being validated.</span>
+<span class="sd">        key: Child key that must be a list of non-empty strings.</span>
+<span class="sd">        path: Dot-path prefix used in error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        tuple[str, ...]: Immutable list of strings.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be a list of non-empty strings"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_number_list">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._number_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_number_list</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a non-empty numeric list JSON field.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping being validated.</span>
+<span class="sd">        key: Child key that must be a non-empty list of numbers.</span>
+<span class="sd">        path: Dot-path prefix used in error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        tuple[float, ...]: Immutable list of floats.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be a non-empty list of numbers"</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be a non-empty list of numbers"</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_validate_positive">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._validate_positive">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_positive</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Assert a numeric default is strictly positive.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        value: Candidate numeric default.</span>
+<span class="sd">        path: Dot-path used in the error message.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: The same ``value`` when ``value &gt; 0``.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> must be greater than zero"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span></div>
+
+
+
+<div class="viewcode-block" id="GeometryDetectionDefaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.GeometryDetectionDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GeometryDetectionDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Heuristics for detecting sphere/prism/cylinder from ``geometry.geo``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        sphere_path_substrings: Path/name markers implying sphere family.</span>
+<span class="sd">        sphere_content_markers: Geo-file text markers implying sphere family.</span>
+<span class="sd">        default_geometry_type: Fallback family when detection is inconclusive.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryDetectionDefaults: Immutable geometry-detection settings.</span>
+<span class="sd">    """</span>
+
+    <span class="n">sphere_path_substrings</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">sphere_content_markers</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">default_geometry_type</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="GlyphDefaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.GlyphDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GlyphDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Per-geometry arrow length fractions of conductor extent for vector glyphs.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        current_density_arrow_fraction_of_extent: J-glyph fraction by family.</span>
+<span class="sd">        magnetic_arrow_fraction_of_extent: B-glyph fraction by family.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GlyphDefaults: Immutable glyph scale fraction maps.</span>
+<span class="sd">    """</span>
+
+    <span class="n">current_density_arrow_fraction_of_extent</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="n">magnetic_arrow_fraction_of_extent</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="ReaderDefaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.ReaderDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReaderDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: VTU/PVTU point and cell arrays enabled in the ParaView reader.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        wanted_point_arrays: Point-data array names to load (T, J, B, etc.).</span>
+<span class="sd">        cell_arrays: Cell-data array names to load (e.g. GeometryIds).</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ReaderDefaults: Immutable reader array selection.</span>
+<span class="sd">    """</span>
+
+    <span class="n">wanted_point_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">cell_arrays</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="JintDefaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.JintDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JintDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Dimensionless multipliers placing interior current-density probes.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        point_multipliers: Maps with ``x_l``, ``y``, ``z_bext_scale`` per probe.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        JintDefaults: Immutable interior probe multiplier set.</span>
+<span class="sd">    """</span>
+
+    <span class="n">point_multipliers</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="BextDefaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.BextDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BextDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Exterior magnetic trusted-band and midplane probe direction settings.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        probe_band_fraction: Fraction along [rho_in, rho_out] for the primary probe.</span>
+<span class="sd">        probe_band_fractions: Per-direction fractions within the trusted band.</span>
+<span class="sd">        r_inf_trusted: Inner trusted radius scale vs ``L_metal_max``.</span>
+<span class="sd">        r_sup_trusted: Outer trusted radius scale vs ``L_metal_max``.</span>
+<span class="sd">        point_directions: Direction vectors for midplane B probes.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        BextDefaults: Immutable exterior B-probe band configuration.</span>
+<span class="sd">    """</span>
+
+    <span class="n">probe_band_fraction</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">probe_band_fractions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">r_inf_trusted</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">r_sup_trusted</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">point_directions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="ExtractionDefaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.ExtractionDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExtractionDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: IDW sampling tolerances plus Jint/Bext probe extraction defaults.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        idw_neighbors: Neighbor count for IDW probe interpolation.</span>
+<span class="sd">        idw_epsilon: Softening length for IDW weights [m].</span>
+<span class="sd">        on_node_epsilon: Exact mesh-node hit distance [m].</span>
+<span class="sd">        jint: Interior J-probe multipliers.</span>
+<span class="sd">        bext: Exterior B trusted-band and directions.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ExtractionDefaults: Immutable probe-extraction settings.</span>
+<span class="sd">    """</span>
+
+    <span class="n">idw_neighbors</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">idw_epsilon</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">on_node_epsilon</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">jint</span><span class="p">:</span> <span class="n">JintDefaults</span>
+    <span class="n">bext</span><span class="p">:</span> <span class="n">BextDefaults</span></div>
+
+
+
+<div class="viewcode-block" id="ModelConfigDefaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.ModelConfigDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelConfigDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Fallback GeometryIds for outer/inner material and air bodies.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        outer_material_id: Default conductive outer body id.</span>
+<span class="sd">        outer_air_id: Default exterior air body id.</span>
+<span class="sd">        inner_air_id: Optional cavity air body id.</span>
+<span class="sd">        inner_material_id: Optional inner conductive layer body id.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ModelConfigDefaults: Immutable default body-id set.</span>
+<span class="sd">    """</span>
+
+    <span class="n">outer_material_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">outer_air_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">inner_air_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">inner_material_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="ProcessingDefaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.ProcessingDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProcessingDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Fully validated post-processing defaults loaded from JSON.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_detection: Sphere/prism/cylinder detection heuristics.</span>
+<span class="sd">        glyph: Vector glyph arrow fractions of extent.</span>
+<span class="sd">        reader: VTU point/cell array selection.</span>
+<span class="sd">        extraction: IDW and probe-band extraction settings.</span>
+<span class="sd">        model_config: Fallback body IDs.</span>
+<span class="sd">        model_layouts: Per-``model_type`` body-id layouts.</span>
+<span class="sd">        raw: Immutable deep copy of the source JSON object.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ProcessingDefaults: Typed defaults with ``to_dict`` / layout helpers.</span>
+<span class="sd">    """</span>
+
+    <span class="n">geometry_detection</span><span class="p">:</span> <span class="n">GeometryDetectionDefaults</span>
+    <span class="n">glyph</span><span class="p">:</span> <span class="n">GlyphDefaults</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="n">ReaderDefaults</span>
+    <span class="n">extraction</span><span class="p">:</span> <span class="n">ExtractionDefaults</span>
+    <span class="n">model_config</span><span class="p">:</span> <span class="n">ModelConfigDefaults</span>
+    <span class="n">model_layouts</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">raw</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">layer_over_model_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: ``model_layouts`` keys that describe layered (inner+outer) conductors.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Reads ``self.model_layouts`` keys.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            frozenset[str]: Layout keys starting with ``layer_over_``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_layouts</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"layer_over_"</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ProcessingDefaults.to_dict">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.ProcessingDefaults.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deep-copy the raw JSON defaults for mutable consumer settings.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.raw``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: Mutable deep copy of the defaults object.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="_parse_geometry_detection">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._parse_geometry_detection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_geometry_detection</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GeometryDetectionDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Validate and parse the ``geometry_detection`` defaults section.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: ``geometry_detection`` object from defaults JSON.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryDetectionDefaults: Parsed detection heuristics.</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">"geometry_detection"</span>
+    <span class="n">default_type</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"default_geometry_type"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">default_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"cylinder"</span><span class="p">,</span> <span class="s2">"prism"</span><span class="p">,</span> <span class="s2">"sphere"</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.default_geometry_type must be cylinder, prism, or sphere"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">GeometryDetectionDefaults</span><span class="p">(</span>
+        <span class="n">sphere_path_substrings</span><span class="o">=</span><span class="n">_string_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"sphere_path_substrings"</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span>
+        <span class="n">sphere_content_markers</span><span class="o">=</span><span class="n">_string_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"sphere_content_markers"</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span>
+        <span class="n">default_geometry_type</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">default_type</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_parse_glyph">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._parse_glyph">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_glyph</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GlyphDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Validate per-family J and B glyph arrow fractions of extent.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: ``glyph`` object from defaults JSON.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GlyphDefaults: Parsed current-density and magnetic glyph fractions.</span>
+<span class="sd">    """</span>
+    <span class="n">fractions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">mag_fractions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"cylinder"</span><span class="p">,</span> <span class="s2">"prism"</span><span class="p">,</span> <span class="s2">"sphere"</span><span class="p">):</span>
+        <span class="n">cd_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"current_density_arrow_fraction_of_extent_</span><span class="si">{</span><span class="n">family</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">mag_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"magnetic_arrow_fraction_of_extent_</span><span class="si">{</span><span class="n">family</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">fractions</span><span class="p">[</span><span class="n">family</span><span class="p">]</span> <span class="o">=</span> <span class="n">_validate_positive</span><span class="p">(</span><span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cd_key</span><span class="p">,</span> <span class="s2">"glyph"</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"glyph.</span><span class="si">{</span><span class="n">cd_key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">mag_fractions</span><span class="p">[</span><span class="n">family</span><span class="p">]</span> <span class="o">=</span> <span class="n">_validate_positive</span><span class="p">(</span><span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mag_key</span><span class="p">,</span> <span class="s2">"glyph"</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"glyph.</span><span class="si">{</span><span class="n">mag_key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">GlyphDefaults</span><span class="p">(</span>
+        <span class="n">current_density_arrow_fraction_of_extent</span><span class="o">=</span><span class="n">MappingProxyType</span><span class="p">(</span><span class="n">fractions</span><span class="p">),</span>
+        <span class="n">magnetic_arrow_fraction_of_extent</span><span class="o">=</span><span class="n">MappingProxyType</span><span class="p">(</span><span class="n">mag_fractions</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_parse_jint">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._parse_jint">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_jint</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">JintDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Validate interior J-probe dimensionless point multipliers.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: ``extraction.jint_defaults`` object from defaults JSON.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        JintDefaults: Parsed interior probe multipliers.</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">"extraction.jint_defaults"</span>
+    <span class="n">raw_points</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"point_multipliers"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_points</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">raw_points</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.point_multipliers must be a non-empty list"</span><span class="p">)</span>
+    <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">raw_points</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.point_multipliers[</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">] must be an object"</span><span class="p">)</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">MappingProxyType</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">"x_l"</span><span class="p">:</span> <span class="n">_number</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s2">"x_l"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.point_multipliers[</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">]"</span><span class="p">),</span>
+                    <span class="s2">"y"</span><span class="p">:</span> <span class="n">_number</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.point_multipliers[</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">]"</span><span class="p">),</span>
+                    <span class="s2">"z_bext_scale"</span><span class="p">:</span> <span class="n">_number</span><span class="p">(</span>
+                        <span class="n">item</span><span class="p">,</span> <span class="s2">"z_bext_scale"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.point_multipliers[</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">]"</span>
+                    <span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">JintDefaults</span><span class="p">(</span><span class="n">point_multipliers</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">points</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="_parse_bext">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._parse_bext">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_bext</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">BextDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Validate exterior B trusted-band scales and midplane probe directions.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: ``extraction.bext_defaults`` object from defaults JSON.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        BextDefaults: Parsed magnetic probe-band configuration.</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">"extraction.bext_defaults"</span>
+    <span class="n">raw_dirs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"point_directions"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_dirs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">raw_dirs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.point_directions must be a non-empty list"</span><span class="p">)</span>
+    <span class="n">directions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">raw_dirs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.point_directions[</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">] must have 3 numbers"</span><span class="p">)</span>
+        <span class="n">directions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
+    <span class="n">fractions</span> <span class="o">=</span> <span class="n">_number_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"probe_band_fractions"</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">band_fraction</span> <span class="o">=</span> <span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"probe_band_fraction"</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">band_fraction</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.probe_band_fraction must be between 0 and 1"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">frac</span> <span class="ow">in</span> <span class="n">fractions</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">frac</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.probe_band_fractions values must be between 0 and 1"</span><span class="p">)</span>
+    <span class="n">r_inf</span> <span class="o">=</span> <span class="n">_validate_positive</span><span class="p">(</span><span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"R_inf_trusted"</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.R_inf_trusted"</span><span class="p">)</span>
+    <span class="n">r_sup</span> <span class="o">=</span> <span class="n">_validate_positive</span><span class="p">(</span><span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"R_sup_trusted"</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.R_sup_trusted"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">r_sup</span> <span class="o">&lt;=</span> <span class="n">r_inf</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.R_sup_trusted must be greater than R_inf_trusted"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">BextDefaults</span><span class="p">(</span>
+        <span class="n">probe_band_fraction</span><span class="o">=</span><span class="n">band_fraction</span><span class="p">,</span>
+        <span class="n">probe_band_fractions</span><span class="o">=</span><span class="n">fractions</span><span class="p">,</span>
+        <span class="n">r_inf_trusted</span><span class="o">=</span><span class="n">r_inf</span><span class="p">,</span>
+        <span class="n">r_sup_trusted</span><span class="o">=</span><span class="n">r_sup</span><span class="p">,</span>
+        <span class="n">point_directions</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">directions</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_parse_model_layouts">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._parse_model_layouts">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_model_layouts</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Validate per-``model_type`` conductive/air body-id layouts.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: ``model_layouts`` object from defaults JSON.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        Mapping[str, Mapping[str, Any]]: Immutable layout map keyed by model type.</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">"model_layouts"</span>
+    <span class="n">layouts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> keys must be non-empty strings"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an object"</span><span class="p">)</span>
+        <span class="n">item_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">layouts</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">MappingProxyType</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"outer_material_id"</span><span class="p">:</span> <span class="n">_integer</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="s2">"outer_material_id"</span><span class="p">,</span> <span class="n">item_path</span><span class="p">),</span>
+                <span class="s2">"outer_air_id"</span><span class="p">:</span> <span class="n">_integer</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="s2">"outer_air_id"</span><span class="p">,</span> <span class="n">item_path</span><span class="p">),</span>
+                <span class="s2">"inner_air_id"</span><span class="p">:</span> <span class="n">_optional_integer</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="s2">"inner_air_id"</span><span class="p">,</span> <span class="n">item_path</span><span class="p">),</span>
+                <span class="s2">"inner_material_id"</span><span class="p">:</span> <span class="n">_optional_integer</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="s2">"inner_material_id"</span><span class="p">,</span> <span class="n">item_path</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">layouts</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> must contain at least one layout"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MappingProxyType</span><span class="p">(</span><span class="n">layouts</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_parse_extraction">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._parse_extraction">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_extraction</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ExtractionDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Validate IDW tolerances and nested Jint/Bext extraction defaults.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: ``extraction`` object from defaults JSON.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ExtractionDefaults: Parsed IDW and probe extraction settings.</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">"extraction"</span>
+    <span class="n">neighbors</span> <span class="o">=</span> <span class="n">_integer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"idw_neighbors"</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">neighbors</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.idw_neighbors must be greater than zero"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ExtractionDefaults</span><span class="p">(</span>
+        <span class="n">idw_neighbors</span><span class="o">=</span><span class="n">neighbors</span><span class="p">,</span>
+        <span class="n">idw_epsilon</span><span class="o">=</span><span class="n">_validate_positive</span><span class="p">(</span><span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"idw_epsilon"</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.idw_epsilon"</span><span class="p">),</span>
+        <span class="n">on_node_epsilon</span><span class="o">=</span><span class="n">_validate_positive</span><span class="p">(</span>
+            <span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"on_node_epsilon"</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.on_node_epsilon"</span>
+        <span class="p">),</span>
+        <span class="n">jint</span><span class="o">=</span><span class="n">_parse_jint</span><span class="p">(</span><span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"jint_defaults"</span><span class="p">,</span> <span class="n">path</span><span class="p">)),</span>
+        <span class="n">bext</span><span class="o">=</span><span class="n">_parse_bext</span><span class="p">(</span><span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"bext_defaults"</span><span class="p">,</span> <span class="n">path</span><span class="p">)),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_parse_defaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._parse_defaults">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_defaults</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ProcessingDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Validate the full post-processing defaults JSON object.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Root object from ``post_processing_defaults.json``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ProcessingDefaults: Fully typed and validated defaults tree.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="s2">"geometry_params"</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"geometry_params is not a processing default; geometry dimensions come from geometry.geo"</span>
+        <span class="p">)</span>
+    <span class="n">detection</span> <span class="o">=</span> <span class="n">_parse_geometry_detection</span><span class="p">(</span><span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"geometry_detection"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">))</span>
+    <span class="n">glyph</span> <span class="o">=</span> <span class="n">_parse_glyph</span><span class="p">(</span><span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"glyph"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">))</span>
+    <span class="n">reader_data</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"reader"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">)</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">ReaderDefaults</span><span class="p">(</span>
+        <span class="n">wanted_point_arrays</span><span class="o">=</span><span class="n">_string_list</span><span class="p">(</span><span class="n">reader_data</span><span class="p">,</span> <span class="s2">"wanted_point_arrays"</span><span class="p">,</span> <span class="s2">"reader"</span><span class="p">),</span>
+        <span class="n">cell_arrays</span><span class="o">=</span><span class="n">_string_list</span><span class="p">(</span><span class="n">reader_data</span><span class="p">,</span> <span class="s2">"cell_arrays"</span><span class="p">,</span> <span class="s2">"reader"</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">extraction</span> <span class="o">=</span> <span class="n">_parse_extraction</span><span class="p">(</span><span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"extraction"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">))</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"model_config_defaults"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ProcessingDefaults</span><span class="p">(</span>
+        <span class="n">geometry_detection</span><span class="o">=</span><span class="n">detection</span><span class="p">,</span>
+        <span class="n">glyph</span><span class="o">=</span><span class="n">glyph</span><span class="p">,</span>
+        <span class="n">reader</span><span class="o">=</span><span class="n">reader</span><span class="p">,</span>
+        <span class="n">extraction</span><span class="o">=</span><span class="n">extraction</span><span class="p">,</span>
+        <span class="n">model_config</span><span class="o">=</span><span class="n">ModelConfigDefaults</span><span class="p">(</span>
+            <span class="n">outer_material_id</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"outer_material_id"</span><span class="p">,</span> <span class="s2">"model_config_defaults"</span><span class="p">),</span>
+            <span class="n">outer_air_id</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"outer_air_id"</span><span class="p">,</span> <span class="s2">"model_config_defaults"</span><span class="p">),</span>
+            <span class="n">inner_air_id</span><span class="o">=</span><span class="n">_optional_integer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"inner_air_id"</span><span class="p">,</span> <span class="s2">"model_config_defaults"</span><span class="p">),</span>
+            <span class="n">inner_material_id</span><span class="o">=</span><span class="n">_optional_integer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"inner_material_id"</span><span class="p">,</span> <span class="s2">"model_config_defaults"</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">model_layouts</span><span class="o">=</span><span class="n">_parse_model_layouts</span><span class="p">(</span><span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"model_layouts"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">)),</span>
+        <span class="n">raw</span><span class="o">=</span><span class="n">MappingProxyType</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">))),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_load_defaults_file">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults._load_defaults_file">[docs]</a>
+<span class="nd">@cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_defaults_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ProcessingDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load and cache validated defaults from a JSON file path.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        path: Absolute path to ``post_processing_defaults.json``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ProcessingDefaults: Cached parsed defaults for ``path``.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing defaults JSON: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Defaults JSON must contain an object: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_parse_defaults</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_processing_defaults">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.load_processing_defaults">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_processing_defaults</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ProcessingDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load packaged or explicit post-processing defaults JSON.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        path: Optional defaults file; defaults to the package ``post_processing_defaults.json``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ProcessingDefaults: Validated defaults instance.</span>
+<span class="sd">    """</span>
+    <span class="n">defaults_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">DEFAULTS_FILENAME</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_load_defaults_file</span><span class="p">(</span><span class="n">defaults_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="deep_merge_dict">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.deep_merge_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">deep_merge_dict</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">overlay</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Recursively merge overlay settings onto a deep-copied base dict.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        base: Base settings mapping (not mutated).</span>
+<span class="sd">        overlay: Override mapping whose nested dicts merge recursively.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        dict[str, Any]: New merged mapping.</span>
+<span class="sd">    """</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">overlay</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">deep_merge_dict</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="load_post_processing_settings">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.load_post_processing_settings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_post_processing_settings</span><span class="p">(</span>
+    <span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load defaults and optionally merge run-local ``processing_config.json`` overlays.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        cwd: Optional FEM run directory; when set, merges ``results/processing_config.json``.</span>
+<span class="sd">        path: Optional explicit defaults JSON path.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        dict[str, Any]: Mutable post-processing settings for ParaView scripts.</span>
+<span class="sd">    """</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">load_processing_defaults</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cwd</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="n">config_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"results"</span> <span class="o">/</span> <span class="s2">"processing_config.json"</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="k">with</span> <span class="n">config_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">run_cfg</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="n">extra</span> <span class="o">=</span> <span class="n">run_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"post_processing_settings"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="k">return</span> <span class="n">deep_merge_dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span></div>
+
+
+
+<span class="n">MANTISSA_DECIMALS</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<div class="viewcode-block" id="truncate_scientific">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.truncate_scientific">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate_scientific</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MANTISSA_DECIMALS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Format a float in truncated scientific notation for CSV/plot ticks.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        value: Numeric value to format [any].</span>
+<span class="sd">        decimals: Mantissa digits kept after truncation.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Scientific string with truncated (not rounded) mantissa.</span>
+<span class="sd">    """</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">number</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">number</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"0.</span><span class="si">{</span><span class="s1">'0'</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">decimals</span><span class="si">}</span><span class="s2">e+00"</span>
+
+    <span class="n">mantissa_text</span><span class="p">,</span> <span class="n">exponent_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">number</span><span class="si">:</span><span class="s2">.17e</span><span class="si">}</span><span class="s2">"</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"e"</span><span class="p">)</span>
+    <span class="n">exponent</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">exponent_text</span><span class="p">)</span>
+    <span class="n">mantissa</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mantissa_text</span><span class="p">)</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">decimals</span>
+    <span class="n">mantissa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">mantissa</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span> <span class="o">/</span> <span class="n">factor</span>
+    <span class="k">if</span> <span class="n">mantissa</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"0.</span><span class="si">{</span><span class="s1">'0'</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">decimals</span><span class="si">}</span><span class="s2">e+00"</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">mantissa</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">decimals</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">e</span><span class="si">{</span><span class="n">exponent</span><span class="si">:</span><span class="s2">+03d</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+
+<div class="viewcode-block" id="format_csv_float">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.format_csv_float">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_csv_float</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Format a CSV numeric cell using truncated scientific notation.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        value: Coercible numeric value [any].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Truncated scientific string suitable for probe CSV columns.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">truncate_scientific</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="truncate_float">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.truncate_float">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate_float</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MANTISSA_DECIMALS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Truncate a float via scientific formatting then parse back to float.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        value: Numeric value [any].</span>
+<span class="sd">        decimals: Mantissa digits kept after truncation.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Value after truncate-through-scientific round-trip.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">truncate_scientific</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">decimals</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="scientific_tick_values">
+<a class="viewcode-back" href="../../api/processing.defaults.html#processing.defaults.scientific_tick_values">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scientific_tick_values</span><span class="p">(</span>
+    <span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build evenly spaced, truncated tick values for scientific color bars.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        lower: Color-bar / axis lower bound [field units].</span>
+<span class="sd">        upper: Color-bar / axis upper bound [field units].</span>
+<span class="sd">        count: Desired number of ticks (minimum 2 for a span).</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        list[float]: Deduplicated truncated tick positions.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">lower</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">upper</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">upper</span> <span class="o">&lt;=</span> <span class="n">lower</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">truncate_float</span><span class="p">(</span><span class="n">lower</span><span class="p">)]</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">upper</span> <span class="o">-</span> <span class="n">lower</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">truncate_float</span><span class="p">(</span><span class="n">lower</span> <span class="o">+</span> <span class="n">index</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">values</span><span class="p">))</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.defaults</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+simulations.generator module
+============================
+
+.. automodule:: simulations.generator
+   :members:
+   :show-inheritance:
+   :undoc-members:

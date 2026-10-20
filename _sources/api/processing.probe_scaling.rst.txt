@@ -1,0 +1,7 @@
+processing.probe\_scaling module
+================================
+
+.. automodule:: processing.probe_scaling
+   :members:
+   :show-inheritance:
+   :undoc-members:

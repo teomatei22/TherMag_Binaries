@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>domain.geometry module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="domain.run_manifest module" href="domain.run_manifest.html" />
+    <link rel="prev" title="domain package" href="domain.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.run_manifest.html" title="domain.run_manifest module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="domain.html" title="domain package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="domain.html" accesskey="U">domain package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.geometry module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-domain.geometry">
+<span id="domain-geometry-module"></span><h1>domain.geometry module<a class="headerlink" href="#module-domain.geometry" title="Link to this heading">¶</a></h1>
+<p>Geometry specification and spatial probe points for FEM post-processing.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.geometry.GeometrySpec">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.geometry.</span></span><span class="sig-name descname"><span class="pre">GeometrySpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/geometry.html#GeometrySpec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.geometry.GeometrySpec" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Named geometry type, parametric dimensions, and optional Gmsh template.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Human-readable geometry case name.</p></li>
+<li><p><strong>geometry_type</strong> – Geometry family identifier (e.g. cylinder, sphere).</p></li>
+<li><p><strong>parameters</strong> – Parametric dimensions keyed by name [m or dimensionless].</p></li>
+<li><p><strong>variant</strong> – Geometry variant label (default <code class="docutils literal notranslate"><span class="pre">full</span></code>).</p></li>
+<li><p><strong>template_file</strong> – Optional path to a Gmsh <code class="docutils literal notranslate"><span class="pre">.geo</span></code> template.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometrySpec</strong> – Immutable named geometry specification for FEM cases.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>parameters</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+<li><p><strong>template_file</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.geometry.GeometrySpec.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/geometry.html#GeometrySpec.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.geometry.GeometrySpec.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize a geometry specification from a mapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – Mapping with <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">geometry_type</span></code>, <code class="docutils literal notranslate"><span class="pre">parameters</span></code>, optional
+<code class="docutils literal notranslate"><span class="pre">variant</span></code> and <code class="docutils literal notranslate"><span class="pre">template_file</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometrySpec</strong> – Immutable geometry specification.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.geometry.GeometrySpec" title="domain.geometry.GeometrySpec"><em>GeometrySpec</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.geometry.GeometrySpec.geometry_type">
+<span class="sig-name descname"><span class="pre">geometry_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#domain.geometry.GeometrySpec.geometry_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.geometry.GeometrySpec.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#domain.geometry.GeometrySpec.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.geometry.GeometrySpec.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#domain.geometry.GeometrySpec.parameters" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.geometry.GeometrySpec.template_file">
+<span class="sig-name descname"><span class="pre">template_file</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#domain.geometry.GeometrySpec.template_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.geometry.GeometrySpec.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/geometry.html#GeometrySpec.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.geometry.GeometrySpec.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize the geometry specification for manifest persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses geometry fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – JSON-serializable geometry mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.geometry.GeometrySpec.variant">
+<span class="sig-name descname"><span class="pre">variant</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full'</span></span><a class="headerlink" href="#domain.geometry.GeometrySpec.variant" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.geometry.ProbePoint">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.geometry.</span></span><span class="sig-name descname"><span class="pre">ProbePoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/geometry.html#ProbePoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.geometry.ProbePoint" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Cartesian point where field quantities are sampled after the FEM solve [m].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – X-coordinate of the probe [m].</p></li>
+<li><p><strong>y</strong> – Y-coordinate of the probe [m].</p></li>
+<li><p><strong>z</strong> – Z-coordinate of the probe [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ProbePoint</strong> – Immutable Cartesian probe location for post-processing samples.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.geometry.ProbePoint.from_value">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/geometry.html#ProbePoint.from_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.geometry.ProbePoint.from_value" title="Link to this definition">¶</a></dt>
+<dd><p>Build a probe from a ProbePoint, dict, or length-3 sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Existing <code class="docutils literal notranslate"><span class="pre">ProbePoint</span></code>, <code class="docutils literal notranslate"><span class="pre">{x,y,z}</span></code> mapping, or <code class="docutils literal notranslate"><span class="pre">(x,y,z)</span></code> sequence [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ProbePoint</strong> – Normalized immutable probe point.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.geometry.ProbePoint" title="domain.geometry.ProbePoint"><em>ProbePoint</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.geometry.ProbePoint.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/geometry.html#ProbePoint.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.geometry.ProbePoint.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize the probe coordinates to a plain dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.x</span></code>, <code class="docutils literal notranslate"><span class="pre">self.y</span></code>, <code class="docutils literal notranslate"><span class="pre">self.z</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, float]</strong> – Mapping with keys <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code> [m].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.geometry.ProbePoint.x">
+<span class="sig-name descname"><span class="pre">x</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.geometry.ProbePoint.x" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.geometry.ProbePoint.y">
+<span class="sig-name descname"><span class="pre">y</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.geometry.ProbePoint.y" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.geometry.ProbePoint.z">
+<span class="sig-name descname"><span class="pre">z</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.geometry.ProbePoint.z" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">domain.geometry module</a><ul>
+<li><a class="reference internal" href="#domain.geometry.GeometrySpec"><code class="docutils literal notranslate"><span class="pre">GeometrySpec</span></code></a><ul>
+<li><a class="reference internal" href="#domain.geometry.GeometrySpec.from_dict"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.GeometrySpec.geometry_type"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.geometry_type</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.GeometrySpec.name"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.name</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.GeometrySpec.parameters"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.parameters</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.GeometrySpec.template_file"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.template_file</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.GeometrySpec.to_dict"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.to_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.GeometrySpec.variant"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.variant</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#domain.geometry.ProbePoint"><code class="docutils literal notranslate"><span class="pre">ProbePoint</span></code></a><ul>
+<li><a class="reference internal" href="#domain.geometry.ProbePoint.from_value"><code class="docutils literal notranslate"><span class="pre">ProbePoint.from_value()</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.ProbePoint.to_dict"><code class="docutils literal notranslate"><span class="pre">ProbePoint.to_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.ProbePoint.x"><code class="docutils literal notranslate"><span class="pre">ProbePoint.x</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.ProbePoint.y"><code class="docutils literal notranslate"><span class="pre">ProbePoint.y</span></code></a></li>
+<li><a class="reference internal" href="#domain.geometry.ProbePoint.z"><code class="docutils literal notranslate"><span class="pre">ProbePoint.z</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="domain.html"
+                          title="previous chapter">domain package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="domain.run_manifest.html"
+                          title="next chapter">domain.run_manifest module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/domain.geometry.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.run_manifest.html" title="domain.run_manifest module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="domain.html" title="domain package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="domain.html" >domain package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.geometry module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts.temperature_map module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.base module" href="processing.base.html" />
+    <link rel="prev" title="processing.scripts.sweep_plot module" href="processing.scripts.sweep_plot.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.base.html" title="processing.base module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.sweep_plot.html" title="processing.scripts.sweep_plot module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" accesskey="U">processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.temperature_map module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts.temperature_map">
+<span id="processing-scripts-temperature-map-module"></span><h1>processing.scripts.temperature_map module<a class="headerlink" href="#module-processing.scripts.temperature_map" title="Link to this heading">¶</a></h1>
+<p>ParaView temperature surface map on conductive GeometryIds with commanded T-range LUT.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.scripts.temperature_map.TemperatureMap">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.scripts.temperature_map.</span></span><span class="sig-name descname"><span class="pre">TemperatureMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/temperature_map.html#TemperatureMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.temperature_map.TemperatureMap" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePostProcessor</span></code></p>
+<p>ParaView temperature surface visualization on conductive GeometryIds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_dir</strong> – FEM run directory [path].</p></li>
+<li><p><strong>verbose</strong> – Verbose logging flag.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TemperatureMap</strong> – Writes <code class="docutils literal notranslate"><span class="pre">temperature_map.png</span></code> or <code class="docutils literal notranslate"><span class="pre">.mp4</span></code>.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.temperature_map.TemperatureMap._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#processing.scripts.temperature_map.TemperatureMap._abc_impl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.temperature_map.TemperatureMap._commanded_temperature_range">
+<span class="sig-name descname"><span class="pre">_commanded_temperature_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/temperature_map.html#TemperatureMap._commanded_temperature_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.temperature_map.TemperatureMap._commanded_temperature_range" title="Link to this definition">¶</a></dt>
+<dd><p>Load commanded temperature range from <code class="docutils literal notranslate"><span class="pre">case.sif</span></code> in the run directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Map instance with <code class="docutils literal notranslate"><span class="pre">cwd</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple | None</strong> – <code class="docutils literal notranslate"><span class="pre">(T_cold,</span> <span class="pre">T_hot)</span></code> [K], or <code class="docutils literal notranslate"><span class="pre">None</span></code> if file missing/unparseable.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[float, float] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.temperature_map.TemperatureMap._parse_commanded_temperature_range">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_parse_commanded_temperature_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">case_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/temperature_map.html#TemperatureMap._parse_commanded_temperature_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.temperature_map.TemperatureMap._parse_commanded_temperature_range" title="Link to this definition">¶</a></dt>
+<dd><p>Parse cold/hot commanded temperatures from Elmer <code class="docutils literal notranslate"><span class="pre">case.sif</span></code> MATC Time Variable block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>case_text</strong> – Full <code class="docutils literal notranslate"><span class="pre">case.sif</span></code> source text.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple | None</strong> – <code class="docutils literal notranslate"><span class="pre">(T_cold,</span> <span class="pre">T_hot)</span></code> [K] sorted, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>case_text</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, float] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.temperature_map.TemperatureMap.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/temperature_map.html#TemperatureMap.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.temperature_map.TemperatureMap.run" title="Link to this definition">¶</a></dt>
+<dd><p>Threshold conductive cells, color by temperature with locked LUT, save PNG/MP4.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Map instance with VTU inputs.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes <code class="docutils literal notranslate"><span class="pre">temperature_map.png</span></code> or <code class="docutils literal notranslate"><span class="pre">.mp4</span></code>; exits 1 on failure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.temperature_map.main">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.temperature_map.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/temperature_map.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.temperature_map.main" title="Link to this definition">¶</a></dt>
+<dd><p>CLI entry that runs <code class="docutils literal notranslate"><span class="pre">TemperatureMap</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – Uses process cwd / default VTU discovery.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Runs the temperature map pipeline.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts.temperature_map module</a><ul>
+<li><a class="reference internal" href="#processing.scripts.temperature_map.TemperatureMap"><code class="docutils literal notranslate"><span class="pre">TemperatureMap</span></code></a><ul>
+<li><a class="reference internal" href="#processing.scripts.temperature_map.TemperatureMap._abc_impl"><code class="docutils literal notranslate"><span class="pre">TemperatureMap._abc_impl</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.temperature_map.TemperatureMap._commanded_temperature_range"><code class="docutils literal notranslate"><span class="pre">TemperatureMap._commanded_temperature_range()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.temperature_map.TemperatureMap._parse_commanded_temperature_range"><code class="docutils literal notranslate"><span class="pre">TemperatureMap._parse_commanded_temperature_range()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.temperature_map.TemperatureMap.run"><code class="docutils literal notranslate"><span class="pre">TemperatureMap.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.scripts.temperature_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.sweep_plot.html"
+                          title="previous chapter">processing.scripts.sweep_plot module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.base.html"
+                          title="next chapter">processing.base module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.temperature_map.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.base.html" title="processing.base module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.sweep_plot.html" title="processing.scripts.sweep_plot module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" >processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.temperature_map module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

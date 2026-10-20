@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts.interior_probe_common module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts.magnetic_field_contour_map module" href="processing.scripts.magnetic_field_contour_map.html" />
+    <link rel="prev" title="processing.scripts.geometry_contract module" href="processing.scripts.geometry_contract.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_contour_map.html" title="processing.scripts.magnetic_field_contour_map module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.geometry_contract.html" title="processing.scripts.geometry_contract module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" accesskey="U">processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.interior_probe_common module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts.interior_probe_common">
+<span id="processing-scripts-interior-probe-common-module"></span><h1>processing.scripts.interior_probe_common module<a class="headerlink" href="#module-processing.scripts.interior_probe_common" title="Link to this heading">¶</a></h1>
+<p>Shared interior (J_int) probe sampling with air/conductor region detection and IDW interp.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.scripts.interior_probe_common.</span></span><span class="sig-name descname"><span class="pre">InteriorProbeSampler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probe_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#processing.scripts.interior_probe_common.ProbeRegionMixin" title="processing.scripts.interior_probe_common.ProbeRegionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProbeRegionMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePostProcessor</span></code></p>
+<p>ParaView IDW sampler for interior J, T, and φ at configured probe points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_dir</strong> – FEM run directory [path].</p></li>
+<li><p><strong>verbose</strong> – Enable verbose logging.</p></li>
+<li><p><strong>probe_points</strong> – Optional explicit probes; else scaled J_int defaults.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>InteriorProbeSampler</strong> – Post-processor with <code class="docutils literal notranslate"><span class="pre">sample_at_point</span></code> IDW API.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>probe_points</strong> (<em>list</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._abc_impl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler._clear_cache">
+<span class="sig-name descname"><span class="pre">_clear_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler._clear_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._clear_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Destroy cached ParaView objects for the current VTU/region threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Sampler instance.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Clears <code class="docutils literal notranslate"><span class="pre">_cache</span></code> / <code class="docutils literal notranslate"><span class="pre">_cache_key</span></code> after cleanup.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler._conductive_region">
+<span class="sig-name descname"><span class="pre">_conductive_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler._conductive_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._conductive_region" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler._material_names">
+<span class="sig-name descname"><span class="pre">_material_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler._material_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._material_names" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Dict</em>[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler._prepare_cache">
+<span class="sig-name descname"><span class="pre">_prepare_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vtu_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_air</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">air_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler._prepare_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._prepare_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Build or reuse VTU Threshold+MergeBlocks cache of J/T/P point arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Sampler instance.</p></li>
+<li><p><strong>vtu_file</strong> – VTU path for this timestep [path].</p></li>
+<li><p><strong>in_air</strong> – Threshold air GeometryIds when true; else conductive range.</p></li>
+<li><p><strong>air_ids</strong> – Outer/inner air GeometryId tuple when <code class="docutils literal notranslate"><span class="pre">in_air</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – Cache with <code class="docutils literal notranslate"><span class="pre">points_np</span></code>, J/T/P arrays, and ParaView <code class="docutils literal notranslate"><span class="pre">objects</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vtu_file</strong> (<em>str</em>)</p></li>
+<li><p><strong>in_air</strong> (<em>bool</em>)</p></li>
+<li><p><strong>air_ids</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Dict</em>[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler._probe_expected_region">
+<span class="sig-name descname"><span class="pre">_probe_expected_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler._probe_expected_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._probe_expected_region" title="Link to this definition">¶</a></dt>
+<dd><p>Classify probe xyz into <code class="docutils literal notranslate"><span class="pre">inner_air</span></code>, <code class="docutils literal notranslate"><span class="pre">outer_air</span></code>, or a material region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Sampler instance.</p></li>
+<li><p><strong>x</strong> – Probe x [m].</p></li>
+<li><p><strong>y</strong> – Probe y [m].</p></li>
+<li><p><strong>z</strong> – Probe z [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Expected sampling region name.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler._sampling_region_ids">
+<span class="sig-name descname"><span class="pre">_sampling_region_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler._sampling_region_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._sampling_region_ids" title="Link to this definition">¶</a></dt>
+<dd><p>Map expected region name to (in_air, GeometryIds, region label) for Threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Sampler with <code class="docutils literal notranslate"><span class="pre">config</span></code> air/conductor IDs.</p></li>
+<li><p><strong>expected_region</strong> – <code class="docutils literal notranslate"><span class="pre">inner_air</span></code> / <code class="docutils literal notranslate"><span class="pre">outer_air</span></code> / material region.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(in_air,</span> <span class="pre">air_ids_tuple,</span> <span class="pre">region_label)</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>expected_region</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[bool, <em>Tuple</em>[int, …], str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler._validate_required_config">
+<span class="sig-name descname"><span class="pre">_validate_required_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler._validate_required_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._validate_required_config" title="Link to this definition">¶</a></dt>
+<dd><p>Ensure extraction IDW keys and J_int point multipliers exist in settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Sampler with <code class="docutils literal notranslate"><span class="pre">pp_settings[&quot;extraction&quot;]</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Raises <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> if required keys are missing.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.InteriorProbeSampler.sample_at_point">
+<span class="sig-name descname"><span class="pre">sample_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vtu_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#InteriorProbeSampler.sample_at_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.InteriorProbeSampler.sample_at_point" title="Link to this definition">¶</a></dt>
+<dd><p>IDW-sample J, T, and P at (x,y,z) in the probe’s expected mesh region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Sampler instance.</p></li>
+<li><p><strong>x</strong> – Probe x [m].</p></li>
+<li><p><strong>y</strong> – Probe y [m].</p></li>
+<li><p><strong>z</strong> – Probe z [m].</p></li>
+<li><p><strong>vtu_file</strong> – Optional VTU path; defaults to first timestep [path].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – <code class="docutils literal notranslate"><span class="pre">Jx,Jy,Jz,T,P</span></code>, nearest point, sample_region, and IDW diagnostics.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+<li><p><strong>vtu_file</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Dict</em>[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.ProbeRegionMixin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.scripts.interior_probe_common.</span></span><span class="sig-name descname"><span class="pre">ProbeRegionMixin</span></span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#ProbeRegionMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.ProbeRegionMixin" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Classify probe xyz into conductor / outer_air / inner_air via geometry contract.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Host post-processor providing <code class="docutils literal notranslate"><span class="pre">cwd</span></code>, <code class="docutils literal notranslate"><span class="pre">geometry</span></code>, and <code class="docutils literal notranslate"><span class="pre">config</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mixin</strong> – Region helpers for sphere/prism/cylinder hollow and air tests.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.ProbeRegionMixin._effective_geometry_type">
+<span class="sig-name descname"><span class="pre">_effective_geometry_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#ProbeRegionMixin._effective_geometry_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._effective_geometry_type" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve geometry family from contract, falling back to <code class="docutils literal notranslate"><span class="pre">geometry.geometry_type</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Mixin host.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Lowercased family (<code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, …).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.ProbeRegionMixin._geometry_contract">
+<span class="sig-name descname"><span class="pre">_geometry_contract</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#ProbeRegionMixin._geometry_contract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._geometry_contract" title="Link to this definition">¶</a></dt>
+<dd><p>Load and cache <code class="docutils literal notranslate"><span class="pre">GeometryContract</span></code> for the current run directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Mixin host with <code class="docutils literal notranslate"><span class="pre">cwd</span></code> [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryContract</strong> – Cached contract instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.ProbeRegionMixin._is_in_air_region">
+<span class="sig-name descname"><span class="pre">_is_in_air_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#ProbeRegionMixin._is_in_air_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._is_in_air_region" title="Link to this definition">¶</a></dt>
+<dd><p>Test whether (x,y,z) is in outer or inner air (not solid conductor).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Mixin host.</p></li>
+<li><p><strong>x</strong> – Probe x [m].</p></li>
+<li><p><strong>y</strong> – Probe y [m].</p></li>
+<li><p><strong>z</strong> – Probe z [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> for exterior air, domain exterior, or hollow cavity air.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.ProbeRegionMixin._is_inside_inner_cavity">
+<span class="sig-name descname"><span class="pre">_is_inside_inner_cavity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#ProbeRegionMixin._is_inside_inner_cavity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._is_inside_inner_cavity" title="Link to this definition">¶</a></dt>
+<dd><p>Test whether (x,y,z) lies in the hollow inner cavity (air) region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Mixin host.</p></li>
+<li><p><strong>x</strong> – Probe x [m].</p></li>
+<li><p><strong>y</strong> – Probe y [m].</p></li>
+<li><p><strong>z</strong> – Probe z [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> if inside cavity for hollow sphere/prism/cylinder topologies.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.ProbeRegionMixin._sphere_radii">
+<span class="sig-name descname"><span class="pre">_sphere_radii</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#ProbeRegionMixin._sphere_radii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._sphere_radii" title="Link to this definition">¶</a></dt>
+<dd><p>Return sphere body/layer/cavity/domain radii required for material-body sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Mixin host whose sphere contract has metal radius <code class="docutils literal notranslate"><span class="pre">R_sphere</span></code> and domain <code class="docutils literal notranslate"><span class="pre">R_sph</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(r_outer,</span> <span class="pre">r_layer,</span> <span class="pre">r_cavity,</span> <span class="pre">r_domain)</span></code> in metres (<code class="docutils literal notranslate"><span class="pre">None</span></code> where absent).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tuple</em>[float, float | None, float | None, float | None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.load_jint_probe_points_from_config">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.interior_probe_common.</span></span><span class="sig-name descname"><span class="pre">load_jint_probe_points_from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">script_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#load_jint_probe_points_from_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.load_jint_probe_points_from_config" title="Link to this definition">¶</a></dt>
+<dd><p>Load J_int <code class="docutils literal notranslate"><span class="pre">probe_points</span></code> from processing config for named script entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> – Path to <code class="docutils literal notranslate"><span class="pre">processing_config.json</span></code> [path].</p></li>
+<li><p><strong>script_names</strong> – Script <code class="docutils literal notranslate"><span class="pre">name</span></code> values to search for probe parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list | None</strong> – Probe point entries, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if config missing / unset.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<em>Path</em>)</p></li>
+<li><p><strong>script_names</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Any</em>] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.interior_probe_common.normalize_probe_dict">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.interior_probe_common.</span></span><span class="sig-name descname"><span class="pre">normalize_probe_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probe</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/interior_probe_common.html#normalize_probe_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.interior_probe_common.normalize_probe_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Validate and coerce a probe dict to float <code class="docutils literal notranslate"><span class="pre">x,y,z</span></code> keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>probe</strong> – Mapping expected to contain <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code> [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict | None</strong> – <code class="docutils literal notranslate"><span class="pre">{&quot;x&quot;,&quot;y&quot;,&quot;z&quot;}</span></code> floats, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if invalid.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>probe</strong> (<em>dict</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Dict</em>[str, <em>Any</em>] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts.interior_probe_common module</a><ul>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler</span></code></a><ul>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._abc_impl"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._abc_impl</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._clear_cache"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._clear_cache()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._conductive_region"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._conductive_region()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._material_names"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._material_names()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._prepare_cache"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._prepare_cache()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._probe_expected_region"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._probe_expected_region()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._sampling_region_ids"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._sampling_region_ids()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler._validate_required_config"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._validate_required_config()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.InteriorProbeSampler.sample_at_point"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler.sample_at_point()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.ProbeRegionMixin"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin</span></code></a><ul>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._effective_geometry_type"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._effective_geometry_type()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._geometry_contract"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._geometry_contract()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._is_in_air_region"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._is_in_air_region()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._is_inside_inner_cavity"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._is_inside_inner_cavity()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.ProbeRegionMixin._sphere_radii"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._sphere_radii()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.load_jint_probe_points_from_config"><code class="docutils literal notranslate"><span class="pre">load_jint_probe_points_from_config()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.interior_probe_common.normalize_probe_dict"><code class="docutils literal notranslate"><span class="pre">normalize_probe_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.geometry_contract.html"
+                          title="previous chapter">processing.scripts.geometry_contract module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.magnetic_field_contour_map.html"
+                          title="next chapter">processing.scripts.magnetic_field_contour_map module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.interior_probe_common.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_contour_map.html" title="processing.scripts.magnetic_field_contour_map module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.geometry_contract.html" title="processing.scripts.geometry_contract module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" >processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.interior_probe_common module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

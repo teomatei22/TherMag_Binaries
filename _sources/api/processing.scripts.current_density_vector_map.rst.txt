@@ -1,0 +1,7 @@
+processing.scripts.current\_density\_vector\_map module
+=======================================================
+
+.. automodule:: processing.scripts.current_density_vector_map
+   :members:
+   :show-inheritance:
+   :undoc-members:

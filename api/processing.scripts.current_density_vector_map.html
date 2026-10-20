@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts.current_density_vector_map module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts.generate_plots module" href="processing.scripts.generate_plots.html" />
+    <link rel="prev" title="processing.scripts.current_density_interior module" href="processing.scripts.current_density_interior.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.generate_plots.html" title="processing.scripts.generate_plots module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.current_density_interior.html" title="processing.scripts.current_density_interior module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" accesskey="U">processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.current_density_vector_map module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts.current_density_vector_map">
+<span id="processing-scripts-current-density-vector-map-module"></span><h1>processing.scripts.current_density_vector_map module<a class="headerlink" href="#module-processing.scripts.current_density_vector_map" title="Link to this heading">¶</a></h1>
+<p>ParaView glyph vector map of total/source current density inside conductive regions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.scripts.current_density_vector_map.CurrentDensityVectorMap">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.scripts.current_density_vector_map.</span></span><span class="sig-name descname"><span class="pre">CurrentDensityVectorMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/current_density_vector_map.html#CurrentDensityVectorMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.current_density_vector_map.CurrentDensityVectorMap" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePostProcessor</span></code></p>
+<p>ParaView glyph map of total/source current density inside conductive GeometryIds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_dir</strong> – FEM run directory [path].</p></li>
+<li><p><strong>verbose</strong> – Verbose logging flag.</p></li>
+<li><p><strong>arrow_fraction</strong> – Optional glyph arrow size fraction override.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>CurrentDensityVectorMap</strong> – Writes current-density vector-map PNG or MP4.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.current_density_vector_map.CurrentDensityVectorMap._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#processing.scripts.current_density_vector_map.CurrentDensityVectorMap._abc_impl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.current_density_vector_map.CurrentDensityVectorMap.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/current_density_vector_map.html#CurrentDensityVectorMap.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.current_density_vector_map.CurrentDensityVectorMap.run" title="Link to this definition">¶</a></dt>
+<dd><p>Threshold conductive cells, glyph <code class="docutils literal notranslate"><span class="pre">JSource</span></code>, color by abs(J), save PNG/MP4.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Map instance with VTU inputs.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes <code class="docutils literal notranslate"><span class="pre">current_density_vector_map.png</span></code> or <code class="docutils literal notranslate"><span class="pre">.mp4</span></code>; exits 1 on failure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.current_density_vector_map.main">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.current_density_vector_map.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/current_density_vector_map.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.current_density_vector_map.main" title="Link to this definition">¶</a></dt>
+<dd><p>CLI entry that runs <code class="docutils literal notranslate"><span class="pre">CurrentDensityVectorMap</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – Uses process cwd / default VTU discovery.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Runs the vector-map pipeline.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts.current_density_vector_map module</a><ul>
+<li><a class="reference internal" href="#processing.scripts.current_density_vector_map.CurrentDensityVectorMap"><code class="docutils literal notranslate"><span class="pre">CurrentDensityVectorMap</span></code></a><ul>
+<li><a class="reference internal" href="#processing.scripts.current_density_vector_map.CurrentDensityVectorMap._abc_impl"><code class="docutils literal notranslate"><span class="pre">CurrentDensityVectorMap._abc_impl</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.current_density_vector_map.CurrentDensityVectorMap.run"><code class="docutils literal notranslate"><span class="pre">CurrentDensityVectorMap.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.scripts.current_density_vector_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.current_density_interior.html"
+                          title="previous chapter">processing.scripts.current_density_interior module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.generate_plots.html"
+                          title="next chapter">processing.scripts.generate_plots module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.current_density_vector_map.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.generate_plots.html" title="processing.scripts.generate_plots module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.current_density_interior.html" title="processing.scripts.current_density_interior module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" >processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.current_density_vector_map module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

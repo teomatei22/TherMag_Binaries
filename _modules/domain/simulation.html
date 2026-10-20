@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>domain.simulation &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.simulation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for domain.simulation</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Simulation configuration models for thermal, electric BC, and solver options."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">config.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApplicationDefaults</span><span class="p">,</span> <span class="n">load_application_defaults</span>
+
+<span class="n">STEADY_SIMULATION_TYPE</span> <span class="o">=</span> <span class="s2">"steady"</span>
+<span class="n">TIME_DEPENDENT_SIMULATION_TYPE</span> <span class="o">=</span> <span class="s2">"time_dependent"</span>
+
+
+<div class="viewcode-block" id="_defaults">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation._defaults">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_defaults</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ApplicationDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load cached application defaults for config field factories.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        N/A: No parameters.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ApplicationDefaults: Validated application defaults.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">load_application_defaults</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="_integration_steps">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation._integration_steps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_integration_steps</span><span class="p">(</span><span class="n">total_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="n">ApplicationDefaults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Compute transient integration steps from total time and timestep size.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        total_time: Simulated physical duration [s].</span>
+<span class="sd">        defaults: Application defaults providing ``driver_runtime.timestep_size`` [s].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        int: Number of integration steps (at least 1).</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_time</span> <span class="o">/</span> <span class="n">defaults</span><span class="o">.</span><span class="n">driver_runtime</span><span class="o">.</span><span class="n">timestep_size</span><span class="p">)))</span></div>
+
+
+
+<div class="viewcode-block" id="_default_integration_steps">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation._default_integration_steps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_default_integration_steps</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Default integration-step count from packaged time-dependent defaults.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        N/A: Loads application defaults.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        int: Integration steps for the default total time.</span>
+<span class="sd">    """</span>
+    <span class="n">defaults</span> <span class="o">=</span> <span class="n">_defaults</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_integration_steps</span><span class="p">(</span><span class="n">defaults</span><span class="o">.</span><span class="n">time_dependent</span><span class="o">.</span><span class="n">total_time</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TemperatureConfig">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.TemperatureConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TemperatureConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Hot/cold thermal BC temperatures and optional driving frequency [K, Hz].</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        t_hot: Hot-side boundary temperature [K].</span>
+<span class="sd">        t_cold: Cold-side boundary temperature [K].</span>
+<span class="sd">        frequency: Optional thermal-driver frequency [Hz]; ``None`` for steady.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        TemperatureConfig: Immutable thermal BC temperatures and optional frequency.</span>
+<span class="sd">    """</span>
+
+    <span class="n">t_hot</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">t_hot</span><span class="p">)</span>
+    <span class="n">t_cold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">t_cold</span><span class="p">)</span>
+    <span class="n">frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="TemperatureConfig.from_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.TemperatureConfig.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">ApplicationDefaults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">driver_period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"TemperatureConfig"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Build temperature config; frequency is inverse of driver period when set.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with optional ``t_hot`` and ``t_cold`` [K].</span>
+<span class="sd">            defaults: Optional application defaults for missing temperatures.</span>
+<span class="sd">            driver_period: Optional thermal-driver period [s]; sets ``frequency = 1/period``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            TemperatureConfig: Immutable temperature configuration.</span>
+<span class="sd">        """</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span> <span class="ow">or</span> <span class="n">_defaults</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">driver_period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">driver_period</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">driver_period</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frequency</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">t_hot</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"t_hot"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">t_hot</span><span class="p">)),</span>
+            <span class="n">t_cold</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"t_cold"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">t_cold</span><span class="p">)),</span>
+            <span class="n">frequency</span><span class="o">=</span><span class="n">frequency</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TemperatureConfig.to_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.TemperatureConfig.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize temperature settings for manifest persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, float | None]: Mapping of ``t_hot``, ``t_cold``, and ``frequency``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"t_hot"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_hot</span><span class="p">,</span>
+            <span class="s2">"t_cold"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_cold</span><span class="p">,</span>
+            <span class="s2">"frequency"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">,</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TimeDependentConfig">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.TimeDependentConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TimeDependentConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Transient simulation duration, driver period, and derived integration steps.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        total_time: Simulated physical duration [s].</span>
+<span class="sd">        driver_period: Thermal-driver period [s].</span>
+<span class="sd">        integration_steps: Derived number of transient integration steps.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        TimeDependentConfig: Immutable transient duration and integration settings.</span>
+<span class="sd">    """</span>
+
+    <span class="n">total_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">time_dependent</span><span class="o">.</span><span class="n">total_time</span><span class="p">)</span>
+    <span class="n">driver_period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">time_dependent</span><span class="o">.</span><span class="n">driver_period</span><span class="p">)</span>
+    <span class="n">integration_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_default_integration_steps</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TimeDependentConfig.from_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.TimeDependentConfig.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">ApplicationDefaults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"TimeDependentConfig"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize time-dependent settings and derive integration steps.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with optional ``total_time`` [s] and ``driver_period`` [s].</span>
+<span class="sd">            defaults: Optional application defaults for missing fields.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            TimeDependentConfig: Immutable time-dependent configuration.</span>
+<span class="sd">        """</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span> <span class="ow">or</span> <span class="n">_defaults</span><span class="p">()</span>
+        <span class="n">total_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"total_time"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">time_dependent</span><span class="o">.</span><span class="n">total_time</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">total_time</span><span class="o">=</span><span class="n">total_time</span><span class="p">,</span>
+            <span class="n">driver_period</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"driver_period"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">time_dependent</span><span class="o">.</span><span class="n">driver_period</span><span class="p">)),</span>
+            <span class="n">integration_steps</span><span class="o">=</span><span class="n">_integration_steps</span><span class="p">(</span><span class="n">total_time</span><span class="p">,</span> <span class="n">defaults</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TimeDependentConfig.to_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.TimeDependentConfig.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize time-dependent settings for manifest persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: Mapping of total time, period, and integration steps.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"total_time"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span><span class="p">,</span>
+            <span class="s2">"driver_period"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver_period</span><span class="p">,</span>
+            <span class="s2">"integration_steps"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">integration_steps</span><span class="p">,</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ElectricBCConfig">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.ElectricBCConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ElectricBCConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Optional Dirichlet electric potentials on two named boundaries [V].</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        bc1_enabled: Whether the first electric BC is active.</span>
+<span class="sd">        bc1_potential: First boundary potential [V], or ``None`` when free.</span>
+<span class="sd">        bc2_enabled: Whether the second electric BC is active.</span>
+<span class="sd">        bc2_potential: Second boundary potential [V], or ``None`` when free.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ElectricBCConfig: Immutable electric Dirichlet BC enable flags and potentials.</span>
+<span class="sd">    """</span>
+
+    <span class="n">bc1_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">bc1_enabled</span><span class="p">)</span>
+    <span class="n">bc1_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">bc1_potential</span>
+    <span class="p">)</span>
+    <span class="n">bc2_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">bc2_enabled</span><span class="p">)</span>
+    <span class="n">bc2_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">bc2_potential</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ElectricBCConfig._parse_potential">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.ElectricBCConfig._parse_potential">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_potential</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Parse a potential value, treating free/empty markers as unset.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            raw: Raw potential (number, ``None``, or free/null string).</span>
+<span class="sd">            enabled: Whether the corresponding electric BC is active.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float | None: Potential in volts, or ``None`` when disabled or free.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">enabled</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="s2">"free"</span><span class="p">,</span> <span class="s2">"null"</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElectricBCConfig._serialize_potential">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.ElectricBCConfig._serialize_potential">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_potential</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Encode an optional potential for JSON (``free`` when unset).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            value: Potential in volts, or ``None`` for a free boundary.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float | str: Numeric potential or the string ``free``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"free"</span></div>
+
+
+<div class="viewcode-block" id="ElectricBCConfig.from_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.ElectricBCConfig.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">ApplicationDefaults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ElectricBCConfig"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize electric BC enable flags and potentials.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with ``bc1_/bc2_enabled`` and ``bc1_/bc2_potential``.</span>
+<span class="sd">            defaults: Optional application defaults for missing fields.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            ElectricBCConfig: Immutable electric BC configuration.</span>
+<span class="sd">        """</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span> <span class="ow">or</span> <span class="n">_defaults</span><span class="p">()</span>
+        <span class="n">bc1_enabled</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"bc1_enabled"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">bc1_enabled</span><span class="p">))</span>
+        <span class="n">bc2_enabled</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"bc2_enabled"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">bc2_enabled</span><span class="p">))</span>
+        <span class="n">bc1_raw</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"bc1_potential"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">bc1_potential</span><span class="p">)</span>
+        <span class="n">bc2_raw</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"bc2_potential"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">bc2_potential</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">bc1_enabled</span><span class="o">=</span><span class="n">bc1_enabled</span><span class="p">,</span>
+            <span class="n">bc1_potential</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_parse_potential</span><span class="p">(</span><span class="n">bc1_raw</span><span class="p">,</span> <span class="n">enabled</span><span class="o">=</span><span class="n">bc1_enabled</span><span class="p">),</span>
+            <span class="n">bc2_enabled</span><span class="o">=</span><span class="n">bc2_enabled</span><span class="p">,</span>
+            <span class="n">bc2_potential</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_parse_potential</span><span class="p">(</span><span class="n">bc2_raw</span><span class="p">,</span> <span class="n">enabled</span><span class="o">=</span><span class="n">bc2_enabled</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElectricBCConfig.to_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.ElectricBCConfig.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize electric BC settings, encoding unset potentials as ``free``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: JSON-serializable electric BC mapping.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"bc1_enabled"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc1_enabled</span><span class="p">,</span>
+            <span class="s2">"bc1_potential"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_potential</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bc1_potential</span><span class="p">),</span>
+            <span class="s2">"bc2_enabled"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc2_enabled</span><span class="p">,</span>
+            <span class="s2">"bc2_potential"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_potential</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bc2_potential</span><span class="p">),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ElectricBCConfig.bc1_value">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.ElectricBCConfig.bc1_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bc1_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return the first boundary electric potential if set.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.bc1_potential``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float | None: Potential [V], or ``None`` when free/disabled.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc1_potential</span></div>
+
+
+<div class="viewcode-block" id="ElectricBCConfig.bc2_value">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.ElectricBCConfig.bc2_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bc2_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return the second boundary electric potential if set.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.bc2_potential``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float | None: Potential [V], or ``None`` when free/disabled.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc2_potential</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SolverOptions">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.SolverOptions">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SolverOptions</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: MPI process counts and stage timeouts for mesh, solve, and post-processing.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        requested_processes: Number of MPI processes to request.</span>
+<span class="sd">        max_partitions: Legacy manifest field; runtime MPI count uses GUI Threads</span>
+<span class="sd">            clamped by host CPU count (see ``ElmerAdapter.resolve_solver_processes``).</span>
+<span class="sd">        mesh_timeout: Mesh-generation stage timeout [s].</span>
+<span class="sd">        solve_timeout: Solver stage timeout [s].</span>
+<span class="sd">        post_timeout: Post-processing stage timeout [s].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SolverOptions: Immutable MPI process counts and pipeline stage timeouts.</span>
+<span class="sd">    """</span>
+
+    <span class="n">requested_processes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">requested_processes</span><span class="p">)</span>
+    <span class="n">max_partitions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">max_partitions</span><span class="p">)</span>
+    <span class="n">mesh_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">mesh_timeout</span><span class="p">)</span>
+    <span class="n">solve_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">solve_timeout</span><span class="p">)</span>
+    <span class="n">post_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">post_timeout</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SolverOptions.from_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.SolverOptions.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">requested_processes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">ApplicationDefaults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"SolverOptions"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize solver options with optional process-count override.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping of solver integer fields (processes, partitions, timeouts [s]).</span>
+<span class="sd">            requested_processes: Optional override for default process count.</span>
+<span class="sd">            defaults: Optional application defaults for missing fields.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            SolverOptions: Immutable solver options.</span>
+<span class="sd">        """</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span> <span class="ow">or</span> <span class="n">_defaults</span><span class="p">()</span>
+        <span class="n">requested_default</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">defaults</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">requested_processes</span>
+            <span class="k">if</span> <span class="n">requested_processes</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">requested_processes</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">requested_processes</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"requested_processes"</span><span class="p">,</span> <span class="n">requested_default</span><span class="p">)),</span>
+            <span class="n">max_partitions</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_partitions"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">max_partitions</span><span class="p">)),</span>
+            <span class="n">mesh_timeout</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mesh_timeout"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">mesh_timeout</span><span class="p">)),</span>
+            <span class="n">solve_timeout</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"solve_timeout"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">solve_timeout</span><span class="p">)),</span>
+            <span class="n">post_timeout</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"post_timeout"</span><span class="p">,</span> <span class="n">defaults</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">post_timeout</span><span class="p">)),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SolverOptions.to_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.SolverOptions.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize solver options for manifest persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, int]: Mapping of process counts and timeouts.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"requested_processes"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">requested_processes</span><span class="p">,</span>
+            <span class="s2">"max_partitions"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_partitions</span><span class="p">,</span>
+            <span class="s2">"mesh_timeout"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh_timeout</span><span class="p">,</span>
+            <span class="s2">"solve_timeout"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">solve_timeout</span><span class="p">,</span>
+            <span class="s2">"post_timeout"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_timeout</span><span class="p">,</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SimulationConfig">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.SimulationConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SimulationConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Full FEM case config: materials, thermal/electric BCs, driver, and solver.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        base_type: Geometry/base case type label (e.g. ``full``).</span>
+<span class="sd">        driver_type: Thermal driver kind (``steady``, ``harmonic``, ``sawtooth``).</span>
+<span class="sd">        simulation_type: ``steady`` or ``time_dependent`` simulation mode.</span>
+<span class="sd">        outer_material_model: Constitutive model name for the outer material.</span>
+<span class="sd">        outer_material_name: Display name of the outer material.</span>
+<span class="sd">        is_twolayer: Whether an inner material layer is present.</span>
+<span class="sd">        inner_material_model: Optional constitutive model for the inner material.</span>
+<span class="sd">        inner_material_name: Optional display name of the inner material.</span>
+<span class="sd">        temperature: Thermal BC temperatures and optional frequency.</span>
+<span class="sd">        electric_bc: Electric Dirichlet BC configuration.</span>
+<span class="sd">        time_dependent: Transient settings when ``simulation_type`` is time-dependent.</span>
+<span class="sd">        solver: MPI process counts and stage timeouts.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SimulationConfig: Immutable full FEM case configuration.</span>
+<span class="sd">    """</span>
+
+    <span class="n">base_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span>
+    <span class="n">driver_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"steady"</span>
+    <span class="n">simulation_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">STEADY_SIMULATION_TYPE</span>
+    <span class="n">outer_material_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"simple"</span>
+    <span class="n">outer_material_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">is_twolayer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">inner_material_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">inner_material_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="n">TemperatureConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">TemperatureConfig</span><span class="p">)</span>
+    <span class="n">electric_bc</span><span class="p">:</span> <span class="n">ElectricBCConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ElectricBCConfig</span><span class="p">)</span>
+    <span class="n">time_dependent</span><span class="p">:</span> <span class="n">TimeDependentConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">solver</span><span class="p">:</span> <span class="n">SolverOptions</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">SolverOptions</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SimulationConfig.from_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.SimulationConfig.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">requested_processes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">ApplicationDefaults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"SimulationConfig"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize a complete simulation configuration from a mapping.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Nested mapping of materials, temperature, electric BC, time-dependent, and solver sections.</span>
+<span class="sd">            requested_processes: Optional override forwarded to ``SolverOptions``.</span>
+<span class="sd">            defaults: Optional application defaults for nested sections.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            SimulationConfig: Immutable simulation configuration.</span>
+<span class="sd">        """</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span> <span class="ow">or</span> <span class="n">_defaults</span><span class="p">()</span>
+        <span class="n">time_dependent_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"time_dependent_params"</span><span class="p">)</span>
+        <span class="n">time_dependent</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">TimeDependentConfig</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">time_dependent_data</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="n">defaults</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">time_dependent_data</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">base_type</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"base_type"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)),</span>
+            <span class="n">driver_type</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"driver_type"</span><span class="p">,</span> <span class="s2">"steady"</span><span class="p">)),</span>
+            <span class="n">simulation_type</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"simulation_type"</span><span class="p">,</span> <span class="n">STEADY_SIMULATION_TYPE</span><span class="p">)),</span>
+            <span class="n">outer_material_model</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"outer_material_model"</span><span class="p">,</span> <span class="s2">"simple"</span><span class="p">)),</span>
+            <span class="n">outer_material_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"outer_material_name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)),</span>
+            <span class="n">is_twolayer</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"is_twolayer"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)),</span>
+            <span class="n">inner_material_model</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inner_material_model"</span><span class="p">),</span>
+            <span class="n">inner_material_name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inner_material_name"</span><span class="p">),</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">TemperatureConfig</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"temperature"</span><span class="p">,</span> <span class="p">{}),</span>
+                <span class="n">defaults</span><span class="o">=</span><span class="n">defaults</span><span class="p">,</span>
+                <span class="n">driver_period</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">time_dependent</span><span class="o">.</span><span class="n">driver_period</span> <span class="k">if</span> <span class="n">time_dependent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">electric_bc</span><span class="o">=</span><span class="n">ElectricBCConfig</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"electric_bc"</span><span class="p">,</span> <span class="p">{}),</span>
+                <span class="n">defaults</span><span class="o">=</span><span class="n">defaults</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">time_dependent</span><span class="o">=</span><span class="n">time_dependent</span><span class="p">,</span>
+            <span class="n">solver</span><span class="o">=</span><span class="n">SolverOptions</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"solver"</span><span class="p">,</span> <span class="p">{}),</span>
+                <span class="n">requested_processes</span><span class="o">=</span><span class="n">requested_processes</span><span class="p">,</span>
+                <span class="n">defaults</span><span class="o">=</span><span class="n">defaults</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SimulationConfig.to_dict">
+<a class="viewcode-back" href="../../api/domain.simulation.html#domain.simulation.SimulationConfig.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize the simulation configuration for manifest persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: JSON-serializable simulation mapping.</span>
+<span class="sd">        """</span>
+        <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"base_type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_type</span><span class="p">,</span>
+            <span class="s2">"driver_type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver_type</span><span class="p">,</span>
+            <span class="s2">"simulation_type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_type</span><span class="p">,</span>
+            <span class="s2">"outer_material_model"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outer_material_model</span><span class="p">,</span>
+            <span class="s2">"outer_material_name"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outer_material_name</span><span class="p">,</span>
+            <span class="s2">"is_twolayer"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_twolayer</span><span class="p">,</span>
+            <span class="s2">"temperature"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="s2">"electric_bc"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">electric_bc</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="s2">"solver"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_material_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"inner_material_model"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_material_model</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_material_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"inner_material_name"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_material_name</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"time_dependent_params"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.simulation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

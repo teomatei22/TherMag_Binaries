@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.scripts.temperature_map &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=1eac167c" />
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.temperature_map</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.scripts.temperature_map</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: ParaView temperature surface map on conductive GeometryIds with commanded T-range LUT."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePostProcessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview.simple</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="TemperatureMap">
+<a class="viewcode-back" href="../../../api/processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TemperatureMap</span><span class="p">(</span><span class="n">BasePostProcessor</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">"""Brief: ParaView temperature surface visualization on conductive GeometryIds.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        working_dir: FEM run directory [path].</span>
+<span class="sd">        verbose: Verbose logging flag.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        TemperatureMap: Writes ``temperature_map.png`` or ``.mp4``.</span>
+<span class="sd">    """</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Initialize temperature map post-processor.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Map instance.</span>
+<span class="sd">            working_dir: FEM run directory [path].</span>
+<span class="sd">            verbose: Verbose flag.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Delegates to ``BasePostProcessor``.</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TemperatureMap._parse_commanded_temperature_range">
+<a class="viewcode-back" href="../../../api/processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap._parse_commanded_temperature_range">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_commanded_temperature_range</span><span class="p">(</span><span class="n">case_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Parse cold/hot commanded temperatures from Elmer ``case.sif`` MATC Time Variable block.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            case_text: Full ``case.sif`` source text.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple | None: ``(T_cold, T_hot)`` [K] sorted, or ``None`` if not found.</span>
+<span class="sd">        """</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">'(?is)Temperature\s*=\s*Variable\s+Time.*?'</span>
+            <span class="sa">r</span><span class="s1">'MATC\s*"([\d.eE+-]+)\s*\+\s*\(([\d.eE+-]+)\s*-\s*([\d.eE+-]+)\)'</span><span class="p">,</span>
+            <span class="n">case_text</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">t_cold</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">t_hot</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">t_hot</span> <span class="o">&lt;</span> <span class="n">t_cold</span><span class="p">:</span>
+                <span class="n">t_cold</span><span class="p">,</span> <span class="n">t_hot</span> <span class="o">=</span> <span class="n">t_hot</span><span class="p">,</span> <span class="n">t_cold</span>
+            <span class="k">return</span> <span class="n">t_cold</span><span class="p">,</span> <span class="n">t_hot</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="TemperatureMap._commanded_temperature_range">
+<a class="viewcode-back" href="../../../api/processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap._commanded_temperature_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_commanded_temperature_range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Load commanded temperature range from ``case.sif`` in the run directory.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Map instance with ``cwd``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple | None: ``(T_cold, T_hot)`` [K], or ``None`` if file missing/unparseable.</span>
+<span class="sd">        """</span>
+        <span class="n">case_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"case.sif"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">case_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_commanded_temperature_range</span><span class="p">(</span>
+                <span class="n">case_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="TemperatureMap.run">
+<a class="viewcode-back" href="../../../api/processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Threshold conductive cells, color by temperature with locked LUT, save PNG/MP4.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Map instance with VTU inputs.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes ``temperature_map.png`` or ``.mp4``; exits 1 on failure.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">render_view</span> <span class="o">=</span> <span class="n">CreateView</span><span class="p">(</span><span class="s1">'RenderView'</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_layout</span><span class="p">(</span><span class="n">render_view</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Note: Only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s). Creating static image."</span><span class="p">)</span>
+                <span class="n">vtu_files_to_use</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="n">is_animation</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vtu_files_to_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span>
+                <span class="n">is_animation</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_reader</span><span class="p">(</span><span class="s1">'case_temperature_map'</span><span class="p">,</span> <span class="n">vtu_files_to_use</span><span class="p">)</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">TimeArray</span> <span class="o">=</span> <span class="s1">'None'</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">PointArrayStatus</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'temperature'</span><span class="p">]</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">CellArrayStatus</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'GeometryIds'</span><span class="p">]</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+
+            <span class="n">frame_last</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">is_animation</span><span class="p">:</span>
+                <span class="n">anim</span> <span class="o">=</span> <span class="n">GetAnimationScene</span><span class="p">()</span>
+                <span class="n">anim</span><span class="o">.</span><span class="n">UpdateAnimationUsingDataTimeSteps</span><span class="p">()</span>
+                <span class="n">reader</span><span class="o">.</span><span class="n">TimeArray</span> <span class="o">=</span> <span class="s1">'None'</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">tk</span> <span class="o">=</span> <span class="n">GetTimeKeeper</span><span class="p">()</span>
+                    <span class="n">ts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">tk</span><span class="p">,</span> <span class="s1">'TimestepValues'</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[])</span>
+                    <span class="k">if</span> <span class="n">ts</span><span class="p">:</span>
+                        <span class="n">frame_last</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">anim</span><span class="o">.</span><span class="n">PlayMode</span> <span class="o">=</span> <span class="s1">'Sequence'</span>
+                        <span class="n">anim</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vtu_files_to_use</span><span class="p">))</span>
+                        <span class="n">frame_last</span> <span class="o">=</span> <span class="n">anim</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">anim</span><span class="o">.</span><span class="n">PlayMode</span> <span class="o">=</span> <span class="s1">'Sequence'</span>
+                    <span class="n">anim</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vtu_files_to_use</span><span class="p">))</span>
+                    <span class="n">frame_last</span> <span class="o">=</span> <span class="n">anim</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">-</span> <span class="mi">1</span>
+
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">Threshold</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="s1">'Threshold_Conductive_T'</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
+            <span class="n">threshold</span><span class="o">.</span><span class="n">Scalars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'CELLS'</span><span class="p">,</span> <span class="s1">'GeometryIds'</span><span class="p">]</span>
+
+            <span class="n">lower_val</span><span class="p">,</span> <span class="n">upper_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">conductive_analysis_range</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_threshold_between</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">lower_val</span><span class="p">,</span> <span class="n">upper_val</span><span class="p">)</span>
+
+            <span class="n">threshold</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+
+            <span class="n">th_display</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">render_view</span><span class="p">,</span> <span class="s1">'UnstructuredGridRepresentation'</span><span class="p">)</span>
+            <span class="n">th_display</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s1">'Surface'</span>
+            <span class="n">th_display</span><span class="o">.</span><span class="n">DataAxesGrid</span><span class="o">.</span><span class="n">GridAxesVisibility</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">render_view</span><span class="o">.</span><span class="n">ResetCamera</span><span class="p">()</span>
+            <span class="n">render_view</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+
+            <span class="n">ColorBy</span><span class="p">(</span><span class="n">th_display</span><span class="p">,</span> <span class="p">(</span><span class="s1">'POINTS'</span><span class="p">,</span> <span class="s1">'temperature'</span><span class="p">))</span>
+
+            <span class="n">lut</span> <span class="o">=</span> <span class="n">GetColorTransferFunction</span><span class="p">(</span><span class="s1">'temperature'</span><span class="p">)</span>
+            <span class="n">lut</span><span class="o">.</span><span class="n">ApplyPreset</span><span class="p">(</span><span class="s1">'Cool to Warm (Extended)'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">is_animation</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">vtu_files_to_use</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">anim</span> <span class="o">=</span> <span class="n">GetAnimationScene</span><span class="p">()</span>
+                <span class="n">global_min</span><span class="p">,</span> <span class="n">global_max</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">anim</span><span class="o">.</span><span class="n">GoToFirst</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">frame_last</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">reader</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+                        <span class="n">threshold</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+                        <span class="n">render_view</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+                        <span class="n">data_info</span> <span class="o">=</span> <span class="n">threshold</span><span class="o">.</span><span class="n">GetDataInformation</span><span class="p">()</span>
+                        <span class="n">point_data</span> <span class="o">=</span> <span class="n">data_info</span><span class="o">.</span><span class="n">GetPointDataInformation</span><span class="p">()</span>
+                        <span class="n">temp_array</span> <span class="o">=</span> <span class="n">point_data</span><span class="o">.</span><span class="n">GetArrayInformation</span><span class="p">(</span><span class="s1">'temperature'</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">temp_array</span><span class="p">:</span>
+                            <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">temp_array</span><span class="o">.</span><span class="n">GetComponentRange</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">global_min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lo</span> <span class="o">&lt;</span> <span class="n">global_min</span><span class="p">:</span>
+                                <span class="n">global_min</span> <span class="o">=</span> <span class="n">lo</span>
+                            <span class="k">if</span> <span class="n">global_max</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">hi</span> <span class="o">&gt;</span> <span class="n">global_max</span><span class="p">:</span>
+                                <span class="n">global_max</span> <span class="o">=</span> <span class="n">hi</span>
+                        <span class="n">anim</span><span class="o">.</span><span class="n">GoToNext</span><span class="p">()</span>
+
+                    <span class="n">commanded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commanded_temperature_range</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">commanded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">t_cold</span><span class="p">,</span> <span class="n">t_hot</span> <span class="o">=</span> <span class="n">commanded</span>
+                        <span class="k">if</span> <span class="n">global_min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">global_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">global_min</span><span class="p">,</span> <span class="n">global_max</span> <span class="o">=</span> <span class="n">t_cold</span><span class="p">,</span> <span class="n">t_hot</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">global_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">global_min</span><span class="p">,</span> <span class="n">t_cold</span><span class="p">)</span>
+                            <span class="n">global_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">global_max</span><span class="p">,</span> <span class="n">t_hot</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">global_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">global_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">global_min</span> <span class="o">&lt;</span> <span class="n">global_max</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">"  Using temperature map range: [</span><span class="si">{</span><span class="n">global_min</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">global_max</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">] K"</span>
+                        <span class="p">)</span>
+                        <span class="n">lut</span><span class="o">.</span><span class="n">RescaleTransferFunction</span><span class="p">(</span><span class="n">global_min</span><span class="p">,</span> <span class="n">global_max</span><span class="p">)</span>
+
+                    <span class="n">anim</span><span class="o">.</span><span class="n">GoToFirst</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+            <span class="n">th_display</span><span class="o">.</span><span class="n">SetScalarBarVisibility</span><span class="p">(</span><span class="n">render_view</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">scalar_bar</span> <span class="o">=</span> <span class="n">GetScalarBar</span><span class="p">(</span><span class="n">lut</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">scalar_bar</span><span class="p">:</span>
+                <span class="n">scalar_bar</span><span class="o">.</span><span class="n">Title</span> <span class="o">=</span> <span class="s1">'Temperature [K]'</span>
+                <span class="n">scalar_bar</span><span class="o">.</span><span class="n">ComponentTitle</span> <span class="o">=</span> <span class="s1">''</span>
+
+            <span class="n">render_view</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_camera</span><span class="p">(</span><span class="n">render_view</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_animation</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_image</span><span class="p">(</span><span class="s2">"temperature_map.png"</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
+                    <span class="s2">"temperature_map.mp4"</span><span class="p">,</span> <span class="n">render_view</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">frame_last</span><span class="p">],</span> <span class="n">fps</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">reader</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"ERROR: temperature_map failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">err_msg</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../api/processing.scripts.temperature_map.html#processing.scripts.temperature_map.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""Brief: CLI entry that runs ``TemperatureMap``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: Uses process cwd / default VTU discovery.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Runs the temperature map pipeline.</span>
+<span class="sd">    """</span>
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">TemperatureMap</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">processor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.temperature_map</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

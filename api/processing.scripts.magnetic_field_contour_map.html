@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts.magnetic_field_contour_map module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts.magnetic_field_exterior module" href="processing.scripts.magnetic_field_exterior.html" />
+    <link rel="prev" title="processing.scripts.interior_probe_common module" href="processing.scripts.interior_probe_common.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_exterior.html" title="processing.scripts.magnetic_field_exterior module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.interior_probe_common.html" title="processing.scripts.interior_probe_common module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" accesskey="U">processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.magnetic_field_contour_map module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts.magnetic_field_contour_map">
+<span id="processing-scripts-magnetic-field-contour-map-module"></span><h1>processing.scripts.magnetic_field_contour_map module<a class="headerlink" href="#module-processing.scripts.magnetic_field_contour_map" title="Link to this heading">¶</a></h1>
+<p>P-R midplane <a href="#id1"><span class="problematic" id="id2">|B|</span></a> contour maps on the trusted exterior band, with IDW grid sampling and probe stability.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">MagneticFieldContourMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePostProcessor</span></code></p>
+<p>Sample abs(B) on a φ–ρ midplane grid in outer air via IDW and write contour CSVs/PNGs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_dir</strong> – FEM run directory [path].</p></li>
+<li><p><strong>verbose</strong> – Verbose logging flag.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MagneticFieldContourMap</strong> – Post-processor writing grid CSV, probe timeseries, and PNGs.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.N_PHI">
+<span class="sig-name descname"><span class="pre">N_PHI</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">72</span></span><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.N_PHI" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.N_RHO">
+<span class="sig-name descname"><span class="pre">N_RHO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">48</span></span><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.N_RHO" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._abc_impl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._geo_text">
+<span class="sig-name descname"><span class="pre">_geo_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._geo_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._geo_text" title="Link to this definition">¶</a></dt>
+<dd><p>Read <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> text from the run directory if present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Contour map instance.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Geo source, or empty string when missing.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._idw_B_mag">
+<span class="sig-name descname"><span class="pre">_idw_B_mag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._idw_B_mag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._idw_B_mag" title="Link to this definition">¶</a></dt>
+<dd><p>IDW-interpolate <a href="#id3"><span class="problematic" id="id4">|B|</span></a> at (x,y,z) from the air cache.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Contour map instance.</p></li>
+<li><p><strong>cache</strong> – Prepared air B cache dict.</p></li>
+<li><p><strong>x</strong> – Sample x [m].</p></li>
+<li><p><strong>y</strong> – Sample y [m].</p></li>
+<li><p><strong>z</strong> – Sample z [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – <a href="#id5"><span class="problematic" id="id6">|B|</span></a> [T], or NaN if vector components are non-finite.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cache</strong> (<em>dict</em>)</p></li>
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._idw_B_vec">
+<span class="sig-name descname"><span class="pre">_idw_B_vec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._idw_B_vec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._idw_B_vec" title="Link to this definition">¶</a></dt>
+<dd><p>IDW-interpolate magnetic flux density vector at (x,y,z) from the air cache.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Contour map instance.</p></li>
+<li><p><strong>cache</strong> – Prepared air B cache dict.</p></li>
+<li><p><strong>x</strong> – Sample x [m].</p></li>
+<li><p><strong>y</strong> – Sample y [m].</p></li>
+<li><p><strong>z</strong> – Sample z [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(Bx,</span> <span class="pre">By,</span> <span class="pre">Bz)</span></code> [T], or NaNs if no mesh points / empty stencil.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cache</strong> (<em>dict</em>)</p></li>
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[float, float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._load_overlay_probes">
+<span class="sig-name descname"><span class="pre">_load_overlay_probes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._load_overlay_probes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._load_overlay_probes" title="Link to this definition">¶</a></dt>
+<dd><p>Load bext midplane overlay probes for the current run’s trusted band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Contour map instance.</p></li>
+<li><p><strong>rho_in</strong> – Band inner radius [m].</p></li>
+<li><p><strong>rho_out</strong> – Band outer radius [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Probe dicts for PNG markers and probe timeseries.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>rho_out</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Dict</em>[str, float]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._prepare_air_b_cache">
+<span class="sig-name descname"><span class="pre">_prepare_air_b_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vtu_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._prepare_air_b_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._prepare_air_b_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Threshold outer-air VTU cells and cache point coords + B vectors for IDW.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Contour map instance.</p></li>
+<li><p><strong>vtu_file</strong> – VTU path for this timestep [path].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – Cache with <code class="docutils literal notranslate"><span class="pre">points_np</span></code>, <code class="docutils literal notranslate"><span class="pre">B_np</span></code>, and ParaView <code class="docutils literal notranslate"><span class="pre">objects</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vtu_file</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._resolve_trusted_band">
+<span class="sig-name descname"><span class="pre">_resolve_trusted_band</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._resolve_trusted_band"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._resolve_trusted_band" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve (rho_in, rho_out) from geo trusted radii or <code class="docutils literal notranslate"><span class="pre">compute_magnetic_trusted_band</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Contour map instance.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(rho_in,</span> <span class="pre">rho_out)</span></code> trusted exterior band radii [m].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tuple</em>[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._sample_grid">
+<span class="sig-name descname"><span class="pre">_sample_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._sample_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._sample_grid" title="Link to this definition">¶</a></dt>
+<dd><p>IDW-sample <a href="#id7"><span class="problematic" id="id8">|B|</span></a> on the N_PHI x N_RHO midplane P-R grid within the trusted band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Contour map instance.</p></li>
+<li><p><strong>cache</strong> – Prepared air B cache.</p></li>
+<li><p><strong>rho_in</strong> – Band inner radius [m].</p></li>
+<li><p><strong>rho_out</strong> – Band outer radius [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(PHI,</span> <span class="pre">RHO,</span> <span class="pre">Bmag)</span></code> meshgrids [rad], [m], [T].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cache</strong> (<em>dict</em>)</p></li>
+<li><p><strong>rho_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>rho_out</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[<em>ndarray</em>, <em>ndarray</em>, <em>ndarray</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._sample_probes">
+<span class="sig-name descname"><span class="pre">_sample_probes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._sample_probes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._sample_probes" title="Link to this definition">¶</a></dt>
+<dd><p>IDW-sample Bx,By,Bz,|B| at overlay probes for one physical time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Contour map instance.</p></li>
+<li><p><strong>cache</strong> – Prepared air B cache.</p></li>
+<li><p><strong>probes</strong> – Overlay probe dicts (xyz or P-R).</p></li>
+<li><p><strong>time_val</strong> – Physical time for the rows [s].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Timeseries row dicts for stability/CSV export.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cache</strong> (<em>dict</em>)</p></li>
+<li><p><strong>probes</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>time_val</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Dict</em>[str, <em>Any</em>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._write_grid_csv">
+<span class="sig-name descname"><span class="pre">_write_grid_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PHI</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RHO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._write_grid_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._write_grid_csv" title="Link to this definition">¶</a></dt>
+<dd><p>Write P-R <a href="#id9"><span class="problematic" id="id10">|B|</span></a> grid samples for all times to <code class="docutils literal notranslate"><span class="pre">magnetic_field_contour_map_data.csv</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Contour map instance.</p></li>
+<li><p><strong>times</strong> – Physical times [s].</p></li>
+<li><p><strong>frames</strong> – <a href="#id11"><span class="problematic" id="id12">|B|</span></a> grids per time [T].</p></li>
+<li><p><strong>PHI</strong> – Azimuth meshgrid [rad].</p></li>
+<li><p><strong>RHO</strong> – Radius meshgrid [m].</p></li>
+<li><p><strong>rho_in</strong> – Band inner radius [m].</p></li>
+<li><p><strong>rho_out</strong> – Band outer radius [m].</p></li>
+<li><p><strong>out_path</strong> – Destination CSV path.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes CSV with time, phi, rho, h, B_mag, band edges.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>times</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>frames</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>PHI</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>RHO</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>rho_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>rho_out</strong> (<em>float</em>)</p></li>
+<li><p><strong>out_path</strong> (<em>Path</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._write_probe_timeseries">
+<span class="sig-name descname"><span class="pre">_write_probe_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap._write_probe_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._write_probe_timeseries" title="Link to this definition">¶</a></dt>
+<dd><p>Write probe B timeseries CSV used by stability analysis and offline plotting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Contour map instance.</p></li>
+<li><p><strong>rows</strong> – Probe sample dicts from <code class="docutils literal notranslate"><span class="pre">_sample_probes</span></code>.</p></li>
+<li><p><strong>out_path</strong> – Destination CSV path.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes time/label/xyz/Bx/By/Bz/B_mag_T rows.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rows</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>out_path</strong> (<em>Path</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#MagneticFieldContourMap.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.run" title="Link to this definition">¶</a></dt>
+<dd><p>Sample all VTU steps, write grid/probe CSVs, stability report, and contour PNGs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Contour map instance with VTU inputs configured.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Side-effect files under <code class="docutils literal notranslate"><span class="pre">out_dir</span></code>; defers PNG if matplotlib missing.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._contour_period_frame_indices">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_contour_period_frame_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_contour_period_frame_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._contour_period_frame_indices" title="Link to this definition">¶</a></dt>
+<dd><p>Pick VTU frame indices nearest to 0, P/4, P/2, 3P/4 within simulated span.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>times</strong> – Physical times per frame [s].</p></li>
+<li><p><strong>period_s</strong> – Driver period P [s].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – <code class="docutils literal notranslate"><span class="pre">(index,</span> <span class="pre">time,</span> <span class="pre">tag)</span></code> with tags <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">P4</span></code>, <code class="docutils literal notranslate"><span class="pre">P2</span></code>, <code class="docutils literal notranslate"><span class="pre">3P4</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>times</strong> (<em>Sequence</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>period_s</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Tuple</em>[int, float, str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._default_bext_xyz_for_contour">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_default_bext_xyz_for_contour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_default_bext_xyz_for_contour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._default_bext_xyz_for_contour" title="Link to this definition">¶</a></dt>
+<dd><p>Compute default bext probe xyz from geometry.geo and trusted-band override.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> – Results or run directory used to locate <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> [path].</p></li>
+<li><p><strong>rho_in</strong> – Trusted-band inner radius [m].</p></li>
+<li><p><strong>rho_out</strong> – Trusted-band outer radius [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Dict probes <code class="docutils literal notranslate"><span class="pre">{x,y,z}</span></code> from <code class="docutils literal notranslate"><span class="pre">compute_bext_probe_positions</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> (<em>Path</em>)</p></li>
+<li><p><strong>rho_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>rho_out</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._fmt_B_csv">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_fmt_B_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_fmt_B_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._fmt_B_csv" title="Link to this definition">¶</a></dt>
+<dd><p>Format <a href="#id13"><span class="problematic" id="id14">|B|</span></a> for CSV output using project float formatting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Magnetic field magnitude [T].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – CSV-ready float text from <code class="docutils literal notranslate"><span class="pre">format_csv_float</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._fmt_B_sci">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_fmt_B_sci</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_fmt_B_sci"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._fmt_B_sci" title="Link to this definition">¶</a></dt>
+<dd><p>Format abs(B) for contour labels using truncated scientific notation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Magnetic field magnitude [T].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Display string from <code class="docutils literal notranslate"><span class="pre">truncate_scientific</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._fmt_time_int_s">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_fmt_time_int_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_fmt_time_int_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._fmt_time_int_s" title="Link to this definition">¶</a></dt>
+<dd><p>Format a physical time as an integer-second label for contour titles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> – Time value [s].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – <code class="docutils literal notranslate"><span class="pre">&quot;{n}</span> <span class="pre">s&quot;</span></code> with rounded integer seconds.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._global_contour_levels">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_global_contour_levels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B_stack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_global_contour_levels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._global_contour_levels" title="Link to this definition">¶</a></dt>
+<dd><p>Build shared contour levels from stacked <a href="#id15"><span class="problematic" id="id16">|B|</span></a> frames using a 99.5th percentile max.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>B_stack</strong> – Sequence of <a href="#id17"><span class="problematic" id="id18">|B|</span></a> grids [T].</p></li>
+<li><p><strong>n_levels</strong> – Number of contour intervals.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>np.ndarray</strong> – Level edges from 0 to <code class="docutils literal notranslate"><span class="pre">bmax</span></code> inclusive [T].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>B_stack</strong> (<em>Sequence</em><em>[</em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>n_levels</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._import_paraview_stack">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_import_paraview_stack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_import_paraview_stack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._import_paraview_stack" title="Link to this definition">¶</a></dt>
+<dd><p>Import ParaView + BasePostProcessor symbols needed for VTU contour sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – No arguments.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(BasePostProcessor,</span> <span class="pre">load_geometry_contract,</span> <span class="pre">MergeBlocks,</span> <span class="pre">Threshold,</span> <span class="pre">ns,</span> <span class="pre">servermanager)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._load_bext_probes_for_plot">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_load_bext_probes_for_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_load_bext_probes_for_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._load_bext_probes_for_plot" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve band-clipped bext overlay probes from config or geometry defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> – Results directory [path].</p></li>
+<li><p><strong>rho_in</strong> – Trusted-band inner radius [m].</p></li>
+<li><p><strong>rho_out</strong> – Trusted-band outer radius [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Midplane probe dicts for contour marker overlay.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> (<em>Path</em>)</p></li>
+<li><p><strong>rho_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>rho_out</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Dict</em>[str, <em>Any</em>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._matplotlib_available">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_matplotlib_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_matplotlib_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._matplotlib_available" title="Link to this definition">¶</a></dt>
+<dd><p>Probe whether Matplotlib can be imported in this interpreter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – No arguments.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> if <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">matplotlib</span></code> succeeds.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._probe_xyz">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_probe_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probe</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_probe_xyz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._probe_xyz" title="Link to this definition">¶</a></dt>
+<dd><p>Convert midplane probe <code class="docutils literal notranslate"><span class="pre">P</span></code>/<code class="docutils literal notranslate"><span class="pre">R</span></code> to Cartesian (x=0, y, z).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>probe</strong> – Dict with <code class="docutils literal notranslate"><span class="pre">P</span></code> [rad] and <code class="docutils literal notranslate"><span class="pre">R</span></code> [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> with <code class="docutils literal notranslate"><span class="pre">x=0</span></code> on the midplane [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>probe</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[float, float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._probes_from_xyz">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_probes_from_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_out</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_in_band</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_probes_from_xyz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._probes_from_xyz" title="Link to this definition">¶</a></dt>
+<dd><p>Convert Cartesian probe points to midplane P-R overlays, optionally band-clipped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points</strong> – List of dicts/tuples with xyz [m].</p></li>
+<li><p><strong>rho_in</strong> – Trusted-band inner radius [m].</p></li>
+<li><p><strong>rho_out</strong> – Trusted-band outer radius [m].</p></li>
+<li><p><strong>require_in_band</strong> – Drop probes outside [rho_in, rho_out].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Probe dicts with <code class="docutils literal notranslate"><span class="pre">phi</span></code>, <code class="docutils literal notranslate"><span class="pre">rho</span></code>, <code class="docutils literal notranslate"><span class="pre">kind=bext</span></code>, <code class="docutils literal notranslate"><span class="pre">label</span></code>, xyz.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points</strong> (<em>List</em><em>[</em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>rho_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>rho_out</strong> (<em>float</em>)</p></li>
+<li><p><strong>require_in_band</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Dict</em>[str, <em>Any</em>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._read_bext_from_processing_config">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_read_bext_from_processing_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_read_bext_from_processing_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._read_bext_from_processing_config" title="Link to this definition">¶</a></dt>
+<dd><p>Read bext probe xyz lists from <code class="docutils literal notranslate"><span class="pre">processing_config.json</span></code> (global or script params).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> – Results directory containing the config [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Raw probe point entries (possibly empty).</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._resolve_contour_period_s">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_resolve_contour_period_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_resolve_contour_period_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._resolve_contour_period_s" title="Link to this definition">¶</a></dt>
+<dd><p>Read driver period P from <code class="docutils literal notranslate"><span class="pre">project.json</span></code> for time-dependent contour snapshots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results_dir</strong> – <code class="docutils literal notranslate"><span class="pre">results/</span></code> or run directory containing <code class="docutils literal notranslate"><span class="pre">project.json</span></code> [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Positive <code class="docutils literal notranslate"><span class="pre">driver_period</span></code> [s].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results_dir</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._stability_rows_from_magnetic_field_csv">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_stability_rows_from_magnetic_field_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_stability_rows_from_magnetic_field_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._stability_rows_from_magnetic_field_csv" title="Link to this definition">¶</a></dt>
+<dd><p>Convert <code class="docutils literal notranslate"><span class="pre">magnetic_field_data.csv</span></code> rows into stability-analysis timeseries dicts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> – Results directory path [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Rows with <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">label</span></code>, coords, <code class="docutils literal notranslate"><span class="pre">Bx,By,Bz</span></code>, <code class="docutils literal notranslate"><span class="pre">B_mag_T</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Dict</em>[str, <em>Any</em>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map._write_stability_from_available_csvs">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">_write_stability_from_available_csvs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#_write_stability_from_available_csvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map._write_stability_from_available_csvs" title="Link to this definition">¶</a></dt>
+<dd><p>Build <code class="docutils literal notranslate"><span class="pre">probe_stability.txt</span></code> from contour timeseries or exterior B CSV if multi-time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> – Results directory [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Path | None</strong> – Written stability path, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if insufficient time samples.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Path</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.analyze_probe_stability">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">analyze_probe_stability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#analyze_probe_stability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.analyze_probe_stability" title="Link to this definition">¶</a></dt>
+<dd><p>Detect B-component sign flips and abs(B) decade jumps across time for each probe label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeseries</strong> – Rows with <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">label</span></code>, <code class="docutils literal notranslate"><span class="pre">x,y,z</span></code>, <code class="docutils literal notranslate"><span class="pre">Bx,By,Bz</span></code>, <code class="docutils literal notranslate"><span class="pre">B_mag_T</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – <code class="docutils literal notranslate"><span class="pre">label</span> <span class="pre">-</span> <span class="pre">{coords,</span> <span class="pre">sign_change,</span> <span class="pre">sign_events,</span> <span class="pre">magnitude_jump,</span> <span class="pre">magnitude_events}</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeseries</strong> (<em>Sequence</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Dict</em>[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.main">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.main" title="Link to this definition">¶</a></dt>
+<dd><p>CLI entry requiring ParaView to sample magnetic contour maps from VTU files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – Uses cwd / default MagenticFieldContourMap settings.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Runs the contour sampler; raises if ParaView stack unavailable.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.plot_contour_map_from_csv">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">plot_contour_map_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#plot_contour_map_from_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.plot_contour_map_from_csv" title="Link to this definition">¶</a></dt>
+<dd><p>Rebuild P-R <a href="#id19"><span class="problematic" id="id20">|B|</span></a> contour PNGs (and stability) from <code class="docutils literal notranslate"><span class="pre">magnetic_field_contour_map_data.csv</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results_dir</strong> – Directory with contour grid CSV and optional probe CSVs [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes period or steady contour PNGs when matplotlib is available.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results_dir</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.render_magnetic_contour_png">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">render_magnetic_contour_png</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PHI</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RHO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bmag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_path</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#render_magnetic_contour_png"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.render_magnetic_contour_png" title="Link to this definition">¶</a></dt>
+<dd><p>Render a P-R filled contour of <a href="#id21"><span class="problematic" id="id22">|B|</span></a> with bext probe markers on the trusted band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>PHI</strong> – Azimuth grid [rad] matching <code class="docutils literal notranslate"><span class="pre">Bmag</span></code> shape.</p></li>
+<li><p><strong>RHO</strong> – Radial grid [m] on the midplane trusted band.</p></li>
+<li><p><strong>Bmag</strong> – <a href="#id23"><span class="problematic" id="id24">|B|</span></a> samples on the P-R grid [T].</p></li>
+<li><p><strong>rho_in</strong> – Trusted-band inner radius [m].</p></li>
+<li><p><strong>rho_out</strong> – Trusted-band outer radius [m].</p></li>
+<li><p><strong>probes</strong> – Probe dicts with <code class="docutils literal notranslate"><span class="pre">phi</span></code>, <code class="docutils literal notranslate"><span class="pre">rho</span></code>, optional <code class="docutils literal notranslate"><span class="pre">kind</span></code>/<code class="docutils literal notranslate"><span class="pre">label</span></code>.</p></li>
+<li><p><strong>out_path</strong> – Output PNG path.</p></li>
+<li><p><strong>title</strong> – Optional plot title.</p></li>
+<li><p><strong>bmax</strong> – Optional color-scale max [T] when <code class="docutils literal notranslate"><span class="pre">levels</span></code> omitted.</p></li>
+<li><p><strong>levels</strong> – Optional shared contour level edges [T].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes the PNG via Matplotlib Agg; raises if no finite samples / no matplotlib.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>PHI</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>RHO</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Bmag</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>rho_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>rho_out</strong> (<em>float</em>)</p></li>
+<li><p><strong>probes</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>out_path</strong> (<em>Path</em>)</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>bmax</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>levels</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.write_contour_period_pngs">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">write_contour_period_pngs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PHI</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RHO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#write_contour_period_pngs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.write_contour_period_pngs" title="Link to this definition">¶</a></dt>
+<dd><p>Write shared-level <a href="#id25"><span class="problematic" id="id26">|B|</span></a> contour PNGs at period phase tags; prune uncovered tags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>times</strong> – Frame times [s].</p></li>
+<li><p><strong>frames_B</strong> – <a href="#id27"><span class="problematic" id="id28">|B|</span></a> grids per time [T].</p></li>
+<li><p><strong>PHI</strong> – Azimuth meshgrid [rad].</p></li>
+<li><p><strong>RHO</strong> – Radius meshgrid [m].</p></li>
+<li><p><strong>rho_in</strong> – Trusted-band inner radius [m].</p></li>
+<li><p><strong>rho_out</strong> – Trusted-band outer radius [m].</p></li>
+<li><p><strong>probes</strong> – Overlay probe dicts for markers.</p></li>
+<li><p><strong>out_dir</strong> – Directory for <code class="docutils literal notranslate"><span class="pre">magnetic_field_contour_map_t*.png</span></code>.</p></li>
+<li><p><strong>period_s</strong> – Optional period override [s]; else from project.json.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Paths of PNGs written (empty if steady / no matplotlib / no coverage).</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>times</strong> (<em>Sequence</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>frames_B</strong> (<em>Sequence</em><em>[</em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>PHI</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>RHO</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>rho_in</strong> (<em>float</em>)</p></li>
+<li><p><strong>rho_out</strong> (<em>float</em>)</p></li>
+<li><p><strong>probes</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>out_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>period_s</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>Path</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_contour_map.write_probe_stability_txt">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_contour_map.</span></span><span class="sig-name descname"><span class="pre">write_probe_stability_txt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reports</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_contour_map.html#write_probe_stability_txt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_contour_map.write_probe_stability_txt" title="Link to this definition">¶</a></dt>
+<dd><p>Write human-readable probe stability report (sign flips and <a href="#id29"><span class="problematic" id="id30">|B|</span></a> decade jumps).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reports</strong> – Output of <code class="docutils literal notranslate"><span class="pre">analyze_probe_stability</span></code>.</p></li>
+<li><p><strong>out_path</strong> – Destination text path (e.g. <code class="docutils literal notranslate"><span class="pre">probe_stability.txt</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes UTF-8 text file at <code class="docutils literal notranslate"><span class="pre">out_path</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reports</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>out_path</strong> (<em>Path</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts.magnetic_field_contour_map module</a><ul>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap</span></code></a><ul>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.N_PHI"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap.N_PHI</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.N_RHO"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap.N_RHO</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._abc_impl"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._abc_impl</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._geo_text"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._geo_text()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._idw_B_mag"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._idw_B_mag()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._idw_B_vec"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._idw_B_vec()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._load_overlay_probes"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._load_overlay_probes()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._prepare_air_b_cache"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._prepare_air_b_cache()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._resolve_trusted_band"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._resolve_trusted_band()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._sample_grid"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._sample_grid()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._sample_probes"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._sample_probes()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._write_grid_csv"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._write_grid_csv()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._write_probe_timeseries"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._write_probe_timeseries()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.run"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._contour_period_frame_indices"><code class="docutils literal notranslate"><span class="pre">_contour_period_frame_indices()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._default_bext_xyz_for_contour"><code class="docutils literal notranslate"><span class="pre">_default_bext_xyz_for_contour()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._fmt_B_csv"><code class="docutils literal notranslate"><span class="pre">_fmt_B_csv()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._fmt_B_sci"><code class="docutils literal notranslate"><span class="pre">_fmt_B_sci()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._fmt_time_int_s"><code class="docutils literal notranslate"><span class="pre">_fmt_time_int_s()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._global_contour_levels"><code class="docutils literal notranslate"><span class="pre">_global_contour_levels()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._import_paraview_stack"><code class="docutils literal notranslate"><span class="pre">_import_paraview_stack()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._load_bext_probes_for_plot"><code class="docutils literal notranslate"><span class="pre">_load_bext_probes_for_plot()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._matplotlib_available"><code class="docutils literal notranslate"><span class="pre">_matplotlib_available()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._probe_xyz"><code class="docutils literal notranslate"><span class="pre">_probe_xyz()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._probes_from_xyz"><code class="docutils literal notranslate"><span class="pre">_probes_from_xyz()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._read_bext_from_processing_config"><code class="docutils literal notranslate"><span class="pre">_read_bext_from_processing_config()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._resolve_contour_period_s"><code class="docutils literal notranslate"><span class="pre">_resolve_contour_period_s()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._stability_rows_from_magnetic_field_csv"><code class="docutils literal notranslate"><span class="pre">_stability_rows_from_magnetic_field_csv()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map._write_stability_from_available_csvs"><code class="docutils literal notranslate"><span class="pre">_write_stability_from_available_csvs()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.analyze_probe_stability"><code class="docutils literal notranslate"><span class="pre">analyze_probe_stability()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.plot_contour_map_from_csv"><code class="docutils literal notranslate"><span class="pre">plot_contour_map_from_csv()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.render_magnetic_contour_png"><code class="docutils literal notranslate"><span class="pre">render_magnetic_contour_png()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.write_contour_period_pngs"><code class="docutils literal notranslate"><span class="pre">write_contour_period_pngs()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_contour_map.write_probe_stability_txt"><code class="docutils literal notranslate"><span class="pre">write_probe_stability_txt()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.interior_probe_common.html"
+                          title="previous chapter">processing.scripts.interior_probe_common module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.magnetic_field_exterior.html"
+                          title="next chapter">processing.scripts.magnetic_field_exterior module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.magnetic_field_contour_map.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_exterior.html" title="processing.scripts.magnetic_field_exterior module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.interior_probe_common.html" title="processing.scripts.interior_probe_common module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" >processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.magnetic_field_contour_map module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

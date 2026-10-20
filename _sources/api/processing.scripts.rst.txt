@@ -1,0 +1,24 @@
+processing.scripts package
+==========================
+
+.. automodule:: processing.scripts
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   processing.scripts.current_density_interior
+   processing.scripts.current_density_vector_map
+   processing.scripts.generate_plots
+   processing.scripts.geometry_contract
+   processing.scripts.interior_probe_common
+   processing.scripts.magnetic_field_contour_map
+   processing.scripts.magnetic_field_exterior
+   processing.scripts.magnetic_field_vector_map
+   processing.scripts.sweep_plot
+   processing.scripts.temperature_map

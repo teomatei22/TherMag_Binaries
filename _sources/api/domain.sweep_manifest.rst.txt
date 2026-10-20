@@ -1,0 +1,7 @@
+domain.sweep\_manifest module
+=============================
+
+.. automodule:: domain.sweep_manifest
+   :members:
+   :show-inheritance:
+   :undoc-members:

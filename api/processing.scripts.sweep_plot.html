@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts.sweep_plot module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts.temperature_map module" href="processing.scripts.temperature_map.html" />
+    <link rel="prev" title="processing.scripts.magnetic_field_vector_map module" href="processing.scripts.magnetic_field_vector_map.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.temperature_map.html" title="processing.scripts.temperature_map module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_vector_map.html" title="processing.scripts.magnetic_field_vector_map module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" accesskey="U">processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.sweep_plot module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts.sweep_plot">
+<span id="processing-scripts-sweep-plot-module"></span><h1>processing.scripts.sweep_plot module<a class="headerlink" href="#module-processing.scripts.sweep_plot" title="Link to this heading">¶</a></h1>
+<p>Aggregate sweep-run B/J probe CSVs into vs-parameter PNGs and <code class="docutils literal notranslate"><span class="pre">sweep_data.csv</span></code>.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot._append_probe_series">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">_append_probe_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probe_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#_append_probe_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot._append_probe_series" title="Link to this definition">¶</a></dt>
+<dd><p>Append one sweep-index of probe peaks into the series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>store</strong> – Mutable <code class="docutils literal notranslate"><span class="pre">point_id</span> <span class="pre">-</span> <span class="pre">list-valued</span> <span class="pre">series</span></code>.</p></li>
+<li><p><strong>probe_vals</strong> – This run’s per-point peak dict from <code class="docutils literal notranslate"><span class="pre">_read_probe_series</span></code>.</p></li>
+<li><p><strong>idx</strong> – Zero-based sweep run index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Mutates <code class="docutils literal notranslate"><span class="pre">store</span></code> in place, aligning list lengths to <code class="docutils literal notranslate"><span class="pre">idx+1</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>store</strong> (<em>Dict</em><em>[</em><em>int</em><em>, </em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>float</em><em> | </em><em>None</em><em>]</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>probe_vals</strong> (<em>Dict</em><em>[</em><em>int</em><em>, </em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>idx</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot._csv_column_names">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">_csv_column_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_dependent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#_csv_column_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot._csv_column_names" title="Link to this definition">¶</a></dt>
+<dd><p>Build (mag, <a href="#id1"><span class="problematic" id="id2">|x|</span></a>, <a href="#id3"><span class="problematic" id="id4">|y|</span></a>, <a href="#id5"><span class="problematic" id="id6">|z|</span></a>) CSV headers for one probe, with max- prefix if time-dependent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>point_id</strong> – Probe index.</p></li>
+<li><p><strong>field</strong> – Field symbol (<code class="docutils literal notranslate"><span class="pre">B</span></code> or <code class="docutils literal notranslate"><span class="pre">J</span></code>).</p></li>
+<li><p><strong>time_dependent</strong> – Whether headers use <code class="docutils literal notranslate"><span class="pre">max</span></code> peak naming.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – Four column header strings for mag and <a href="#id7"><span class="problematic" id="id8">|components|</span></a>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>point_id</strong> (<em>int</em>)</p></li>
+<li><p><strong>field</strong> (<em>str</em>)</p></li>
+<li><p><strong>time_dependent</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[str, str, str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot._csv_has_multiple_times">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">_csv_has_multiple_times</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#_csv_has_multiple_times"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot._csv_has_multiple_times" title="Link to this definition">¶</a></dt>
+<dd><p>Detect whether a probe CSV contains two or more distinct time values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>csv_path</strong> – Path to a probe CSV with a <code class="docutils literal notranslate"><span class="pre">time</span></code> column [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> if at least two distinct times appear.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>csv_path</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot._format_probe_coord">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">_format_probe_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#_format_probe_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot._format_probe_coord" title="Link to this definition">¶</a></dt>
+<dd><p>Format a probe coordinate for sweep plot titles, clamping tiny values to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Coordinate component [m].</p></li>
+<li><p><strong>decimals</strong> – Digits after the decimal point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Fixed-point coordinate text.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>float</em>)</p></li>
+<li><p><strong>decimals</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot._probe_coords_label">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">_probe_coords_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#_probe_coords_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot._probe_coords_label" title="Link to this definition">¶</a></dt>
+<dd><p>Build a (x, y, z) label for sweep plot titles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>px</strong> – Probe x [m].</p></li>
+<li><p><strong>py</strong> – Probe y [m].</p></li>
+<li><p><strong>pz</strong> – Probe z [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Formatted <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> label.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>px</strong> (<em>float</em>)</p></li>
+<li><p><strong>py</strong> (<em>float</em>)</p></li>
+<li><p><strong>pz</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot._probe_location">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">_probe_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#_probe_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot._probe_location" title="Link to this definition">¶</a></dt>
+<dd><p>Recover the first non-None (x,y,z) probe location from a sweep series store entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdata</strong> – Per-probe lists including <code class="docutils literal notranslate"><span class="pre">px</span></code>, <code class="docutils literal notranslate"><span class="pre">py</span></code>, <code class="docutils literal notranslate"><span class="pre">pz</span></code> [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(px,</span> <span class="pre">py,</span> <span class="pre">pz)</span></code> in metres, or <code class="docutils literal notranslate"><span class="pre">(0,0,0)</span></code> if unavailable.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdata</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>float</em><em> | </em><em>None</em><em>]</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[float, float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot._read_probe_series">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">_read_probe_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#_read_probe_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot._read_probe_series" title="Link to this definition">¶</a></dt>
+<dd><p>Collapse a probe CSV to per-point peak <a href="#id9"><span class="problematic" id="id10">|v|</span></a> and signed extrema of components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_path</strong> – Probe CSV path [path].</p></li>
+<li><p><strong>x_col</strong> – X-component header [field units].</p></li>
+<li><p><strong>y_col</strong> – Y-component header [field units].</p></li>
+<li><p><strong>z_col</strong> – Z-component header [field units].</p></li>
+<li><p><strong>mag_col</strong> – Optional magnitude header [field units].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – <code class="docutils literal notranslate"><span class="pre">point_id</span> <span class="pre">-</span> <span class="pre">{mag,x,y,z,abs_*,px,py,pz}</span></code> peak/extrema summary.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_path</strong> (<em>Path</em>)</p></li>
+<li><p><strong>x_col</strong> (<em>str</em>)</p></li>
+<li><p><strong>y_col</strong> (<em>str</em>)</p></li>
+<li><p><strong>z_col</strong> (<em>str</em>)</p></li>
+<li><p><strong>mag_col</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Dict</em>[int, <em>Dict</em>[str, float]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot._row_magnitude">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">_row_magnitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#_row_magnitude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot._row_magnitude" title="Link to this definition">¶</a></dt>
+<dd><p>Read <a href="#id11"><span class="problematic" id="id12">|v|</span></a> from a mag column or compute sqrt(x**2+y**2+z**2) from a CSV row.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>row</strong> – DictReader row of component (and optional mag) fields.</p></li>
+<li><p><strong>x_col</strong> – X-component column name [field units].</p></li>
+<li><p><strong>y_col</strong> – Y-component column name [field units].</p></li>
+<li><p><strong>z_col</strong> – Z-component column name [field units].</p></li>
+<li><p><strong>mag_col</strong> – Optional magnitude column name [field units].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Absolute magnitude for ranking/peak tracking [field units].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>row</strong> (<em>dict</em>)</p></li>
+<li><p><strong>x_col</strong> (<em>str</em>)</p></li>
+<li><p><strong>y_col</strong> (<em>str</em>)</p></li>
+<li><p><strong>z_col</strong> (<em>str</em>)</p></li>
+<li><p><strong>mag_col</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.sweep_plot.main">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.sweep_plot.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/sweep_plot.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.sweep_plot.main" title="Link to this definition">¶</a></dt>
+<dd><p>CLI: read sweep manifest, plot B/J vs swept parameter, write <code class="docutils literal notranslate"><span class="pre">sweep_data.csv</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – Parses <code class="docutils literal notranslate"><span class="pre">sweep_dir</span></code> from argv; loads <code class="docutils literal notranslate"><span class="pre">sweep_manifest.json</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes PNGs and CSV under <code class="docutils literal notranslate"><span class="pre">sweep_dir/sweep_results</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts.sweep_plot module</a><ul>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot._append_probe_series"><code class="docutils literal notranslate"><span class="pre">_append_probe_series()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot._csv_column_names"><code class="docutils literal notranslate"><span class="pre">_csv_column_names()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot._csv_has_multiple_times"><code class="docutils literal notranslate"><span class="pre">_csv_has_multiple_times()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot._format_probe_coord"><code class="docutils literal notranslate"><span class="pre">_format_probe_coord()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot._probe_coords_label"><code class="docutils literal notranslate"><span class="pre">_probe_coords_label()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot._probe_location"><code class="docutils literal notranslate"><span class="pre">_probe_location()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot._read_probe_series"><code class="docutils literal notranslate"><span class="pre">_read_probe_series()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot._row_magnitude"><code class="docutils literal notranslate"><span class="pre">_row_magnitude()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.sweep_plot.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.magnetic_field_vector_map.html"
+                          title="previous chapter">processing.scripts.magnetic_field_vector_map module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.temperature_map.html"
+                          title="next chapter">processing.scripts.temperature_map module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.sweep_plot.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.temperature_map.html" title="processing.scripts.temperature_map module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_vector_map.html" title="processing.scripts.magnetic_field_vector_map module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" >processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.sweep_plot module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

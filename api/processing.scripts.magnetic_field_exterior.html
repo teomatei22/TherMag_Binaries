@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts.magnetic_field_exterior module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts.magnetic_field_vector_map module" href="processing.scripts.magnetic_field_vector_map.html" />
+    <link rel="prev" title="processing.scripts.magnetic_field_contour_map module" href="processing.scripts.magnetic_field_contour_map.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_vector_map.html" title="processing.scripts.magnetic_field_vector_map module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_contour_map.html" title="processing.scripts.magnetic_field_contour_map module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" accesskey="U">processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.magnetic_field_exterior module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts.magnetic_field_exterior">
+<span id="processing-scripts-magnetic-field-exterior-module"></span><h1>processing.scripts.magnetic_field_exterior module<a class="headerlink" href="#module-processing.scripts.magnetic_field_exterior" title="Link to this heading">¶</a></h1>
+<p>Exterior magnetic-field probes in outer air via IDW on VTU <code class="docutils literal notranslate"><span class="pre">magnetic</span> <span class="pre">flux</span> <span class="pre">density</span></code>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_exterior.</span></span><span class="sig-name descname"><span class="pre">MagneticFieldExterior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probe_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#MagneticFieldExterior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ProbeRegionMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePostProcessor</span></code></p>
+<p>Exterior B probes in outer air via IDW on VTU magnetic flux density.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_dir</strong> – FEM run directory [path].</p></li>
+<li><p><strong>verbose</strong> – Verbose logging flag.</p></li>
+<li><p><strong>probe_points</strong> – Optional probes (max 3); else scaled bext defaults.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MagneticFieldExterior</strong> – Post-processor writing <code class="docutils literal notranslate"><span class="pre">magnetic_field_data.csv</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>probe_points</strong> (<em>list</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._abc_impl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior._clear_cache">
+<span class="sig-name descname"><span class="pre">_clear_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#MagneticFieldExterior._clear_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._clear_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Destroy cached outer-air Threshold/MergeBlocks objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Processor instance.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Clears <code class="docutils literal notranslate"><span class="pre">_cache</span></code> and <code class="docutils literal notranslate"><span class="pre">_cache_key</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior._default_bext_probe_points">
+<span class="sig-name descname"><span class="pre">_default_bext_probe_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#MagneticFieldExterior._default_bext_probe_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._default_bext_probe_points" title="Link to this definition">¶</a></dt>
+<dd><p>Compute default exterior probe xyz from geometry probe-scaling helpers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Processor with geometry metadata.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Dict probes <code class="docutils literal notranslate"><span class="pre">{x,y,z}</span></code> [m].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior._extract_at_point">
+<span class="sig-name descname"><span class="pre">_extract_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vtu_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#MagneticFieldExterior._extract_at_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._extract_at_point" title="Link to this definition">¶</a></dt>
+<dd><p>IDW-interpolate Bx,By,Bz at an exterior probe and return nearest-node coords.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Processor instance.</p></li>
+<li><p><strong>x</strong> – Probe x [m].</p></li>
+<li><p><strong>y</strong> – Probe y [m].</p></li>
+<li><p><strong>z</strong> – Probe z [m].</p></li>
+<li><p><strong>vtu_file</strong> – Optional VTU path [path].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – <code class="docutils literal notranslate"><span class="pre">Bx,By,Bz</span></code>, nearest <code class="docutils literal notranslate"><span class="pre">x,y,z</span></code>, and IDW diagnostics.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+<li><p><strong>vtu_file</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior._prepare_b_cache">
+<span class="sig-name descname"><span class="pre">_prepare_b_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vtu_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#MagneticFieldExterior._prepare_b_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._prepare_b_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Threshold outer-air cells and cache point coords + B vectors for IDW probes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Processor instance.</p></li>
+<li><p><strong>vtu_file</strong> – VTU path [path].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – Cache with <code class="docutils literal notranslate"><span class="pre">points_np</span></code>, <code class="docutils literal notranslate"><span class="pre">B_np</span></code>, and ParaView <code class="docutils literal notranslate"><span class="pre">objects</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vtu_file</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_probe_point">
+<span class="sig-name descname"><span class="pre">_validate_probe_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#MagneticFieldExterior._validate_probe_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_probe_point" title="Link to this definition">¶</a></dt>
+<dd><p>Ensure probe lies in outer air (sphere: R_sphere &lt; r &lt; R_sph; else non-cavity air).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – Processor with geometry contract.</p></li>
+<li><p><strong>x</strong> – Probe x [m].</p></li>
+<li><p><strong>y</strong> – Probe y [m].</p></li>
+<li><p><strong>z</strong> – Probe z [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – Validated <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>)</p></li>
+<li><p><strong>y</strong> (<em>float</em>)</p></li>
+<li><p><strong>z</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_required_config">
+<span class="sig-name descname"><span class="pre">_validate_required_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#MagneticFieldExterior._validate_required_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_required_config" title="Link to this definition">¶</a></dt>
+<dd><p>Require IDW extraction keys and bext <code class="docutils literal notranslate"><span class="pre">point_directions</span></code> in settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Processor with <code class="docutils literal notranslate"><span class="pre">pp_settings[&quot;extraction&quot;]</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Raises <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> if required keys are missing.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.MagneticFieldExterior.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#MagneticFieldExterior.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior.run" title="Link to this definition">¶</a></dt>
+<dd><p>Sample all timesteps at exterior probes and write B CSV plus sampling log.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – Processor with probe points and VTU inputs.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes <code class="docutils literal notranslate"><span class="pre">magnetic_field_data.csv</span></code>, sampling log, and integrity evidence.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.magnetic_field_exterior.main">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.magnetic_field_exterior.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/magnetic_field_exterior.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.magnetic_field_exterior.main" title="Link to this definition">¶</a></dt>
+<dd><p>CLI entry for exterior magnetic probes; loads optional config <code class="docutils literal notranslate"><span class="pre">probe_points</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – Parses <code class="docutils literal notranslate"><span class="pre">--config</span></code> and <code class="docutils literal notranslate"><span class="pre">--run-dir</span></code> from argv.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Instantiates <code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior</span></code> and runs extraction.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts.magnetic_field_exterior module</a><ul>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior</span></code></a><ul>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._abc_impl"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._abc_impl</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._clear_cache"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._clear_cache()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._default_bext_probe_points"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._default_bext_probe_points()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._extract_at_point"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._extract_at_point()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._prepare_b_cache"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._prepare_b_cache()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_probe_point"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._validate_probe_point()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_required_config"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._validate_required_config()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.MagneticFieldExterior.run"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.scripts.magnetic_field_exterior.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.magnetic_field_contour_map.html"
+                          title="previous chapter">processing.scripts.magnetic_field_contour_map module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.magnetic_field_vector_map.html"
+                          title="next chapter">processing.scripts.magnetic_field_vector_map module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.magnetic_field_exterior.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_vector_map.html" title="processing.scripts.magnetic_field_vector_map module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.magnetic_field_contour_map.html" title="processing.scripts.magnetic_field_contour_map module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" >processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.magnetic_field_exterior module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

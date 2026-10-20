@@ -1,0 +1,7 @@
+simulations.material\_params module
+===================================
+
+.. automodule:: simulations.material_params
+   :members:
+   :show-inheritance:
+   :undoc-members:

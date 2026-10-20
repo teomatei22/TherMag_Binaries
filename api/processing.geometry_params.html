@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.geometry_params module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.probe_scaling module" href="processing.probe_scaling.html" />
+    <link rel="prev" title="processing.defaults module" href="processing.defaults.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.probe_scaling.html" title="processing.probe_scaling module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.defaults.html" title="processing.defaults module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" accesskey="U">processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.geometry_params module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.geometry_params">
+<span id="processing-geometry-params-module"></span><h1>processing.geometry_params module<a class="headerlink" href="#module-processing.geometry_params" title="Link to this heading">¶</a></h1>
+<p>Geometry and model configuration for FEM post-processing from <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.geometry_params.</span></span><span class="sig-name descname"><span class="pre">GeometryParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_two_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_inner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_sphere</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_cap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_sph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#GeometryParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.GeometryParams" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Conductor dimensions and hollow/layer variant parsed from <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_type</strong> – Family <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+<li><p><strong>variant</strong> – Topology <code class="docutils literal notranslate"><span class="pre">full</span></code>, <code class="docutils literal notranslate"><span class="pre">hollow</span></code>, or <code class="docutils literal notranslate"><span class="pre">layer_over_*</span></code>.</p></li>
+<li><p><strong>is_two_layer</strong> – Whether an inner material layer is present.</p></li>
+<li><p><strong>T_inner</strong> – Inner-layer wall thickness [m].</p></li>
+<li><p><strong>T_outer</strong> – Outer-layer / hollow wall thickness [m].</p></li>
+<li><p><strong>L</strong> – Axial length (cylinder/prism) [m].</p></li>
+<li><p><strong>R</strong> – Cylinder radius [m].</p></li>
+<li><p><strong>W</strong> – Prism half-width [m].</p></li>
+<li><p><strong>H</strong> – Prism half-height [m].</p></li>
+<li><p><strong>R_sphere</strong> – Metal sphere radius [m].</p></li>
+<li><p><strong>R_cap</strong> – Sphere contact-cap radius [m].</p></li>
+<li><p><strong>R_sph</strong> – Optional far-field air-sphere radius [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryParams</strong> – Dimension container for glyph scale and probe band layout.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+<li><p><strong>is_two_layer</strong> (<em>bool</em>)</p></li>
+<li><p><strong>T_inner</strong> (<em>float</em>)</p></li>
+<li><p><strong>T_outer</strong> (<em>float</em>)</p></li>
+<li><p><strong>L</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>R</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>W</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>H</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>R_sphere</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>R_cap</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>R_sph</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.H">
+<span class="sig-name descname"><span class="pre">H</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.H" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.L">
+<span class="sig-name descname"><span class="pre">L</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.L" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.R">
+<span class="sig-name descname"><span class="pre">R</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.R" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.R_cap">
+<span class="sig-name descname"><span class="pre">R_cap</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.R_cap" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.R_sph">
+<span class="sig-name descname"><span class="pre">R_sph</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.R_sph" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.R_sphere">
+<span class="sig-name descname"><span class="pre">R_sphere</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.R_sphere" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.T_inner">
+<span class="sig-name descname"><span class="pre">T_inner</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.T_inner" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.T_outer">
+<span class="sig-name descname"><span class="pre">T_outer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.T_outer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.W">
+<span class="sig-name descname"><span class="pre">W</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.W" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.cavity_thickness_m">
+<span class="sig-name descname"><span class="pre">cavity_thickness_m</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#GeometryParams.cavity_thickness_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.GeometryParams.cavity_thickness_m" title="Link to this definition">¶</a></dt>
+<dd><p>Total cavity wall thickness for hollow or layered-hollow variants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.variant</span></code>, <code class="docutils literal notranslate"><span class="pre">self.T_inner</span></code>, <code class="docutils literal notranslate"><span class="pre">self.T_outer</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Cavity wall thickness [m]; <code class="docutils literal notranslate"><span class="pre">0.0</span></code> for solid full bodies.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.characteristic_extent">
+<span class="sig-name descname"><span class="pre">characteristic_extent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#GeometryParams.characteristic_extent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.GeometryParams.characteristic_extent" title="Link to this definition">¶</a></dt>
+<dd><p>Characteristic conductor extent used for camera and glyph span scaling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses family dimensions on <code class="docutils literal notranslate"><span class="pre">self</span></code> (L/R, L/W/H, or R_sphere/R_cap).</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Positive characteristic length [m] (floor <code class="docutils literal notranslate"><span class="pre">1e-9</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.from_geo_file">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_geo_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geo_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#GeometryParams.from_geo_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.GeometryParams.from_geo_file" title="Link to this definition">¶</a></dt>
+<dd><p>Parse conductor dimensions and variant from a Gmsh <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geo_path</strong> – Path to <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> in the FEM run directory.</p></li>
+<li><p><strong>pp_settings</strong> – Optional post-processing settings; loaded from the run root if omitted.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>GeometryParams</strong> – Populated geometry for the detected family and variant.</p></li>
+<li><p><strong>A sphere stores metal radius ``R_sphere`` and air-domain radius ``R_sph``.</strong></p></li>
+</ul>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geo_path</strong> (<em>str</em>)</p></li>
+<li><p><strong>pp_settings</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.geometry_params.GeometryParams" title="processing.geometry_params.GeometryParams"><em>GeometryParams</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.geometry_type">
+<span class="sig-name descname"><span class="pre">geometry_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.geometry_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.is_two_layer">
+<span class="sig-name descname"><span class="pre">is_two_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.is_two_layer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.probe_scaling_params">
+<span class="sig-name descname"><span class="pre">probe_scaling_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#GeometryParams.probe_scaling_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.GeometryParams.probe_scaling_params" title="Link to this definition">¶</a></dt>
+<dd><p>Export the subset of dimensions required by probe-band / Jint scaling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses family-required fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, float]</strong> – Geometry keys (e.g. <code class="docutils literal notranslate"><span class="pre">L</span></code>/<code class="docutils literal notranslate"><span class="pre">R</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>/<code class="docutils literal notranslate"><span class="pre">W</span></code>/<code class="docutils literal notranslate"><span class="pre">H</span></code>, <code class="docutils literal notranslate"><span class="pre">R_sphere</span></code>/<code class="docutils literal notranslate"><span class="pre">R_cap</span></code>) [m].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.GeometryParams.variant">
+<span class="sig-name descname"><span class="pre">variant</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full'</span></span><a class="headerlink" href="#processing.geometry_params.GeometryParams.variant" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.geometry_params.</span></span><span class="sig-name descname"><span class="pre">ModelConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full_cylinder'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cylinder'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_material_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_air_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_air_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_material_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#ModelConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.ModelConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Mesh body IDs and model layout for conductive vs air thresholding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_type</strong> – Layout key (e.g. <code class="docutils literal notranslate"><span class="pre">full_cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">layer_over_hollow_prism</span></code>).</p></li>
+<li><p><strong>geometry_type</strong> – Family <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+<li><p><strong>outer_material_id</strong> – Conductive outer body GeometryIds value.</p></li>
+<li><p><strong>outer_air_id</strong> – Exterior air body GeometryIds value.</p></li>
+<li><p><strong>inner_air_id</strong> – Optional cavity air body id.</p></li>
+<li><p><strong>inner_material_id</strong> – Optional inner conductive layer body id.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ModelConfig</strong> – Body-id configuration for ParaView thresholds and coloring.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>outer_material_id</strong> (<em>int</em>)</p></li>
+<li><p><strong>outer_air_id</strong> (<em>int</em>)</p></li>
+<li><p><strong>inner_air_id</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>inner_material_id</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.conductive_analysis_range">
+<span class="sig-name descname"><span class="pre">conductive_analysis_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#ModelConfig.conductive_analysis_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.ModelConfig.conductive_analysis_range" title="Link to this definition">¶</a></dt>
+<dd><p>GeometryIds threshold range selecting conductive material bodies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.inner_material_id</span></code>, <code class="docutils literal notranslate"><span class="pre">self.outer_material_id</span></code>, <code class="docutils literal notranslate"><span class="pre">self.model_type</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[float, float]</strong> – Inclusive lower/upper GeometryIds for conductive volumes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.detect">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">detect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cwd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#ModelConfig.detect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.ModelConfig.detect" title="Link to this definition">¶</a></dt>
+<dd><p>Detect model layout and body IDs from geometry, mesh names, and defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> – FEM run working directory containing <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> and mesh metadata.</p></li>
+<li><p><strong>pp_settings</strong> – Optional post-processing settings; loaded from <code class="docutils literal notranslate"><span class="pre">cwd</span></code> if omitted.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ModelConfig</strong> – Resolved <code class="docutils literal notranslate"><span class="pre">model_type</span></code> and conductive/air GeometryIds.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> (<em>str</em>)</p></li>
+<li><p><strong>pp_settings</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.geometry_params.ModelConfig" title="processing.geometry_params.ModelConfig"><em>ModelConfig</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.geometry_type">
+<span class="sig-name descname"><span class="pre">geometry_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cylinder'</span></span><a class="headerlink" href="#processing.geometry_params.ModelConfig.geometry_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.inner_air_id">
+<span class="sig-name descname"><span class="pre">inner_air_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.ModelConfig.inner_air_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.inner_material_id">
+<span class="sig-name descname"><span class="pre">inner_material_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.geometry_params.ModelConfig.inner_material_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.model_type">
+<span class="sig-name descname"><span class="pre">model_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full_cylinder'</span></span><a class="headerlink" href="#processing.geometry_params.ModelConfig.model_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.outer_air_id">
+<span class="sig-name descname"><span class="pre">outer_air_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#processing.geometry_params.ModelConfig.outer_air_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.outer_material_id">
+<span class="sig-name descname"><span class="pre">outer_material_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#processing.geometry_params.ModelConfig.outer_material_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.geometry_params.ModelConfig.validate_outer_air_sampling">
+<span class="sig-name descname"><span class="pre">validate_outer_air_sampling</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/geometry_params.html#ModelConfig.validate_outer_air_sampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.geometry_params.ModelConfig.validate_outer_air_sampling" title="Link to this definition">¶</a></dt>
+<dd><p>Ensure exterior B-field sampling targets outer air, not metal or cavity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.outer_air_id</span></code>, <code class="docutils literal notranslate"><span class="pre">self.outer_material_id</span></code>, <code class="docutils literal notranslate"><span class="pre">self.inner_air_id</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Raises <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> when outer air id collides with metal or cavity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.geometry_params module</a><ul>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams"><code class="docutils literal notranslate"><span class="pre">GeometryParams</span></code></a><ul>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.H"><code class="docutils literal notranslate"><span class="pre">GeometryParams.H</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.L"><code class="docutils literal notranslate"><span class="pre">GeometryParams.L</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.R"><code class="docutils literal notranslate"><span class="pre">GeometryParams.R</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.R_cap"><code class="docutils literal notranslate"><span class="pre">GeometryParams.R_cap</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.R_sph"><code class="docutils literal notranslate"><span class="pre">GeometryParams.R_sph</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.R_sphere"><code class="docutils literal notranslate"><span class="pre">GeometryParams.R_sphere</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.T_inner"><code class="docutils literal notranslate"><span class="pre">GeometryParams.T_inner</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.T_outer"><code class="docutils literal notranslate"><span class="pre">GeometryParams.T_outer</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.W"><code class="docutils literal notranslate"><span class="pre">GeometryParams.W</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.cavity_thickness_m"><code class="docutils literal notranslate"><span class="pre">GeometryParams.cavity_thickness_m()</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.characteristic_extent"><code class="docutils literal notranslate"><span class="pre">GeometryParams.characteristic_extent()</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.from_geo_file"><code class="docutils literal notranslate"><span class="pre">GeometryParams.from_geo_file()</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.geometry_type"><code class="docutils literal notranslate"><span class="pre">GeometryParams.geometry_type</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.is_two_layer"><code class="docutils literal notranslate"><span class="pre">GeometryParams.is_two_layer</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.probe_scaling_params"><code class="docutils literal notranslate"><span class="pre">GeometryParams.probe_scaling_params()</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.GeometryParams.variant"><code class="docutils literal notranslate"><span class="pre">GeometryParams.variant</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig"><code class="docutils literal notranslate"><span class="pre">ModelConfig</span></code></a><ul>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.conductive_analysis_range"><code class="docutils literal notranslate"><span class="pre">ModelConfig.conductive_analysis_range()</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.detect"><code class="docutils literal notranslate"><span class="pre">ModelConfig.detect()</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.geometry_type"><code class="docutils literal notranslate"><span class="pre">ModelConfig.geometry_type</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.inner_air_id"><code class="docutils literal notranslate"><span class="pre">ModelConfig.inner_air_id</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.inner_material_id"><code class="docutils literal notranslate"><span class="pre">ModelConfig.inner_material_id</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.model_type"><code class="docutils literal notranslate"><span class="pre">ModelConfig.model_type</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.outer_air_id"><code class="docutils literal notranslate"><span class="pre">ModelConfig.outer_air_id</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.outer_material_id"><code class="docutils literal notranslate"><span class="pre">ModelConfig.outer_material_id</span></code></a></li>
+<li><a class="reference internal" href="#processing.geometry_params.ModelConfig.validate_outer_air_sampling"><code class="docutils literal notranslate"><span class="pre">ModelConfig.validate_outer_air_sampling()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.defaults.html"
+                          title="previous chapter">processing.defaults module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.probe_scaling.html"
+                          title="next chapter">processing.probe_scaling module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.geometry_params.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.probe_scaling.html" title="processing.probe_scaling module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.defaults.html" title="processing.defaults module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.geometry_params module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

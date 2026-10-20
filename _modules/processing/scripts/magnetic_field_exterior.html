@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.scripts.magnetic_field_exterior &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=1eac167c" />
+    <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.magnetic_field_exterior</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.scripts.magnetic_field_exterior</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Exterior magnetic-field probes in outer air via IDW on VTU ``magnetic flux density``."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">_this_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">_parent_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_this_dir</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_path</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_parent_dir</span><span class="p">,</span> <span class="n">_this_dir</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_path</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">_this_dir</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">_this_dir</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_this_dir</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePostProcessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometry_contract</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_geometry_contract</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">interior_probe_common</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProbeRegionMixin</span><span class="p">,</span> <span class="n">normalize_probe_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">MergeBlocks</span><span class="p">,</span> <span class="n">Threshold</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview</span><span class="w"> </span><span class="kn">import</span> <span class="n">numpy_support</span> <span class="k">as</span> <span class="n">ns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview</span><span class="w"> </span><span class="kn">import</span> <span class="n">servermanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_csv_float</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sampling</span><span class="w"> </span><span class="kn">import</span> <span class="n">idw_interpolate_vectors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">run_integrity</span><span class="w"> </span><span class="kn">import</span> <span class="n">append_run_integrity</span><span class="p">,</span> <span class="n">log_time_coverage</span>
+
+
+<div class="viewcode-block" id="MagneticFieldExterior">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MagneticFieldExterior</span><span class="p">(</span><span class="n">ProbeRegionMixin</span><span class="p">,</span> <span class="n">BasePostProcessor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Exterior B probes in outer air via IDW on VTU magnetic flux density.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        working_dir: FEM run directory [path].</span>
+<span class="sd">        verbose: Verbose logging flag.</span>
+<span class="sd">        probe_points: Optional probes (max 3); else scaled bext defaults.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        MagneticFieldExterior: Post-processor writing ``magnetic_field_data.csv``.</span>
+<span class="sd">    """</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">probe_points</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Initialize exterior B probe extractor, validate config, resolve probe points.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor instance.</span>
+<span class="sd">            working_dir: FEM run directory [path].</span>
+<span class="sd">            verbose: Verbose flag.</span>
+<span class="sd">            probe_points: Optional list of xyz probes [m].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Sets IDW config, geometry contract, and validated probe list.</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span><span class="p">[</span><span class="s2">"extraction"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bext_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">[</span><span class="s2">"bext_defaults"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_required_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">geometry_contract</span> <span class="o">=</span> <span class="n">load_geometry_contract</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">probe_points</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">probe_points</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">probe</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">probe</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">"y"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">"z"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="mi">2</span><span class="p">])}</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">probe</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">normalized</span> <span class="o">=</span> <span class="n">normalize_probe_dict</span><span class="p">(</span><span class="n">probe</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">normalized</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">normalized</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_bext_probe_points</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"[WARN] Truncated exterior probes to the first three user/automatic points"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Destructor clearing the ParaView B-field cache.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor instance.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Best-effort ``_clear_cache``.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="MagneticFieldExterior._clear_cache">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._clear_cache">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Destroy cached outer-air Threshold/MergeBlocks objects.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor instance.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Clears ``_cache`` and ``_cache_key``.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"objects"</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MagneticFieldExterior._validate_required_config">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_required_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_required_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Require IDW extraction keys and bext ``point_directions`` in settings.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor with ``pp_settings["extraction"]``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Raises ``KeyError`` if required keys are missing.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"idw_neighbors"</span><span class="p">,</span> <span class="s2">"idw_epsilon"</span><span class="p">,</span> <span class="s2">"on_node_epsilon"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing required extraction config key: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"point_directions"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bext_cfg</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">"Missing extraction.bext_defaults.point_directions"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MagneticFieldExterior._default_bext_probe_points">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._default_bext_probe_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_default_bext_probe_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Compute default exterior probe xyz from geometry probe-scaling helpers.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor with geometry metadata.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list: Dict probes ``{x,y,z}`` [m].</span>
+<span class="sd">        """</span>
+        <span class="n">gtype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geometry_type</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">geo_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">probe_scaling_params</span><span class="p">()</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">probe_scaling</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_bext_probe_positions</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="n">z</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">compute_bext_probe_positions</span><span class="p">(</span><span class="n">geo_params</span><span class="p">,</span> <span class="n">gtype</span><span class="p">)</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MagneticFieldExterior._validate_probe_point">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_probe_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_probe_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Ensure probe lies in outer air (sphere: R_sphere &lt; r &lt; R_sph; else non-cavity air).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor with geometry contract.</span>
+<span class="sd">            x: Probe x [m].</span>
+<span class="sd">            y: Probe y [m].</span>
+<span class="sd">            z: Probe z [m].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple: Validated ``(x, y, z)`` [m].</span>
+<span class="sd">        """</span>
+        <span class="n">r3</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry_contract</span><span class="o">.</span><span class="n">family</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry_contract</span><span class="o">.</span><span class="n">body_outer_radius_m</span>
+            <span class="n">R_domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry_contract</span><span class="o">.</span><span class="n">domain_radius_m</span>
+            <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">R_domain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Sphere exterior validation requires R_sphere and R_sph."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">r3</span> <span class="o">&lt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">R_domain</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Sphere exterior probe radius </span><span class="si">{</span><span class="n">r3</span><span class="si">:</span><span class="s2">.9g</span><span class="si">}</span><span class="s2"> must satisfy "</span>
+                    <span class="sa">f</span><span class="s2">"R_sphere=</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">R</span><span class="p">)</span><span class="si">:</span><span class="s2">.9g</span><span class="si">}</span><span class="s2"> &lt; r &lt; R_sph=</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">R_domain</span><span class="p">)</span><span class="si">:</span><span class="s2">.9g</span><span class="si">}</span><span class="s2">."</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span>
+
+        <span class="n">Rs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">R_sph</span>
+        <span class="k">if</span> <span class="n">Rs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">r3</span> <span class="o">&gt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Rs</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Exterior probe radius </span><span class="si">{</span><span class="n">r3</span><span class="si">:</span><span class="s2">.9g</span><span class="si">}</span><span class="s2"> is outside the simulation domain </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">Rs</span><span class="p">)</span><span class="si">:</span><span class="s2">.9g</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_in_air_region</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_inside_inner_cavity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"MagneticFieldExterior probes must lie in outer_air, not conductor or inner cavity."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span></div>
+
+
+<div class="viewcode-block" id="MagneticFieldExterior._prepare_b_cache">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._prepare_b_cache">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_b_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtu_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Threshold outer-air cells and cache point coords + B vectors for IDW probes.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor instance.</span>
+<span class="sd">            vtu_file: VTU path [path].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict: Cache with ``points_np``, ``B_np``, and ParaView ``objects``.</span>
+<span class="sd">        """</span>
+        <span class="n">cache_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">vtu_file</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">outer_air_id</span><span class="p">),))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span> <span class="o">==</span> <span class="n">cache_key</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_reader</span><span class="p">(</span><span class="s2">"magnetic_ext_vtu"</span><span class="p">,</span> <span class="n">vtu_file</span><span class="p">)</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">Threshold</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="s2">"Threshold_B_probe"</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">Scalars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"CELLS"</span><span class="p">,</span> <span class="s2">"GeometryIds"</span><span class="p">]</span>
+        <span class="n">air_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">outer_air_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_threshold_between</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">air_id</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">air_id</span><span class="p">))</span>
+        <span class="n">merged</span> <span class="o">=</span> <span class="n">MergeBlocks</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+        <span class="n">vtk_data</span> <span class="o">=</span> <span class="n">servermanager</span><span class="o">.</span><span class="n">Fetch</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">vtk_data</span><span class="o">.</span><span class="n">GetPoints</span><span class="p">()</span>
+        <span class="n">points_np</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ns</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">GetData</span><span class="p">())</span> <span class="k">if</span> <span class="n">points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">point_data</span> <span class="o">=</span> <span class="n">vtk_data</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span>
+        <span class="n">B_array</span> <span class="o">=</span> <span class="n">point_data</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="s2">"magnetic flux density"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">B_array</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Missing 'magnetic flux density' point array."</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"objects"</span><span class="p">:</span> <span class="p">[</span><span class="n">merged</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">reader</span><span class="p">],</span>
+            <span class="s2">"points_np"</span><span class="p">:</span> <span class="n">points_np</span><span class="p">,</span>
+            <span class="s2">"B_np"</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">B_array</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span> <span class="o">=</span> <span class="n">cache_key</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span></div>
+
+
+<div class="viewcode-block" id="MagneticFieldExterior._extract_at_point">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._extract_at_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">vtu_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: IDW-interpolate Bx,By,Bz at an exterior probe and return nearest-node coords.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor instance.</span>
+<span class="sd">            x: Probe x [m].</span>
+<span class="sd">            y: Probe y [m].</span>
+<span class="sd">            z: Probe z [m].</span>
+<span class="sd">            vtu_file: Optional VTU path [path].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict: ``Bx,By,Bz``, nearest ``x,y,z``, and IDW diagnostics.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">vtu_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vtu_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_b_cache</span><span class="p">(</span><span class="n">vtu_file</span><span class="p">)</span>
+        <span class="n">points_np</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="s2">"points_np"</span><span class="p">]</span>
+        <span class="n">B_np</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="s2">"B_np"</span><span class="p">]</span>
+        <span class="n">target_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">points_np</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"No mesh points available in outer_air region for B-field probe."</span><span class="p">)</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">points_np</span> <span class="o">-</span> <span class="n">target_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">Bvec</span><span class="p">,</span> <span class="n">diagnostics</span> <span class="o">=</span> <span class="n">idw_interpolate_vectors</span><span class="p">(</span>
+            <span class="n">B_np</span><span class="p">,</span>
+            <span class="n">distances</span><span class="p">,</span>
+            <span class="n">k</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">[</span><span class="s2">"idw_neighbors"</span><span class="p">]),</span>
+            <span class="n">epsilon</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">[</span><span class="s2">"idw_epsilon"</span><span class="p">]),</span>
+            <span class="n">on_node_epsilon</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">[</span><span class="s2">"on_node_epsilon"</span><span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">Bx</span><span class="p">,</span> <span class="n">By</span><span class="p">,</span> <span class="n">Bz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Bvec</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">Bvec</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">Bvec</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">nearest_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">distances</span><span class="p">))</span>
+        <span class="n">nearest</span> <span class="o">=</span> <span class="n">points_np</span><span class="p">[</span><span class="n">nearest_idx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"Bx"</span><span class="p">:</span> <span class="n">Bx</span><span class="p">,</span>
+            <span class="s2">"By"</span><span class="p">:</span> <span class="n">By</span><span class="p">,</span>
+            <span class="s2">"Bz"</span><span class="p">:</span> <span class="n">Bz</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">nearest</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">nearest</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="s2">"z"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">nearest</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="o">**</span><span class="n">diagnostics</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="MagneticFieldExterior.run">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Sample all timesteps at exterior probes and write B CSV plus sampling log.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor with probe points and VTU inputs.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes ``magnetic_field_data.csv``, sampling log, and integrity evidence.</span>
+<span class="sd">        """</span>
+        <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="s2">"magnetic_field_data.csv"</span><span class="p">)</span>
+        <span class="n">sampling_log</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"logs"</span> <span class="o">/</span> <span class="s2">"magnetic_field_sampling.log"</span>
+        <span class="n">sampling_log</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">times_written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span>
+            <span class="n">sampling_log</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">"time"</span><span class="p">,</span>
+                    <span class="s2">"point_id"</span><span class="p">,</span>
+                    <span class="s2">"B_mag"</span><span class="p">,</span>
+                    <span class="s2">"Bx"</span><span class="p">,</span>
+                    <span class="s2">"By"</span><span class="p">,</span>
+                    <span class="s2">"Bz"</span><span class="p">,</span>
+                    <span class="s2">"x"</span><span class="p">,</span>
+                    <span class="s2">"y"</span><span class="p">,</span>
+                    <span class="s2">"z"</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="s2">"time,point_id,mesh_distance_m,idw_neighbors_used,idw_exact_node_hit,"</span>
+                <span class="s2">"idw_support_radius_m,idw_support_mean_distance_m</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_steady_state</span><span class="p">:</span>
+                <span class="n">step_files</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">step_files</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">physical_time_for_vtu_index</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">)</span>
+                <span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">time_val</span><span class="p">,</span> <span class="n">vtu_file</span> <span class="ow">in</span> <span class="n">step_files</span><span class="p">:</span>
+                <span class="n">times_written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">time_val</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">):</span>
+                    <span class="n">tx</span><span class="p">,</span> <span class="n">ty</span><span class="p">,</span> <span class="n">tz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="s2">"z"</span><span class="p">])</span>
+                    <span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_probe_point</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">)</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_at_point</span><span class="p">(</span><span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">,</span> <span class="n">vtu_file</span><span class="o">=</span><span class="n">vtu_file</span><span class="p">)</span>
+                    <span class="n">bx</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">bz</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"Bx"</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s2">"By"</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s2">"Bz"</span><span class="p">]</span>
+                    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">time_val</span><span class="p">,</span>
+                            <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="n">format_csv_float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">bx</span> <span class="o">*</span> <span class="n">bx</span> <span class="o">+</span> <span class="n">by</span> <span class="o">*</span> <span class="n">by</span> <span class="o">+</span> <span class="n">bz</span> <span class="o">*</span> <span class="n">bz</span><span class="p">)),</span>
+                            <span class="n">format_csv_float</span><span class="p">(</span><span class="n">bx</span><span class="p">),</span>
+                            <span class="n">format_csv_float</span><span class="p">(</span><span class="n">by</span><span class="p">),</span>
+                            <span class="n">format_csv_float</span><span class="p">(</span><span class="n">bz</span><span class="p">),</span>
+                            <span class="n">format_csv_float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]),</span>
+                            <span class="n">format_csv_float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]),</span>
+                            <span class="n">format_csv_float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]),</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">time_val</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'mesh_distance'</span><span class="p">]</span><span class="si">}</span><span class="s2">,"</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'idw_neighbors_used'</span><span class="p">]</span><span class="si">}</span><span class="s2">,"</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'idw_exact_node_hit'</span><span class="p">]))</span><span class="si">}</span><span class="s2">,"</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'idw_support_radius_m'</span><span class="p">]</span><span class="si">}</span><span class="s2">,"</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'idw_support_mean_distance_m'</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                    <span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Wrote magnetic-field CSV"</span><span class="p">)</span>
+        <span class="n">append_run_integrity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span> <span class="s2">"magnetic_field_exterior_fields"</span><span class="p">,</span> <span class="s2">"required Bx/By/Bz fields written"</span><span class="p">)</span>
+        <span class="n">log_time_coverage</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span>
+            <span class="s2">"magnetic_field_exterior"</span><span class="p">,</span>
+            <span class="n">times_written</span><span class="p">,</span>
+            <span class="n">expected_time_dependent</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_steady_state</span><span class="p">,</span>
+            <span class="n">n_steps</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">),</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../api/processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: CLI entry for exterior magnetic probes; loads optional config ``probe_points``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: Parses ``--config`` and ``--run-dir`` from argv.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Instantiates ``MagneticFieldExterior`` and runs extraction.</span>
+<span class="sd">    """</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Extract magnetic field exterior probe data"</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--config"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"results/processing_config.json"</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--run-dir"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"."</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">probe_points</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">run_dir</span><span class="p">)</span>
+    <span class="n">config_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">config_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">config_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"scripts"</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">script</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"magnetic_field_exterior"</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">probe_points</span> <span class="o">=</span> <span class="p">(</span><span class="n">script</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parameters"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"probe_points"</span><span class="p">)</span>
+                <span class="k">break</span>
+
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">MagneticFieldExterior</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">probe_points</span><span class="o">=</span><span class="n">probe_points</span><span class="p">)</span>
+    <span class="n">processor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.magnetic_field_exterior</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

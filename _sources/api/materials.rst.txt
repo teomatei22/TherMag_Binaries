@@ -1,0 +1,16 @@
+materials package
+=================
+
+.. automodule:: materials
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   materials.database
+   materials.repository

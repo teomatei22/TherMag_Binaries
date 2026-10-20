@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.scripts.current_density_vector_map &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=1eac167c" />
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.current_density_vector_map</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.scripts.current_density_vector_map</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: ParaView glyph vector map of total/source current density inside conductive regions."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePostProcessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview.simple</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="CurrentDensityVectorMap">
+<a class="viewcode-back" href="../../../api/processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.CurrentDensityVectorMap">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CurrentDensityVectorMap</span><span class="p">(</span><span class="n">BasePostProcessor</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">"""Brief: ParaView glyph map of total/source current density inside conductive GeometryIds.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        working_dir: FEM run directory [path].</span>
+<span class="sd">        verbose: Verbose logging flag.</span>
+<span class="sd">        arrow_fraction: Optional glyph arrow size fraction override.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        CurrentDensityVectorMap: Writes current-density vector-map PNG or MP4.</span>
+<span class="sd">    """</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">arrow_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Initialize current-density glyph post-processor with optional arrow fraction.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Map instance.</span>
+<span class="sd">            working_dir: FEM run directory [path].</span>
+<span class="sd">            verbose: Verbose flag.</span>
+<span class="sd">            arrow_fraction: Optional glyph scale fraction.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Stores ``arrow_fraction`` on the instance.</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrow_fraction</span> <span class="o">=</span> <span class="n">arrow_fraction</span>
+
+<div class="viewcode-block" id="CurrentDensityVectorMap.run">
+<a class="viewcode-back" href="../../../api/processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.CurrentDensityVectorMap.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Threshold conductive cells, glyph ``JSource``, color by abs(J), save PNG/MP4.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Map instance with VTU inputs.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes ``current_density_vector_map.png`` or ``.mp4``; exits 1 on failure.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">render_view</span> <span class="o">=</span> <span class="n">CreateView</span><span class="p">(</span><span class="s2">"RenderView"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_layout</span><span class="p">(</span><span class="n">render_view</span><span class="p">)</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Note: Only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s). Creating static image."</span><span class="p">)</span>
+
+            <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_reader</span><span class="p">(</span><span class="s2">"case_current_vector_map"</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">PointArrayStatus</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"sourcecurrentx"</span><span class="p">,</span> <span class="s2">"sourcecurrenty"</span><span class="p">,</span> <span class="s2">"sourcecurrentz"</span><span class="p">]</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">CellArrayStatus</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"GeometryIds"</span><span class="p">]</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+            <span class="n">is_animation</span><span class="p">,</span> <span class="n">frame_last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">animation_frame_last</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span>
+
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">Threshold</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="s2">"Threshold_Conductive_J"</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
+            <span class="n">threshold</span><span class="o">.</span><span class="n">Scalars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"CELLS"</span><span class="p">,</span> <span class="s2">"GeometryIds"</span><span class="p">]</span>
+            <span class="n">lower_val</span><span class="p">,</span> <span class="n">upper_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">conductive_analysis_range</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_threshold_between</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">lower_val</span><span class="p">,</span> <span class="n">upper_val</span><span class="p">)</span>
+            <span class="n">threshold</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">metal_cells</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">threshold</span><span class="o">.</span><span class="n">GetDataInformation</span><span class="p">()</span><span class="o">.</span><span class="n">GetNumberOfCells</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">metal_cells</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">metal_cells</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Conductive threshold produced no cells "</span>
+                <span class="p">)</span>
+
+            <span class="n">calculator</span> <span class="o">=</span> <span class="n">Calculator</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="s2">"JSource_Vector"</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">threshold</span><span class="p">)</span>
+            <span class="n">calculator</span><span class="o">.</span><span class="n">ResultArrayName</span> <span class="o">=</span> <span class="s2">"JSource"</span>
+            <span class="n">calculator</span><span class="o">.</span><span class="n">Function</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"sourcecurrentx*iHat + sourcecurrenty*jHat + sourcecurrentz*kHat"</span>
+            <span class="p">)</span>
+            <span class="n">calculator</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+
+            <span class="n">surface</span> <span class="o">=</span> <span class="n">ExtractSurface</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="s2">"Surface_Conductive_J"</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">threshold</span><span class="p">)</span>
+            <span class="n">surface</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+
+            <span class="n">th_display</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">render_view</span><span class="p">,</span> <span class="s2">"GeometryRepresentation"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">style_conductive_surface</span><span class="p">(</span><span class="n">th_display</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+
+            <span class="n">j_lut</span> <span class="o">=</span> <span class="n">GetColorTransferFunction</span><span class="p">(</span><span class="s2">"JSource"</span><span class="p">)</span>
+            <span class="n">scalar_bar</span> <span class="o">=</span> <span class="n">GetScalarBar</span><span class="p">(</span><span class="n">j_lut</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">scalar_bar</span><span class="p">:</span>
+                <span class="n">scalar_bar</span><span class="o">.</span><span class="n">Title</span> <span class="o">=</span> <span class="s2">"Current Density [A/m</span><span class="se">\u00b2</span><span class="s2">]"</span>
+                <span class="n">scalar_bar</span><span class="o">.</span><span class="n">ComponentTitle</span> <span class="o">=</span> <span class="s2">""</span>
+                <span class="n">scalar_bar</span><span class="o">.</span><span class="n">LabelFormat</span> <span class="o">=</span> <span class="s2">"</span><span class="si">%.3e</span><span class="s2">"</span>
+
+            <span class="n">glyph_scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vector_glyph_scale_factor</span><span class="p">(</span>
+                <span class="s2">"current_density"</span><span class="p">,</span>
+                <span class="n">extent_source</span><span class="o">=</span><span class="n">surface</span><span class="p">,</span>
+                <span class="n">scale_by_magnitude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">arrow_fraction</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arrow_fraction</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">sample_cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_max_sample_points</span><span class="p">(</span><span class="s2">"current_density"</span><span class="p">)</span>
+            <span class="n">glyph</span> <span class="o">=</span> <span class="n">Glyph</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="s2">"Glyph_J"</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">calculator</span><span class="p">,</span> <span class="n">GlyphType</span><span class="o">=</span><span class="s2">"Arrow"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">configure_vector_glyph</span><span class="p">(</span>
+                <span class="n">glyph</span><span class="p">,</span>
+                <span class="n">array_name</span><span class="o">=</span><span class="s2">"JSource"</span><span class="p">,</span>
+                <span class="n">scale_factor</span><span class="o">=</span><span class="n">glyph_scale</span><span class="p">,</span>
+                <span class="n">scale_by_magnitude</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">max_sample_points</span><span class="o">=</span><span class="n">sample_cap</span> <span class="k">if</span> <span class="n">sample_cap</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">glyph_display</span> <span class="o">=</span> <span class="n">Show</span><span class="p">(</span><span class="n">glyph</span><span class="p">,</span> <span class="n">render_view</span><span class="p">,</span> <span class="s2">"GeometryRepresentation"</span><span class="p">)</span>
+            <span class="n">glyph_display</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s2">"Surface"</span>
+            <span class="n">ColorBy</span><span class="p">(</span><span class="n">glyph_display</span><span class="p">,</span> <span class="p">(</span><span class="s2">"POINTS"</span><span class="p">,</span> <span class="s2">"JSource"</span><span class="p">,</span> <span class="s2">"Magnitude"</span><span class="p">))</span>
+            <span class="n">glyph_display</span><span class="o">.</span><span class="n">LookupTable</span> <span class="o">=</span> <span class="n">j_lut</span>
+            <span class="n">glyph_display</span><span class="o">.</span><span class="n">SetScalarBarVisibility</span><span class="p">(</span><span class="n">render_view</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">glyph_display</span><span class="o">.</span><span class="n">DataAxesGrid</span><span class="o">.</span><span class="n">GridAxesVisibility</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_vector_magnitude_hi</span><span class="p">(</span>
+                <span class="n">calculator</span><span class="p">,</span> <span class="s2">"JSource"</span><span class="p">,</span> <span class="n">frame_last</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">hi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lock_lut_to_range</span><span class="p">(</span><span class="n">j_lut</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">hi</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">scalar_bar</span><span class="p">:</span>
+                    <span class="n">scalar_bar</span><span class="o">.</span><span class="n">UseCustomLabels</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">scalar_bar</span><span class="o">.</span><span class="n">CustomLabels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scientific_tick_values</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">hi</span><span class="p">))</span>
+
+            <span class="n">render_view</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_camera</span><span class="p">(</span><span class="n">render_view</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_animation</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
+                    <span class="s2">"current_density_vector_map.mp4"</span><span class="p">,</span> <span class="n">render_view</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">frame_last</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_image</span><span class="p">(</span><span class="s2">"current_density_vector_map.png"</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">glyph</span><span class="p">,</span> <span class="n">surface</span><span class="p">,</span> <span class="n">calculator</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">reader</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"ERROR: current_density_vector_map failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">err_msg</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../api/processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""Brief: CLI entry that runs ``CurrentDensityVectorMap``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: Uses process cwd / default VTU discovery.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Runs the vector-map pipeline.</span>
+<span class="sd">    """</span>
+    <span class="n">CurrentDensityVectorMap</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.current_density_vector_map</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

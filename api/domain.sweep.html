@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>domain.sweep module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="domain.sweep_manifest module" href="domain.sweep_manifest.html" />
+    <link rel="prev" title="domain.simulation module" href="domain.simulation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.sweep_manifest.html" title="domain.sweep_manifest module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="domain.simulation.html" title="domain.simulation module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="domain.html" accesskey="U">domain package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.sweep module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-domain.sweep">
+<span id="domain-sweep-module"></span><h1>domain.sweep module<a class="headerlink" href="#module-domain.sweep" title="Link to this heading">¶</a></h1>
+<p>Typed sweep configuration for geometric parameter studies.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.sweep.SweepConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.sweep.</span></span><span class="sig-name descname"><span class="pre">SweepConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">swept_parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_coefficient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_coefficient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefficient_step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep.html#SweepConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep.SweepConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Coefficient range and observables for sweeping a geometric parameter in FEM runs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>swept_parameter</strong> – Name of the geometry parameter being swept (e.g. <code class="docutils literal notranslate"><span class="pre">L</span></code>).</p></li>
+<li><p><strong>observables</strong> – Ordered observable names to extract per run.</p></li>
+<li><p><strong>lower_coefficient</strong> – Lower multiplicative coefficient for the sweep.</p></li>
+<li><p><strong>upper_coefficient</strong> – Upper multiplicative coefficient for the sweep.</p></li>
+<li><p><strong>coefficient_step</strong> – Step between consecutive coefficients.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SweepConfig</strong> – Immutable geometric parameter-sweep configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>swept_parameter</strong> (<em>str</em>)</p></li>
+<li><p><strong>observables</strong> (<em>tuple</em><em>[</em><em>str</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>lower_coefficient</strong> (<em>float</em>)</p></li>
+<li><p><strong>upper_coefficient</strong> (<em>float</em>)</p></li>
+<li><p><strong>coefficient_step</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep.SweepConfig.coefficient_step">
+<span class="sig-name descname"><span class="pre">coefficient_step</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.sweep.SweepConfig.coefficient_step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.sweep.SweepConfig.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep.html#SweepConfig.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep.SweepConfig.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Build sweep config from a mapping, filling gaps from application defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Mapping with optional <code class="docutils literal notranslate"><span class="pre">swept_parameter</span></code>, <code class="docutils literal notranslate"><span class="pre">observables</span></code>, and coefficients.</p></li>
+<li><p><strong>defaults</strong> – Optional <code class="docutils literal notranslate"><span class="pre">SweepDefaults</span></code>; loads application defaults when omitted.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SweepConfig</strong> – Immutable sweep configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>defaults</strong> (<a class="reference internal" href="config.defaults.html#config.defaults.SweepDefaults" title="config.defaults.SweepDefaults"><em>SweepDefaults</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.sweep.SweepConfig" title="domain.sweep.SweepConfig"><em>SweepConfig</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep.SweepConfig.lower_coefficient">
+<span class="sig-name descname"><span class="pre">lower_coefficient</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.sweep.SweepConfig.lower_coefficient" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep.SweepConfig.observables">
+<span class="sig-name descname"><span class="pre">observables</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#domain.sweep.SweepConfig.observables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep.SweepConfig.swept_parameter">
+<span class="sig-name descname"><span class="pre">swept_parameter</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#domain.sweep.SweepConfig.swept_parameter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.sweep.SweepConfig.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep.html#SweepConfig.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep.SweepConfig.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize the sweep configuration for persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – JSON-serializable sweep mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep.SweepConfig.upper_coefficient">
+<span class="sig-name descname"><span class="pre">upper_coefficient</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.sweep.SweepConfig.upper_coefficient" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">domain.sweep module</a><ul>
+<li><a class="reference internal" href="#domain.sweep.SweepConfig"><code class="docutils literal notranslate"><span class="pre">SweepConfig</span></code></a><ul>
+<li><a class="reference internal" href="#domain.sweep.SweepConfig.coefficient_step"><code class="docutils literal notranslate"><span class="pre">SweepConfig.coefficient_step</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep.SweepConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">SweepConfig.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep.SweepConfig.lower_coefficient"><code class="docutils literal notranslate"><span class="pre">SweepConfig.lower_coefficient</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep.SweepConfig.observables"><code class="docutils literal notranslate"><span class="pre">SweepConfig.observables</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep.SweepConfig.swept_parameter"><code class="docutils literal notranslate"><span class="pre">SweepConfig.swept_parameter</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep.SweepConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">SweepConfig.to_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep.SweepConfig.upper_coefficient"><code class="docutils literal notranslate"><span class="pre">SweepConfig.upper_coefficient</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="domain.simulation.html"
+                          title="previous chapter">domain.simulation module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="domain.sweep_manifest.html"
+                          title="next chapter">domain.sweep_manifest module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/domain.sweep.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.sweep_manifest.html" title="domain.sweep_manifest module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="domain.simulation.html" title="domain.simulation module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="domain.html" >domain package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.sweep module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

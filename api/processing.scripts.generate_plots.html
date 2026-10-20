@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts.generate_plots module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts.geometry_contract module" href="processing.scripts.geometry_contract.html" />
+    <link rel="prev" title="processing.scripts.current_density_vector_map module" href="processing.scripts.current_density_vector_map.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.geometry_contract.html" title="processing.scripts.geometry_contract module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.current_density_vector_map.html" title="processing.scripts.current_density_vector_map module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" accesskey="U">processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.generate_plots module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts.generate_plots">
+<span id="processing-scripts-generate-plots-module"></span><h1>processing.scripts.generate_plots module<a class="headerlink" href="#module-processing.scripts.generate_plots" title="Link to this heading">¶</a></h1>
+<p>Generate Matplotlib time-series PNGs from probe CSVs (B_ext, J_int, T, P) and contour maps.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots._evenly_spaced_ids">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">_evenly_spaced_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#_evenly_spaced_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots._evenly_spaced_ids" title="Link to this definition">¶</a></dt>
+<dd><p>Pick up to <code class="docutils literal notranslate"><span class="pre">count</span></code> evenly spaced IDs from a sorted ID sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ids</strong> – Sorted available point IDs.</p></li>
+<li><p><strong>count</strong> – Maximum IDs to return.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Selected point IDs (order of selection, de-duplicated).</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ids</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>count</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots._format_probe_coord">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">_format_probe_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#_format_probe_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots._format_probe_coord" title="Link to this definition">¶</a></dt>
+<dd><p>Format a probe coordinate for plot titles, clamping tiny values to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Coordinate component [m].</p></li>
+<li><p><strong>decimals</strong> – Digits after the decimal point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Fixed-point coordinate text suitable for titles.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>float</em>)</p></li>
+<li><p><strong>decimals</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots._is_steady">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">_is_steady</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#_is_steady"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots._is_steady" title="Link to this definition">¶</a></dt>
+<dd><p>Detect stationary/steady probe series that should skip component PNGs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>times</strong> – Sample times for one probe [s].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> when a single sample or trivial t=0 steady set.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>times</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots._probe_coords_label">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">_probe_coords_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#_probe_coords_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots._probe_coords_label" title="Link to this definition">¶</a></dt>
+<dd><p>Build a parenthesized (x, y, z) label for probe plot titles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>px</strong> – Probe x [m].</p></li>
+<li><p><strong>py</strong> – Probe y [m].</p></li>
+<li><p><strong>pz</strong> – Probe z [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Formatted <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> label.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>px</strong> (<em>float</em>)</p></li>
+<li><p><strong>py</strong> (<em>float</em>)</p></li>
+<li><p><strong>pz</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots._save_component_plot">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">_save_component_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#_save_component_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots._save_component_plot" title="Link to this definition">¶</a></dt>
+<dd><p>Write one Matplotlib line+scatter component PNG under <code class="docutils literal notranslate"><span class="pre">results_dir</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> – Output directory for the PNG [path].</p></li>
+<li><p><strong>times</strong> – Abscissa time samples [s].</p></li>
+<li><p><strong>values</strong> – Ordinate field samples [field units].</p></li>
+<li><p><strong>ylabel</strong> – Y-axis label with units.</p></li>
+<li><p><strong>title</strong> – Plot title.</p></li>
+<li><p><strong>filename</strong> – Output basename (<code class="docutils literal notranslate"><span class="pre">.png</span></code>).</p></li>
+<li><p><strong>color</strong> – Matplotlib color for the series.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Saves <code class="docutils literal notranslate"><span class="pre">results_dir/filename</span></code> and closes the figure.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> (<em>str</em>)</p></li>
+<li><p><strong>times</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>values</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>)</p></li>
+<li><p><strong>title</strong> (<em>str</em>)</p></li>
+<li><p><strong>filename</strong> (<em>str</em>)</p></li>
+<li><p><strong>color</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots._top_ids_by_value">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">_top_ids_by_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#_top_ids_by_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots._top_ids_by_value" title="Link to this definition">¶</a></dt>
+<dd><p>Rank point IDs by peak absolute field value across given CSV columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raw_data</strong> – Full CSV numeric array (time, point_id, values) [mixed].</p></li>
+<li><p><strong>ids</strong> – Candidate point IDs.</p></li>
+<li><p><strong>value_cols</strong> – Column indices used for scoring [field units].</p></li>
+<li><p><strong>count</strong> – Maximum top IDs to keep.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Point IDs with largest <code class="docutils literal notranslate"><span class="pre">nanmax(|values|)</span></code>, highest first.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raw_data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>ids</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>value_cols</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>count</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots._unique_sorted_point_ids">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">_unique_sorted_point_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_id_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#_unique_sorted_point_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots._unique_sorted_point_ids" title="Link to this definition">¶</a></dt>
+<dd><p>Collect unique probe point IDs from a CSV column, sorted ascending.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>point_id_column</strong> – Array of point_id values.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Sorted unique integer point IDs.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>point_id_column</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots._vector_probe_layout">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">_vector_probe_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#_vector_probe_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots._vector_probe_layout" title="Link to this definition">¶</a></dt>
+<dd><p>Map CSV column indices for vector probes (compact vs magnitude-inclusive layouts).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_cols</strong> – Number of CSV columns.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – Keys <code class="docutils literal notranslate"><span class="pre">mag</span></code>, <code class="docutils literal notranslate"><span class="pre">vx</span></code>, <code class="docutils literal notranslate"><span class="pre">vy</span></code>, <code class="docutils literal notranslate"><span class="pre">vz</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code> - column index or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_cols</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, int | None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots.filter_point_ids">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">filter_point_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_ids</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_value_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_auto_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'field'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#filter_point_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots.filter_point_ids" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve which probe point IDs to plot (explicit, all, or auto top+spread).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raw_data</strong> – CSV numeric array with point_id in column 1 [mixed].</p></li>
+<li><p><strong>selected_ids</strong> – <code class="docutils literal notranslate"><span class="pre">None</span></code> (auto), <code class="docutils literal notranslate"><span class="pre">'all'</span></code>, or explicit <code class="docutils literal notranslate"><span class="pre">set[int]</span></code>.</p></li>
+<li><p><strong>auto_value_cols</strong> – Columns for auto top-value ranking [field units].</p></li>
+<li><p><strong>max_auto_points</strong> – Cap on auto-selected IDs.</p></li>
+<li><p><strong>label</strong> – Log label for the field being filtered.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list</strong> – Final sorted (or explicit-order) point IDs to plot.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raw_data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>selected_ids</strong> (<em>None</em><em> | </em><em>str</em><em> | </em><em>Set</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>auto_value_cols</strong> (<em>Sequence</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>max_auto_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>label</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots.generate_bext_plot">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">generate_bext_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_point_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_magnitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_auto_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#generate_bext_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots.generate_bext_plot" title="Link to this definition">¶</a></dt>
+<dd><p>Plot exterior B_x/B_y/B_z (and optional <a href="#id1"><span class="problematic" id="id2">|B|</span></a>) time series from <code class="docutils literal notranslate"><span class="pre">magnetic_field_data.csv</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> – Directory containing magnetic field CSV [path].</p></li>
+<li><p><strong>selected_point_ids</strong> – Point-ID filter (auto/all/explicit).</p></li>
+<li><p><strong>include_magnitude</strong> – Also write <a href="#id3"><span class="problematic" id="id4">|B|</span></a> diagnostic PNGs.</p></li>
+<li><p><strong>max_auto_points</strong> – Auto-mode ID cap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes <code class="docutils literal notranslate"><span class="pre">magnetic_field_B*_p*.png</span></code> (and optional abs) under <code class="docutils literal notranslate"><span class="pre">results_dir</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> (<em>str</em>)</p></li>
+<li><p><strong>selected_point_ids</strong> (<em>None</em><em> | </em><em>str</em><em> | </em><em>Set</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>include_magnitude</strong> (<em>bool</em>)</p></li>
+<li><p><strong>max_auto_points</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots.generate_jint_plot">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">generate_jint_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_point_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_magnitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_auto_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#generate_jint_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots.generate_jint_plot" title="Link to this definition">¶</a></dt>
+<dd><p>Plot interior J_x/J_y/J_z (and optional <a href="#id5"><span class="problematic" id="id6">|J|</span></a>) time series from current-density CSV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> – Directory containing <code class="docutils literal notranslate"><span class="pre">current_density_interior_data.csv</span></code> [path].</p></li>
+<li><p><strong>selected_point_ids</strong> – Point-ID filter (auto/all/explicit).</p></li>
+<li><p><strong>include_magnitude</strong> – Also write <a href="#id7"><span class="problematic" id="id8">|J|</span></a> diagnostic PNGs.</p></li>
+<li><p><strong>max_auto_points</strong> – Auto-mode ID cap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes <code class="docutils literal notranslate"><span class="pre">current_density_J*_p*.png</span></code> under <code class="docutils literal notranslate"><span class="pre">results_dir</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> (<em>str</em>)</p></li>
+<li><p><strong>selected_point_ids</strong> (<em>None</em><em> | </em><em>str</em><em> | </em><em>Set</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>include_magnitude</strong> (<em>bool</em>)</p></li>
+<li><p><strong>max_auto_points</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots.generate_potential_int_plot">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">generate_potential_int_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_point_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_auto_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#generate_potential_int_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots.generate_potential_int_plot" title="Link to this definition">¶</a></dt>
+<dd><p>Plot interior electric potential probes from <code class="docutils literal notranslate"><span class="pre">potential_interior_data.csv</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> – Results directory [path].</p></li>
+<li><p><strong>selected_point_ids</strong> – Point-ID filter (auto/all/explicit).</p></li>
+<li><p><strong>max_auto_points</strong> – Auto-mode ID cap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Delegates to <code class="docutils literal notranslate"><span class="pre">generate_scalar_interior_plot</span></code> for P [V] PNGs.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> (<em>str</em>)</p></li>
+<li><p><strong>selected_point_ids</strong> (<em>None</em><em> | </em><em>str</em><em> | </em><em>Set</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>max_auto_points</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots.generate_scalar_interior_plot">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">generate_scalar_interior_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_point_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_auto_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#generate_scalar_interior_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots.generate_scalar_interior_plot" title="Link to this definition">¶</a></dt>
+<dd><p>Generic interior scalar probe time-series plots (temperature or potential).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> – Results directory holding the scalar CSV [path].</p></li>
+<li><p><strong>csv_name</strong> – CSV basename under <code class="docutils literal notranslate"><span class="pre">results_dir</span></code>.</p></li>
+<li><p><strong>value_label</strong> – Short field tag for logs (e.g. <code class="docutils literal notranslate"><span class="pre">T_int</span></code>).</p></li>
+<li><p><strong>ylabel</strong> – Y-axis label with units.</p></li>
+<li><p><strong>title_prefix</strong> – Title stem before probe id/coords.</p></li>
+<li><p><strong>color</strong> – Matplotlib series color.</p></li>
+<li><p><strong>filename_prefix</strong> – PNG basename prefix before <code class="docutils literal notranslate"><span class="pre">_p{id}.png</span></code>.</p></li>
+<li><p><strong>selected_point_ids</strong> – Point-ID filter (auto/all/explicit).</p></li>
+<li><p><strong>max_auto_points</strong> – Auto-mode ID cap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes <code class="docutils literal notranslate"><span class="pre">{filename_prefix}_p*.png</span></code> under <code class="docutils literal notranslate"><span class="pre">results_dir</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> (<em>str</em>)</p></li>
+<li><p><strong>csv_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>value_label</strong> (<em>str</em>)</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>)</p></li>
+<li><p><strong>title_prefix</strong> (<em>str</em>)</p></li>
+<li><p><strong>color</strong> (<em>str</em>)</p></li>
+<li><p><strong>filename_prefix</strong> (<em>str</em>)</p></li>
+<li><p><strong>selected_point_ids</strong> (<em>None</em><em> | </em><em>str</em><em> | </em><em>Set</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>max_auto_points</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots.generate_temperature_int_plot">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">generate_temperature_int_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_point_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_auto_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#generate_temperature_int_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots.generate_temperature_int_plot" title="Link to this definition">¶</a></dt>
+<dd><p>Plot interior temperature probes from <code class="docutils literal notranslate"><span class="pre">temperature_interior_data.csv</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> – Results directory [path].</p></li>
+<li><p><strong>selected_point_ids</strong> – Point-ID filter (auto/all/explicit).</p></li>
+<li><p><strong>max_auto_points</strong> – Auto-mode ID cap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Delegates to <code class="docutils literal notranslate"><span class="pre">generate_scalar_interior_plot</span></code> for T [K] PNGs.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results_dir</strong> (<em>str</em>)</p></li>
+<li><p><strong>selected_point_ids</strong> (<em>None</em><em> | </em><em>str</em><em> | </em><em>Set</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>max_auto_points</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots.main">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots.main" title="Link to this definition">¶</a></dt>
+<dd><p>CLI entry: generate B/J/T/P probe PNGs and optional magnetic contour map from CSVs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – Parses <code class="docutils literal notranslate"><span class="pre">working_dir</span></code> and point-ID / magnitude flags from argv.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes plots under <code class="docutils literal notranslate"><span class="pre">working_dir/results</span></code>; exits non-zero on missing results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.generate_plots.parse_point_ids">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.generate_plots.</span></span><span class="sig-name descname"><span class="pre">parse_point_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/generate_plots.html#parse_point_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.generate_plots.parse_point_ids" title="Link to this definition">¶</a></dt>
+<dd><p>Parse CLI point-ID selection text into <code class="docutils literal notranslate"><span class="pre">None</span></code> (auto), <code class="docutils literal notranslate"><span class="pre">'all'</span></code>, or an explicit ID set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – Comma-separated IDs, or <code class="docutils literal notranslate"><span class="pre">auto</span></code>/<code class="docutils literal notranslate"><span class="pre">all</span></code>/empty [str].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>PointSelection</strong> – <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">'all'</span></code>, or <code class="docutils literal notranslate"><span class="pre">set[int]</span></code> of requested point IDs.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None | str | <em>Set</em>[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts.generate_plots module</a><ul>
+<li><a class="reference internal" href="#processing.scripts.generate_plots._evenly_spaced_ids"><code class="docutils literal notranslate"><span class="pre">_evenly_spaced_ids()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots._format_probe_coord"><code class="docutils literal notranslate"><span class="pre">_format_probe_coord()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots._is_steady"><code class="docutils literal notranslate"><span class="pre">_is_steady()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots._probe_coords_label"><code class="docutils literal notranslate"><span class="pre">_probe_coords_label()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots._save_component_plot"><code class="docutils literal notranslate"><span class="pre">_save_component_plot()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots._top_ids_by_value"><code class="docutils literal notranslate"><span class="pre">_top_ids_by_value()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots._unique_sorted_point_ids"><code class="docutils literal notranslate"><span class="pre">_unique_sorted_point_ids()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots._vector_probe_layout"><code class="docutils literal notranslate"><span class="pre">_vector_probe_layout()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots.filter_point_ids"><code class="docutils literal notranslate"><span class="pre">filter_point_ids()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots.generate_bext_plot"><code class="docutils literal notranslate"><span class="pre">generate_bext_plot()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots.generate_jint_plot"><code class="docutils literal notranslate"><span class="pre">generate_jint_plot()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots.generate_potential_int_plot"><code class="docutils literal notranslate"><span class="pre">generate_potential_int_plot()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots.generate_scalar_interior_plot"><code class="docutils literal notranslate"><span class="pre">generate_scalar_interior_plot()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots.generate_temperature_int_plot"><code class="docutils literal notranslate"><span class="pre">generate_temperature_int_plot()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.generate_plots.parse_point_ids"><code class="docutils literal notranslate"><span class="pre">parse_point_ids()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.current_density_vector_map.html"
+                          title="previous chapter">processing.scripts.current_density_vector_map module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.geometry_contract.html"
+                          title="next chapter">processing.scripts.geometry_contract module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.generate_plots.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.geometry_contract.html" title="processing.scripts.geometry_contract module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.current_density_vector_map.html" title="processing.scripts.current_density_vector_map module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" >processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.generate_plots module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

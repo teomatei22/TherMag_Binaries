@@ -1,0 +1,7 @@
+processing.scripts.generate\_plots module
+=========================================
+
+.. automodule:: processing.scripts.generate_plots
+   :members:
+   :show-inheritance:
+   :undoc-members:

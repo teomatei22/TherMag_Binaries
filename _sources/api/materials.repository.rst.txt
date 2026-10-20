@@ -1,0 +1,7 @@
+materials.repository module
+===========================
+
+.. automodule:: materials.repository
+   :members:
+   :show-inheritance:
+   :undoc-members:

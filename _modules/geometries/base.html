@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geometries.base &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.base</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for geometries.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Abstract geometry contract, parameter specs, and domain size helpers."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+
+<div class="viewcode-block" id="ParameterSpec">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.ParameterSpec">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParameterSpec</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Declares a named geometry parameter with bounds and UI metadata.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        name: Parameter identifier used in ``.geo`` templates [dimensionless].</span>
+<span class="sd">        description: Human-readable meaning of the parameter [dimensionless].</span>
+<span class="sd">        default_value: Numeric value when unset [matches ``unit``].</span>
+<span class="sd">        min_value: Inclusive lower bound, if any [matches ``unit``].</span>
+<span class="sd">        max_value: Inclusive upper bound, if any [matches ``unit``].</span>
+<span class="sd">        unit: Physical unit label such as ``m`` or ``deg`` [dimensionless].</span>
+<span class="sd">        step: Suggested UI increment [matches ``unit``].</span>
+<span class="sd">        decimals: Digits retained when writing template values [dimensionless].</span>
+<span class="sd">        read_only: Whether the GUI should forbid edits [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ParameterSpec: Frozen-style dataclass instance describing one parameter.</span>
+<span class="sd">    """</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">default_value</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">min_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span>
+    <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">read_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="ParameterSpec.validate">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.ParameterSpec.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Check that a candidate value lies within configured bounds.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            value: Proposed parameter value [matches ``unit``].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple[bool, str]: ``(True, "")`` if valid, else ``(False, message)``.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be &gt;= </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be &lt;= </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">""</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="l_metal_max_m">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.l_metal_max_m">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">l_metal_max_m</span><span class="p">(</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Characteristic metal extent used for mesh/domain scaling.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_type: Shape family ``cylinder``, ``prism``, or ``sphere`` [dimensionless].</span>
+<span class="sd">        params: Geometry parameter map (lengths and radii) [m].</span>
+<span class="sd">        variant: Topology variant such as ``full`` or ``hollow`` [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Maximum metal length scale for the shape [m].</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameter_value</span>
+
+    <span class="n">gt</span> <span class="o">=</span> <span class="p">(</span><span class="n">geometry_type</span> <span class="ow">or</span> <span class="s2">"cylinder"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">variant_l</span> <span class="o">=</span> <span class="p">(</span><span class="n">variant</span> <span class="ow">or</span> <span class="s2">"full"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">gt</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+        <span class="n">l_cyl</span> <span class="o">=</span> <span class="n">parameter_value</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"prism"</span><span class="p">,</span> <span class="s2">"L"</span><span class="p">)</span>
+        <span class="n">w_cyl</span> <span class="o">=</span> <span class="n">parameter_value</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"prism"</span><span class="p">,</span> <span class="s2">"W"</span><span class="p">)</span>
+        <span class="n">h_cyl</span> <span class="o">=</span> <span class="n">parameter_value</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"prism"</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">l_cyl</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">w_cyl</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">h_cyl</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">gt</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="n">r_sphere</span> <span class="o">=</span> <span class="n">parameter_value</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"sphere"</span><span class="p">,</span> <span class="s2">"R_sphere"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"hollow"</span> <span class="ow">in</span> <span class="n">variant_l</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">r_sphere</span>
+        <span class="k">return</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">r_sphere</span>
+
+    <span class="n">l_cyl</span> <span class="o">=</span> <span class="n">parameter_value</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"cylinder"</span><span class="p">,</span> <span class="s2">"L"</span><span class="p">)</span>
+    <span class="n">r_cyl</span> <span class="o">=</span> <span class="n">parameter_value</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"cylinder"</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">l_cyl</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">r_cyl</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="air_sphere_radius_m">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.air_sphere_radius_m">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">air_sphere_radius_m</span><span class="p">(</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Resolve surrounding air-sphere radius via the geometry registry.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_type: Shape family key such as ``cylinder`` [dimensionless].</span>
+<span class="sd">        params: Geometry parameter map used by the ``.geo`` template [m].</span>
+<span class="sd">        variant: Topology variant; defaults to ``full`` when omitted [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Outer air domain radius taken from generated geometry [m].</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_geometry_registry</span>
+
+    <span class="n">variant_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">variant</span> <span class="ow">or</span> <span class="s2">"full"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">geometry_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variant_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="p">(</span><span class="n">geometry_type</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'cylinder'</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">registry</span> <span class="o">=</span> <span class="n">get_geometry_registry</span><span class="p">()</span>
+    <span class="n">resolved</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">resolve_key</span><span class="p">(</span>
+        <span class="n">geometry_key</span><span class="p">,</span>
+        <span class="n">geometry_type</span><span class="o">=</span><span class="n">geometry_type</span><span class="p">,</span>
+        <span class="n">variant</span><span class="o">=</span><span class="n">variant_key</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">registry</span><span class="o">.</span><span class="n">air_sphere_radius_m</span><span class="p">(</span><span class="n">resolved</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="BaseGeometry">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.BaseGeometry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseGeometry</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Abstract Gmsh geometry: parameters, template fill, and physical IDs.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: subclass sets ``geometry_type``, template path, and parameter specs.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        BaseGeometry: Instance ready to validate params and emit ``.geo`` text.</span>
+<span class="sd">    """</span>
+
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"unknown"</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Unknown Geometry"</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Store template path and initialise parameter specifications.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            template_file: Path to the Gmsh ``.geo`` template [path].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Constructs ``BaseGeometry`` with populated ``_parameters``.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">template_file</span> <span class="o">=</span> <span class="n">template_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParameterSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BaseGeometry._init_parameters">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.BaseGeometry._init_parameters">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Populate ``_parameters`` from defaults for this shape/variant.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: uses subclass variant and defaults JSON.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Mutates ``self._parameters`` in place.</span>
+<span class="sd">        """</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParameterSpec</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Expose the live parameter-spec dictionary for this geometry.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: reads ``self._parameters``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, ParameterSpec]: Name-to-spec mapping for GUI and validation.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">variant_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Normalize the topology variant to a lowercase registry key.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: reads optional ``self.variant`` enum or string.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Variant key such as ``full`` or ``hollow`` [dimensionless].</span>
+<span class="sd">        """</span>
+        <span class="n">variant</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"variant"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">variant</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">variant</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">"full"</span>
+
+<div class="viewcode-block" id="BaseGeometry.air_sphere_radius_m">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.BaseGeometry.air_sphere_radius_m">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">air_sphere_radius_m</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Parse outer air radius from generated ``.geo`` domain text.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            params: Partial or full parameter overrides [m / deg as applicable].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float: Spherical air domain radius implied by the template [m].</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">processing.scripts.geometry_contract</span><span class="w"> </span><span class="kn">import</span> <span class="n">domain_radius_from_geo_text</span>
+
+        <span class="n">merged</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">merged</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="k">continue</span>
+        <span class="k">return</span> <span class="n">domain_radius_from_geo_text</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_geo_content</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="BaseGeometry.validate_parameters">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.BaseGeometry.validate_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Validate all declared parameters against their specs.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            params: Candidate parameter values keyed by name [matches units].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple[bool, list[str]]: Validity flag and list of error messages.</span>
+<span class="sd">        """</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span>
+            <span class="n">valid</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">errors</span></div>
+
+
+<div class="viewcode-block" id="BaseGeometry.load_template">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.BaseGeometry.load_template">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Read the Gmsh ``.geo`` template file from disk.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: uses ``self.template_file``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Raw template source text.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_file</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Template file not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">template_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">template_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BaseGeometry.generate_geo_content">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.BaseGeometry.generate_geo_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_geo_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Substitute numeric parameters into the Gmsh template.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            params: Parameter name/value pairs to rewrite in assignments [m/deg].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Filled ``.geo`` content ready for meshing.</span>
+<span class="sd">        """</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_template</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param_value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">decimals</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">decimals</span> <span class="k">if</span> <span class="n">spec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">6</span>
+                <span class="n">formatted_value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">param_value</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">decimals</span><span class="p">)</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">formatted_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">param_value</span><span class="p">)</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">"\b(</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">param_name</span><span class="p">)</span><span class="si">}</span><span class="s2">\s*=\s*)([0-9.eE+-]+)(\s*;)"</span>
+            <span class="n">replacement</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">"\g&lt;1&gt;</span><span class="si">{</span><span class="n">formatted_value</span><span class="si">}</span><span class="s2">\3"</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">content</span></div>
+
+
+<div class="viewcode-block" id="BaseGeometry.get_physical_volumes">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.BaseGeometry.get_physical_volumes">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_physical_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Map logical volume roles to Gmsh physical volume tags.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: uses subclass variant configuration.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, int]: Role name to physical volume ID for SIF body mapping.</span>
+<span class="sd">        """</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BaseGeometry.get_physical_surfaces">
+<a class="viewcode-back" href="../../api/geometries.base.html#geometries.base.BaseGeometry.get_physical_surfaces">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_physical_surfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Map logical surface roles to Gmsh physical surface tags.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: uses subclass variant configuration.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, int]: Role name (hot/cold/infinity) to physical surface ID.</span>
+<span class="sd">        """</span>
+        <span class="k">pass</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.base</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

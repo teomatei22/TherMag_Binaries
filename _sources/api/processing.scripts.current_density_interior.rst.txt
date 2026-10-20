@@ -1,0 +1,7 @@
+processing.scripts.current\_density\_interior module
+====================================================
+
+.. automodule:: processing.scripts.current_density_interior
+   :members:
+   :show-inheritance:
+   :undoc-members:

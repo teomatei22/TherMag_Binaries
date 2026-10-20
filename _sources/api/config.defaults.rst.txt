@@ -1,0 +1,7 @@
+config.defaults module
+======================
+
+.. automodule:: config.defaults
+   :members:
+   :show-inheritance:
+   :undoc-members:

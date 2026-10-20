@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>materials.database &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">materials.database</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for materials.database</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Material models, property tables, and in-memory FEM material database."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaterialRepository</span>
+
+
+<div class="viewcode-block" id="MaterialClassification">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialClassification">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaterialClassification</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Flags describing anisotropic, T-dependent, permittivity, or hysteresis models.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        anisotropic: Whether constitutive tensors are anisotropic.</span>
+<span class="sd">        temperature_dependent: Whether properties vary with temperature.</span>
+<span class="sd">        variable_permittivity: Whether relative permittivity is variable.</span>
+<span class="sd">        hysteresis: Whether magnetic hysteresis (e.g. HB curve) is enabled.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        MaterialClassification: Boolean flags classifying a material model.</span>
+<span class="sd">    """</span>
+
+    <span class="n">anisotropic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">temperature_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">variable_permittivity</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">hysteresis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="MaterialClassification.to_dict">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialClassification.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize classification flags for JSON persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, bool]: Mapping of classification flag names to booleans.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"anisotropic"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">anisotropic</span><span class="p">,</span>
+            <span class="s2">"temperature_dependent"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature_dependent</span><span class="p">,</span>
+            <span class="s2">"variable_permittivity"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_permittivity</span><span class="p">,</span>
+            <span class="s2">"hysteresis"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hysteresis</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="MaterialClassification.from_dict">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialClassification.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"MaterialClassification"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize classification flags from a mapping.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with optional boolean classification keys.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            MaterialClassification: Classification instance with defaults for missing keys.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">anisotropic</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"anisotropic"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">temperature_dependent</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"temperature_dependent"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">variable_permittivity</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"variable_permittivity"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">hysteresis</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"hysteresis"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MaterialProperties">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialProperties">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaterialProperties</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Scalar, tensor, and tabulated thermo-electromagnetic material properties.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        density: Mass density [kg/m^3].</span>
+<span class="sd">        heat_capacity: Specific heat capacity [J/(kg K)].</span>
+<span class="sd">        heat_conductivity: Isotropic thermal conductivity [W/(m K)].</span>
+<span class="sd">        electric_conductivity: Isotropic electric conductivity [S/m].</span>
+<span class="sd">        relative_permittivity: Relative permittivity (dimensionless).</span>
+<span class="sd">        relative_permeability: Relative permeability (dimensionless).</span>
+<span class="sd">        seebeck_coefficient: Isotropic Seebeck coefficient [V/K].</span>
+<span class="sd">        heat_conductivity_tensor: Optional anisotropic thermal conductivity tensor.</span>
+<span class="sd">        electric_conductivity_tensor: Optional anisotropic electric conductivity tensor.</span>
+<span class="sd">        seebeck_coefficient_tensor: Optional anisotropic Seebeck coefficient tensor.</span>
+<span class="sd">        heat_conductivity_table: Optional T-dependent thermal conductivity table.</span>
+<span class="sd">        electric_conductivity_table: Optional T-dependent electric conductivity table.</span>
+<span class="sd">        hb_curve: Optional magnetic H-B hysteresis curve table.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        MaterialProperties: Scalar, tensor, and tabulated constitutive property values.</span>
+<span class="sd">    """</span>
+
+    <span class="n">density</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">heat_capacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">heat_conductivity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">electric_conductivity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">relative_permittivity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">relative_permeability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">seebeck_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">heat_conductivity_tensor</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">electric_conductivity_tensor</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">seebeck_coefficient_tensor</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">heat_conductivity_table</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">electric_conductivity_table</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">hb_curve</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MaterialProperties.to_dict">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialProperties.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize material properties, omitting unset tensor/table fields.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: JSON-serializable properties mapping.</span>
+<span class="sd">        """</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"density"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+            <span class="s2">"heat_capacity"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">heat_capacity</span><span class="p">,</span>
+            <span class="s2">"heat_conductivity"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">heat_conductivity</span><span class="p">,</span>
+            <span class="s2">"electric_conductivity"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">electric_conductivity</span><span class="p">,</span>
+            <span class="s2">"relative_permittivity"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_permittivity</span><span class="p">,</span>
+            <span class="s2">"relative_permeability"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_permeability</span><span class="p">,</span>
+            <span class="s2">"seebeck_coefficient"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">seebeck_coefficient</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heat_conductivity_tensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"heat_conductivity_tensor"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">heat_conductivity_tensor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">electric_conductivity_tensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"electric_conductivity_tensor"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">electric_conductivity_tensor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seebeck_coefficient_tensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"seebeck_coefficient_tensor"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seebeck_coefficient_tensor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heat_conductivity_table</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"heat_conductivity_table"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">heat_conductivity_table</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">electric_conductivity_table</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"electric_conductivity_table"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">electric_conductivity_table</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hb_curve</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">"hb_curve"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hb_curve</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="MaterialProperties.from_dict">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialProperties.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"MaterialProperties"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize scalar, tensor, and table material properties.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping of property names to scalars, tensors, or tables.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            MaterialProperties: Properties instance with defaults for missing scalars.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">density</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"density"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="n">heat_capacity</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"heat_capacity"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="n">heat_conductivity</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"heat_conductivity"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="n">electric_conductivity</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"electric_conductivity"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">relative_permittivity</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"relative_permittivity"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="n">relative_permeability</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"relative_permeability"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="n">seebeck_coefficient</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"seebeck_coefficient"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">heat_conductivity_tensor</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"heat_conductivity_tensor"</span><span class="p">),</span>
+            <span class="n">electric_conductivity_tensor</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"electric_conductivity_tensor"</span><span class="p">),</span>
+            <span class="n">seebeck_coefficient_tensor</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"seebeck_coefficient_tensor"</span><span class="p">),</span>
+            <span class="n">heat_conductivity_table</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"heat_conductivity_table"</span><span class="p">),</span>
+            <span class="n">electric_conductivity_table</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"electric_conductivity_table"</span><span class="p">),</span>
+            <span class="n">hb_curve</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"hb_curve"</span><span class="p">),</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Material">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.Material">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Material</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Named FEM material with classification flags and constitutive properties.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        name: Material display name used as the registry key.</span>
+<span class="sd">        classification: Model classification flags (anisotropy, T-dependence, etc.).</span>
+<span class="sd">        properties: Scalar, tensor, and tabulated constitutive properties.</span>
+<span class="sd">        description: Optional human-readable material description.</span>
+<span class="sd">        source_file: Optional path to the JSON file this material was loaded from.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        Material: Named FEM material definition with classification and properties.</span>
+<span class="sd">    """</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">classification</span><span class="p">:</span> <span class="n">MaterialClassification</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">MaterialClassification</span><span class="p">)</span>
+    <span class="n">properties</span><span class="p">:</span> <span class="n">MaterialProperties</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">MaterialProperties</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">source_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Material.to_dict">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.Material.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize the material for JSON persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: Mapping of name, description, classification, and properties.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+            <span class="s2">"classification"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">classification</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="s2">"properties"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="Material.from_dict">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.Material.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">source_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Material"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize a material from a mapping and optional source path.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with ``name``, ``description``, ``classification``, ``properties``.</span>
+<span class="sd">            source_file: Optional path of the JSON file that provided ``data``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Material: Material instance linked to ``source_file`` when given.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"Unknown"</span><span class="p">),</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="n">classification</span><span class="o">=</span><span class="n">MaterialClassification</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"classification"</span><span class="p">,</span> <span class="p">{})),</span>
+            <span class="n">properties</span><span class="o">=</span><span class="n">MaterialProperties</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"properties"</span><span class="p">,</span> <span class="p">{})),</span>
+            <span class="n">source_file</span><span class="o">=</span><span class="n">source_file</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Material.save">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.Material.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Write the material JSON to disk and record ``source_file``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            file_path: Destination path; falls back to ``self.source_file`` when omitted.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes JSON and sets ``self.source_file`` to the written path.</span>
+<span class="sd">        """</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">file_path</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_file</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No file path specified"</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_file</span> <span class="o">=</span> <span class="n">path</span></div>
+
+
+<div class="viewcode-block" id="Material.is_anisotropic">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.Material.is_anisotropic">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_anisotropic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Whether the material uses anisotropic constitutive tensors.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.classification.anisotropic``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            bool: ``True`` when anisotropic.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">classification</span><span class="o">.</span><span class="n">anisotropic</span></div>
+
+
+<div class="viewcode-block" id="Material.is_temperature_dependent">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.Material.is_temperature_dependent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_temperature_dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Whether material properties vary with temperature.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.classification.temperature_dependent``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            bool: ``True`` when temperature-dependent.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">classification</span><span class="o">.</span><span class="n">temperature_dependent</span></div>
+
+
+<div class="viewcode-block" id="Material.is_hysteresis">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.Material.is_hysteresis">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_hysteresis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Whether the material includes magnetic hysteresis (e.g. HB curve).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.classification.hysteresis``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            bool: ``True`` when hysteresis is enabled.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">classification</span><span class="o">.</span><span class="n">hysteresis</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MaterialDatabase">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaterialDatabase</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: In-memory registry of builtin and user-configured FEM materials.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        configs_dir: Optional extra directory of user JSON materials overlaid on builtins.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        MaterialDatabase: Name-keyed in-memory registry of loaded FEM materials.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configs_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Load builtin materials, then optionally overlay a user configs directory.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            configs_dir: Optional extra directory of JSON materials; skipped if same as</span>
+<span class="sd">                the package builtin directory.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Populates ``self._materials`` and stores ``self.configs_dir``.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_materials</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Material</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span> <span class="o">=</span> <span class="n">configs_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_builtin_materials</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_config_files</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MaterialDatabase._load_builtin_materials">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase._load_builtin_materials">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_builtin_materials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Load packaged default materials into the registry.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Reads JSON from the materials package directory.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Inserts builtin materials into ``self._materials``.</span>
+<span class="sd">        """</span>
+        <span class="n">default_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">MaterialRepository</span><span class="p">(</span><span class="n">default_dir</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">load_all</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_materials</span><span class="p">[</span><span class="n">material</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">material</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase._load_config_files">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase._load_config_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_config_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Overlay user material JSON files from ``configs_dir`` when distinct.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.configs_dir`` if set and different from the package dir.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Merges user materials into ``self._materials`` by name.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="n">default_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">==</span> <span class="n">default_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">MaterialRepository</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">load_all</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_materials</span><span class="p">[</span><span class="n">material</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">material</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase.get_material">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase.get_material">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_material</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Material</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Look up a material by exact name.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: Material display name key.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Material | None: Matching material, or ``None`` if absent.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_materials</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase.get_all_materials">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase.get_all_materials">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_materials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Material</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return a shallow copy of the full material registry.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Reads ``self._materials``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Material]: Name-keyed copy of registered materials.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_materials</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase.get_material_names">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase.get_material_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_material_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: List registered material names.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Reads ``self._materials`` keys.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[str]: Material names currently in the registry.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_materials</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase.get_materials_by_classification">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase.get_materials_by_classification">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_materials_by_classification</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">anisotropic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">temperature_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hysteresis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Material</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Filter materials by optional classification flag criteria.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            anisotropic: Required anisotropic flag, or ``None`` to ignore.</span>
+<span class="sd">            temperature_dependent: Required T-dependent flag, or ``None`` to ignore.</span>
+<span class="sd">            hysteresis: Required hysteresis flag, or ``None`` to ignore.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[Material]: Materials matching all provided criteria.</span>
+<span class="sd">        """</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">material</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_materials</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">anisotropic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">material</span><span class="o">.</span><span class="n">classification</span><span class="o">.</span><span class="n">anisotropic</span> <span class="o">!=</span> <span class="n">anisotropic</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">temperature_dependent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="n">material</span><span class="o">.</span><span class="n">classification</span><span class="o">.</span><span class="n">temperature_dependent</span> <span class="o">!=</span> <span class="n">temperature_dependent</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">hysteresis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">material</span><span class="o">.</span><span class="n">classification</span><span class="o">.</span><span class="n">hysteresis</span> <span class="o">!=</span> <span class="n">hysteresis</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">material</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase.get_isotropic_materials">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase.get_isotropic_materials">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_isotropic_materials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Material</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return materials classified as isotropic (not anisotropic).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Filters via ``get_materials_by_classification``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[Material]: Isotropic materials.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_materials_by_classification</span><span class="p">(</span><span class="n">anisotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase.get_anisotropic_materials">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase.get_anisotropic_materials">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_anisotropic_materials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Material</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return materials classified as anisotropic.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Filters via ``get_materials_by_classification``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[Material]: Anisotropic materials.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_materials_by_classification</span><span class="p">(</span><span class="n">anisotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase.add_material">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase.add_material">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_material</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">material</span><span class="p">:</span> <span class="n">Material</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Register or replace a material in the in-memory database.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            material: Material instance keyed by ``material.name``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Updates ``self._materials``.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_materials</span><span class="p">[</span><span class="n">material</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">material</span></div>
+
+
+<div class="viewcode-block" id="MaterialDatabase.save_material">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.MaterialDatabase.save_material">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_material</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Persist a registered material to a JSON file under the configs directory.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: Registered material name to save.</span>
+<span class="sd">            file_path: Optional destination; defaults to ``configs_dir/&lt;name&gt;.json``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes the material JSON via ``MaterialRepository.save``.</span>
+<span class="sd">        """</span>
+        <span class="n">material</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_material</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">material</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Material not found: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No material configuration directory is configured"</span><span class="p">)</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span><span class="w"> </span><span class="s1">'_'</span><span class="p">)</span><span class="si">}</span><span class="s2">.json"</span>
+
+        <span class="n">MaterialRepository</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">material</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="n">_database</span><span class="p">:</span> <span class="n">MaterialDatabase</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="get_material_database">
+<a class="viewcode-back" href="../../api/materials.database.html#materials.database.get_material_database">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_material_database</span><span class="p">(</span><span class="n">configs_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterialDatabase</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Return the process-wide material database, recreating when ``configs_dir`` is set.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        configs_dir: Optional user materials directory; forces rebuild when not ``None``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        MaterialDatabase: Shared database instance.</span>
+<span class="sd">    """</span>
+    <span class="k">global</span> <span class="n">_database</span>
+    <span class="k">if</span> <span class="n">_database</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">configs_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_database</span> <span class="o">=</span> <span class="n">MaterialDatabase</span><span class="p">(</span><span class="n">configs_dir</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_database</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">materials.database</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

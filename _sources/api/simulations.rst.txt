@@ -1,0 +1,17 @@
+simulations package
+===================
+
+.. automodule:: simulations
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   simulations.generator
+   simulations.material_params
+   simulations.tensor_utils

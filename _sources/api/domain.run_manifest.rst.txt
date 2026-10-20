@@ -1,0 +1,7 @@
+domain.run\_manifest module
+===========================
+
+.. automodule:: domain.run_manifest
+   :members:
+   :show-inheritance:
+   :undoc-members:

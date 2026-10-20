@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts package &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts.current_density_interior module" href="processing.scripts.current_density_interior.html" />
+    <link rel="prev" title="processing package" href="processing.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.current_density_interior.html" title="processing.scripts.current_density_interior module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.html" title="processing package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" accesskey="U">processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts">
+<span id="processing-scripts-package"></span><h1>processing.scripts package<a class="headerlink" href="#module-processing.scripts" title="Link to this heading">¶</a></h1>
+<p>Standalone ParaView/matplotlib post-processing scripts for TherMag runs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – package of CLI/script modules staged into run directories.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>module</strong> – Contour/vector maps, probes, generate_plots, and sweep_plot helpers.</p>
+</dd>
+</dl>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.current_density_interior.html">processing.scripts.current_density_interior module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.CurrentDensityInterior"><code class="docutils literal notranslate"><span class="pre">CurrentDensityInterior</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.CurrentDensityInterior._abc_impl"><code class="docutils literal notranslate"><span class="pre">CurrentDensityInterior._abc_impl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.CurrentDensityInterior.run"><code class="docutils literal notranslate"><span class="pre">CurrentDensityInterior.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.current_density_vector_map.html">processing.scripts.current_density_vector_map module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.CurrentDensityVectorMap"><code class="docutils literal notranslate"><span class="pre">CurrentDensityVectorMap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.CurrentDensityVectorMap._abc_impl"><code class="docutils literal notranslate"><span class="pre">CurrentDensityVectorMap._abc_impl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.CurrentDensityVectorMap.run"><code class="docutils literal notranslate"><span class="pre">CurrentDensityVectorMap.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.generate_plots.html">processing.scripts.generate_plots module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._evenly_spaced_ids"><code class="docutils literal notranslate"><span class="pre">_evenly_spaced_ids()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._format_probe_coord"><code class="docutils literal notranslate"><span class="pre">_format_probe_coord()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._is_steady"><code class="docutils literal notranslate"><span class="pre">_is_steady()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._probe_coords_label"><code class="docutils literal notranslate"><span class="pre">_probe_coords_label()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._save_component_plot"><code class="docutils literal notranslate"><span class="pre">_save_component_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._top_ids_by_value"><code class="docutils literal notranslate"><span class="pre">_top_ids_by_value()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._unique_sorted_point_ids"><code class="docutils literal notranslate"><span class="pre">_unique_sorted_point_ids()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._vector_probe_layout"><code class="docutils literal notranslate"><span class="pre">_vector_probe_layout()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.filter_point_ids"><code class="docutils literal notranslate"><span class="pre">filter_point_ids()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_bext_plot"><code class="docutils literal notranslate"><span class="pre">generate_bext_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_jint_plot"><code class="docutils literal notranslate"><span class="pre">generate_jint_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_potential_int_plot"><code class="docutils literal notranslate"><span class="pre">generate_potential_int_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_scalar_interior_plot"><code class="docutils literal notranslate"><span class="pre">generate_scalar_interior_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_temperature_int_plot"><code class="docutils literal notranslate"><span class="pre">generate_temperature_int_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.parse_point_ids"><code class="docutils literal notranslate"><span class="pre">parse_point_ids()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.geometry_contract.html">processing.scripts.geometry_contract module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract"><code class="docutils literal notranslate"><span class="pre">GeometryContract</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract.body_outer_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryContract.body_outer_radius_m</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract.cavity_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryContract.cavity_radius_m</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract.domain_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryContract.domain_radius_m</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract.family"><code class="docutils literal notranslate"><span class="pre">GeometryContract.family</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract.is_hollow"><code class="docutils literal notranslate"><span class="pre">GeometryContract.is_hollow</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract.is_sphere"><code class="docutils literal notranslate"><span class="pre">GeometryContract.is_sphere</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract.layer_interface_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryContract.layer_interface_radius_m</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract.variant"><code class="docutils literal notranslate"><span class="pre">GeometryContract.variant</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract._infer_contract"><code class="docutils literal notranslate"><span class="pre">_infer_contract()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.contract_from_text"><code class="docutils literal notranslate"><span class="pre">contract_from_text()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.domain_radius_from_geo_text"><code class="docutils literal notranslate"><span class="pre">domain_radius_from_geo_text()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.domain_radius_m"><code class="docutils literal notranslate"><span class="pre">domain_radius_m()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.first_value"><code class="docutils literal notranslate"><span class="pre">first_value()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.geo_code_text"><code class="docutils literal notranslate"><span class="pre">geo_code_text()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.load_geometry_contract"><code class="docutils literal notranslate"><span class="pre">load_geometry_contract()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.load_mesh_name_ids"><code class="docutils literal notranslate"><span class="pre">load_mesh_name_ids()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.metal_sphere_radius_m"><code class="docutils literal notranslate"><span class="pre">metal_sphere_radius_m()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.parse_geo_assignments"><code class="docutils literal notranslate"><span class="pre">parse_geo_assignments()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.physical_names"><code class="docutils literal notranslate"><span class="pre">physical_names()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.strip_geo_comment"><code class="docutils literal notranslate"><span class="pre">strip_geo_comment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.interior_probe_common.html">processing.scripts.interior_probe_common module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._abc_impl"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._abc_impl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._clear_cache"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._clear_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._conductive_region"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._conductive_region()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._material_names"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._material_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._prepare_cache"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._prepare_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._probe_expected_region"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._probe_expected_region()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._sampling_region_ids"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._sampling_region_ids()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._validate_required_config"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler._validate_required_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler.sample_at_point"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler.sample_at_point()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._effective_geometry_type"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._effective_geometry_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._geometry_contract"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._geometry_contract()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._is_in_air_region"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._is_in_air_region()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._is_inside_inner_cavity"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._is_inside_inner_cavity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._sphere_radii"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin._sphere_radii()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.load_jint_probe_points_from_config"><code class="docutils literal notranslate"><span class="pre">load_jint_probe_points_from_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.normalize_probe_dict"><code class="docutils literal notranslate"><span class="pre">normalize_probe_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html">processing.scripts.magnetic_field_contour_map module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.N_PHI"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap.N_PHI</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.N_RHO"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap.N_RHO</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._abc_impl"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._abc_impl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._geo_text"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._geo_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._idw_B_mag"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._idw_B_mag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._idw_B_vec"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._idw_B_vec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._load_overlay_probes"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._load_overlay_probes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._prepare_air_b_cache"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._prepare_air_b_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._resolve_trusted_band"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._resolve_trusted_band()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._sample_grid"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._sample_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._sample_probes"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._sample_probes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._write_grid_csv"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._write_grid_csv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap._write_probe_timeseries"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap._write_probe_timeseries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap.run"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._contour_period_frame_indices"><code class="docutils literal notranslate"><span class="pre">_contour_period_frame_indices()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._default_bext_xyz_for_contour"><code class="docutils literal notranslate"><span class="pre">_default_bext_xyz_for_contour()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._fmt_B_csv"><code class="docutils literal notranslate"><span class="pre">_fmt_B_csv()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._fmt_B_sci"><code class="docutils literal notranslate"><span class="pre">_fmt_B_sci()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._fmt_time_int_s"><code class="docutils literal notranslate"><span class="pre">_fmt_time_int_s()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._global_contour_levels"><code class="docutils literal notranslate"><span class="pre">_global_contour_levels()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._import_paraview_stack"><code class="docutils literal notranslate"><span class="pre">_import_paraview_stack()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._load_bext_probes_for_plot"><code class="docutils literal notranslate"><span class="pre">_load_bext_probes_for_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._matplotlib_available"><code class="docutils literal notranslate"><span class="pre">_matplotlib_available()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._probe_xyz"><code class="docutils literal notranslate"><span class="pre">_probe_xyz()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._probes_from_xyz"><code class="docutils literal notranslate"><span class="pre">_probes_from_xyz()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._read_bext_from_processing_config"><code class="docutils literal notranslate"><span class="pre">_read_bext_from_processing_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._resolve_contour_period_s"><code class="docutils literal notranslate"><span class="pre">_resolve_contour_period_s()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._stability_rows_from_magnetic_field_csv"><code class="docutils literal notranslate"><span class="pre">_stability_rows_from_magnetic_field_csv()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._write_stability_from_available_csvs"><code class="docutils literal notranslate"><span class="pre">_write_stability_from_available_csvs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.analyze_probe_stability"><code class="docutils literal notranslate"><span class="pre">analyze_probe_stability()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.plot_contour_map_from_csv"><code class="docutils literal notranslate"><span class="pre">plot_contour_map_from_csv()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.render_magnetic_contour_png"><code class="docutils literal notranslate"><span class="pre">render_magnetic_contour_png()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.write_contour_period_pngs"><code class="docutils literal notranslate"><span class="pre">write_contour_period_pngs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.write_probe_stability_txt"><code class="docutils literal notranslate"><span class="pre">write_probe_stability_txt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html">processing.scripts.magnetic_field_exterior module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._abc_impl"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._abc_impl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._clear_cache"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._clear_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._default_bext_probe_points"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._default_bext_probe_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._extract_at_point"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._extract_at_point()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._prepare_b_cache"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._prepare_b_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_probe_point"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._validate_probe_point()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior._validate_required_config"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior._validate_required_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior.run"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.magnetic_field_vector_map.html">processing.scripts.magnetic_field_vector_map module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_vector_map.html#processing.scripts.magnetic_field_vector_map.MagneticFieldVectorMap"><code class="docutils literal notranslate"><span class="pre">MagneticFieldVectorMap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_vector_map.html#processing.scripts.magnetic_field_vector_map.MagneticFieldVectorMap._abc_impl"><code class="docutils literal notranslate"><span class="pre">MagneticFieldVectorMap._abc_impl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_vector_map.html#processing.scripts.magnetic_field_vector_map.MagneticFieldVectorMap.run"><code class="docutils literal notranslate"><span class="pre">MagneticFieldVectorMap.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.magnetic_field_vector_map.html#processing.scripts.magnetic_field_vector_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.sweep_plot.html">processing.scripts.sweep_plot module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._append_probe_series"><code class="docutils literal notranslate"><span class="pre">_append_probe_series()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._csv_column_names"><code class="docutils literal notranslate"><span class="pre">_csv_column_names()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._csv_has_multiple_times"><code class="docutils literal notranslate"><span class="pre">_csv_has_multiple_times()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._format_probe_coord"><code class="docutils literal notranslate"><span class="pre">_format_probe_coord()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._probe_coords_label"><code class="docutils literal notranslate"><span class="pre">_probe_coords_label()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._probe_location"><code class="docutils literal notranslate"><span class="pre">_probe_location()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._read_probe_series"><code class="docutils literal notranslate"><span class="pre">_read_probe_series()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._row_magnitude"><code class="docutils literal notranslate"><span class="pre">_row_magnitude()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.temperature_map.html">processing.scripts.temperature_map module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap"><code class="docutils literal notranslate"><span class="pre">TemperatureMap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap._abc_impl"><code class="docutils literal notranslate"><span class="pre">TemperatureMap._abc_impl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap._commanded_temperature_range"><code class="docutils literal notranslate"><span class="pre">TemperatureMap._commanded_temperature_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap._parse_commanded_temperature_range"><code class="docutils literal notranslate"><span class="pre">TemperatureMap._parse_commanded_temperature_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap.run"><code class="docutils literal notranslate"><span class="pre">TemperatureMap.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.temperature_map.html#processing.scripts.temperature_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.html"
+                          title="previous chapter">processing package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.current_density_interior.html"
+                          title="next chapter">processing.scripts.current_density_interior module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.current_density_interior.html" title="processing.scripts.current_density_interior module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.html" title="processing package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+geometries.cylinder module
+==========================
+
+.. automodule:: geometries.cylinder
+   :members:
+   :show-inheritance:
+   :undoc-members:

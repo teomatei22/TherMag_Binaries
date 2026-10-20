@@ -1,0 +1,19 @@
+domain package
+==============
+
+.. automodule:: domain
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   domain.geometry
+   domain.run_manifest
+   domain.simulation
+   domain.sweep
+   domain.sweep_manifest

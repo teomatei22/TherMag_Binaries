@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.scripts.generate_plots &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=1eac167c" />
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.generate_plots</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.scripts.generate_plots</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Generate Matplotlib time-series PNGs from probe CSVs (B_ext, J_int, T, P) and contour maps."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="kn">import</span> <span class="n">FuncFormatter</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">truncate_scientific</span>
+
+<span class="n">PointSelection</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+
+
+<div class="viewcode-block" id="_format_probe_coord">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots._format_probe_coord">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_format_probe_coord</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Format a probe coordinate for plot titles, clamping tiny values to zero.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        value: Coordinate component [m].</span>
+<span class="sd">        decimals: Digits after the decimal point.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Fixed-point coordinate text suitable for titles.</span>
+<span class="sd">    """</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">decimals</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="mf">0.0</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">decimals</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">number</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">decimals</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"-0."</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="mf">0.0</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">decimals</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="n">text</span></div>
+
+
+
+<div class="viewcode-block" id="_probe_coords_label">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots._probe_coords_label">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_probe_coords_label</span><span class="p">(</span><span class="n">px</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">py</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pz</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build a parenthesized (x, y, z) label for probe plot titles.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        px: Probe x [m].</span>
+<span class="sd">        py: Probe y [m].</span>
+<span class="sd">        pz: Probe z [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Formatted ``(x, y, z)`` label.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">_format_probe_coord</span><span class="p">(</span><span class="n">px</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">_format_probe_coord</span><span class="p">(</span><span class="n">py</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">_format_probe_coord</span><span class="p">(</span><span class="n">pz</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span></div>
+
+
+
+<div class="viewcode-block" id="_vector_probe_layout">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots._vector_probe_layout">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_vector_probe_layout</span><span class="p">(</span><span class="n">n_cols</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Map CSV column indices for vector probes (compact vs magnitude-inclusive layouts).</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        n_cols: Number of CSV columns.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        dict: Keys ``mag``, ``vx``, ``vy``, ``vz``, ``x``, ``y``, ``z`` - column index or ``None``.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">n_cols</span> <span class="o">&gt;=</span> <span class="mi">9</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"mag"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"vx"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"vy"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"vz"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="mi">8</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"mag"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"vx"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"vy"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"vz"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="mi">7</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="parse_point_ids">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots.parse_point_ids">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_point_ids</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">PointSelection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Parse CLI point-ID selection text into ``None`` (auto), ``'all'``, or an explicit ID set.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        text: Comma-separated IDs, or ``auto``/``all``/empty [str].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        PointSelection: ``None``, ``'all'``, or ``set[int]`` of requested point IDs.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">""</span> <span class="ow">or</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">"auto"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">"all"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"all"</span>
+
+    <span class="n">point_ids</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">):</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">point_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Invalid point-id token </span><span class="si">{</span><span class="n">token</span><span class="si">!r}</span><span class="s2">. "</span>
+                <span class="s2">"Use a comma-separated list such as 1,2,3, or use 'auto'/'all'."</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+    <span class="k">return</span> <span class="n">point_ids</span></div>
+
+
+<div class="viewcode-block" id="_unique_sorted_point_ids">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots._unique_sorted_point_ids">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unique_sorted_point_ids</span><span class="p">(</span><span class="n">point_id_column</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Collect unique probe point IDs from a CSV column, sorted ascending.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        point_id_column: Array of point_id values.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        list: Sorted unique integer point IDs.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span> <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">point_id_column</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="_evenly_spaced_ids">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots._evenly_spaced_ids">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_evenly_spaced_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Pick up to ``count`` evenly spaced IDs from a sorted ID sequence.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        ids: Sorted available point IDs.</span>
+<span class="sd">        count: Maximum IDs to return.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        list: Selected point IDs (order of selection, de-duplicated).</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">count</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+
+
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+    <span class="n">chosen</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">pos</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chosen</span><span class="p">:</span>
+            <span class="n">chosen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chosen</span></div>
+
+
+<div class="viewcode-block" id="_top_ids_by_value">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots._top_ids_by_value">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_top_ids_by_value</span><span class="p">(</span><span class="n">raw_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">value_cols</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Rank point IDs by peak absolute field value across given CSV columns.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        raw_data: Full CSV numeric array (time, point_id, values) [mixed].</span>
+<span class="sd">        ids: Candidate point IDs.</span>
+<span class="sd">        value_cols: Column indices used for scoring [field units].</span>
+<span class="sd">        count: Maximum top IDs to keep.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        list: Point IDs with largest ``nanmax(|values|)``, highest first.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ncols</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">valid_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">value_cols</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="n">ncols</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_cols</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">==</span> <span class="n">pid</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">rows</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[:,</span> <span class="n">valid_cols</span><span class="p">]</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">score</span><span class="p">),</span> <span class="n">pid</span><span class="p">))</span>
+
+    <span class="n">scores</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">pid</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">[:</span><span class="n">count</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="filter_point_ids">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots.filter_point_ids">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_point_ids</span><span class="p">(</span>
+    <span class="n">raw_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">selected_ids</span><span class="p">:</span> <span class="n">PointSelection</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">auto_value_cols</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_auto_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"field"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Resolve which probe point IDs to plot (explicit, all, or auto top+spread).</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        raw_data: CSV numeric array with point_id in column 1 [mixed].</span>
+<span class="sd">        selected_ids: ``None`` (auto), ``'all'``, or explicit ``set[int]``.</span>
+<span class="sd">        auto_value_cols: Columns for auto top-value ranking [field units].</span>
+<span class="sd">        max_auto_points: Cap on auto-selected IDs.</span>
+<span class="sd">        label: Log label for the field being filtered.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        list: Final sorted (or explicit-order) point IDs to plot.</span>
+<span class="sd">    """</span>
+    <span class="n">available</span> <span class="o">=</span> <span class="n">_unique_sorted_point_ids</span><span class="p">(</span><span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">selected_ids</span> <span class="o">==</span> <span class="s2">"all"</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[INFO] </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: plotting all </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">available</span><span class="p">)</span><span class="si">}</span><span class="s2"> point IDs"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">available</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selected_ids</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+        <span class="n">chosen</span> <span class="o">=</span> <span class="p">[</span><span class="n">pid</span> <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">available</span> <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">selected_ids</span><span class="p">]</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">selected_ids</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">available</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[WARN] </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: requested point IDs not present in CSV: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[INFO] </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: plotting explicit point IDs: </span><span class="si">{</span><span class="n">chosen</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chosen</span>
+
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_auto_points</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[INFO] </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: auto mode; plotting all available point IDs: </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">available</span>
+
+    <span class="n">n_top</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_auto_points</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">n_spread</span> <span class="o">=</span> <span class="n">max_auto_points</span> <span class="o">-</span> <span class="n">n_top</span>
+
+    <span class="n">chosen</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">auto_value_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">_top_ids_by_value</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">available</span><span class="p">,</span> <span class="n">auto_value_cols</span><span class="p">,</span> <span class="n">n_top</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chosen</span><span class="p">:</span>
+                <span class="n">chosen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">_evenly_spaced_ids</span><span class="p">(</span><span class="n">available</span><span class="p">,</span> <span class="n">n_spread</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chosen</span><span class="p">:</span>
+            <span class="n">chosen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chosen</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">max_auto_points</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">_evenly_spaced_ids</span><span class="p">(</span><span class="n">available</span><span class="p">,</span> <span class="n">max_auto_points</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chosen</span><span class="p">:</span>
+                <span class="n">chosen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chosen</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">max_auto_points</span><span class="p">:</span>
+                <span class="k">break</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chosen</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">max_auto_points</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">available</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chosen</span><span class="p">:</span>
+                <span class="n">chosen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chosen</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">max_auto_points</span><span class="p">:</span>
+                <span class="k">break</span>
+
+    <span class="n">chosen</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">chosen</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"[INFO] </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: auto mode; plotting </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">chosen</span><span class="p">)</span><span class="si">}</span><span class="s2"> of "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">available</span><span class="p">)</span><span class="si">}</span><span class="s2"> point IDs: </span><span class="si">{</span><span class="n">chosen</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">chosen</span></div>
+
+
+<div class="viewcode-block" id="_is_steady">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots._is_steady">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_steady</span><span class="p">(</span><span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Detect stationary/steady probe series that should skip component PNGs.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        times: Sample times for one probe [s].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        bool: ``True`` when a single sample or trivial t=0 steady set.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_save_component_plot">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots._save_component_plot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_component_plot</span><span class="p">(</span>
+    <span class="n">results_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Write one Matplotlib line+scatter component PNG under ``results_dir``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        results_dir: Output directory for the PNG [path].</span>
+<span class="sd">        times: Abscissa time samples [s].</span>
+<span class="sd">        values: Ordinate field samples [field units].</span>
+<span class="sd">        ylabel: Y-axis label with units.</span>
+<span class="sd">        title: Plot title.</span>
+<span class="sd">        filename: Output basename (``.png``).</span>
+<span class="sd">        color: Matplotlib color for the series.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Saves ``results_dir/filename`` and closes the figure.</span>
+<span class="sd">    """</span>
+    <span class="n">_fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Time [s]"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span>
+        <span class="n">FuncFormatter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">value</span><span class="p">,</span> <span class="n">_pos</span><span class="p">:</span> <span class="n">truncate_scientific</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="generate_bext_plot">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_bext_plot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_bext_plot</span><span class="p">(</span>
+    <span class="n">results_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">selected_point_ids</span><span class="p">:</span> <span class="n">PointSelection</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">include_magnitude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_auto_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Plot exterior B_x/B_y/B_z (and optional |B|) time series from ``magnetic_field_data.csv``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        results_dir: Directory containing magnetic field CSV [path].</span>
+<span class="sd">        selected_point_ids: Point-ID filter (auto/all/explicit).</span>
+<span class="sd">        include_magnitude: Also write |B| diagnostic PNGs.</span>
+<span class="sd">        max_auto_points: Auto-mode ID cap.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Writes ``magnetic_field_B*_p*.png`` (and optional abs) under ``results_dir``.</span>
+<span class="sd">    """</span>
+    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="s2">"magnetic_field_data.csv"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">csv_path</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Skipping magnetic_field plot: </span><span class="si">{</span><span class="n">csv_path</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">","</span><span class="p">,</span> <span class="n">skip_header</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">raw_data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"[WARN] magnetic_field_data.csv has </span><span class="si">{</span><span class="n">raw_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> columns; "</span>
+                <span class="s2">"expected at least 8 for compact Bx/By/Bz output"</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">point_ids</span> <span class="o">=</span> <span class="n">filter_point_ids</span><span class="p">(</span>
+            <span class="n">raw_data</span><span class="p">,</span>
+            <span class="n">selected_point_ids</span><span class="p">,</span>
+            <span class="n">auto_value_cols</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="n">max_auto_points</span><span class="o">=</span><span class="n">max_auto_points</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">"B_ext"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ipid</span> <span class="ow">in</span> <span class="n">point_ids</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">==</span> <span class="n">ipid</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">times</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">_is_steady</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"[INFO] B_ext probe </span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">: stationary dataset - CSV kept, skipping component plots"</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">_vector_probe_layout</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">Bx</span><span class="p">,</span> <span class="n">By</span><span class="p">,</span> <span class="n">Bz</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">cols</span><span class="p">[</span><span class="s2">"vx"</span><span class="p">]],</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">cols</span><span class="p">[</span><span class="s2">"vy"</span><span class="p">]],</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">cols</span><span class="p">[</span><span class="s2">"vz"</span><span class="p">]]</span>
+            <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">pz</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]]</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">_probe_coords_label</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">pz</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">include_magnitude</span><span class="p">:</span>
+                <span class="n">mag_col</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="s2">"mag"</span><span class="p">]</span>
+                <span class="n">B_mag</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">mag_col</span><span class="p">]</span> <span class="k">if</span> <span class="n">mag_col</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Bx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">By</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">Bz</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">_save_component_plot</span><span class="p">(</span>
+                    <span class="n">results_dir</span><span class="p">,</span>
+                    <span class="n">times</span><span class="p">,</span>
+                    <span class="n">B_mag</span><span class="p">,</span>
+                    <span class="n">ylabel</span><span class="o">=</span><span class="sa">r</span><span class="s2">"$|\vec</span><span class="si">{B}</span><span class="s2">|$ [T]"</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">rf</span><span class="s2">"$|\vec</span><span class="se">{{</span><span class="s2">B</span><span class="se">}}</span><span class="s2">|$ at P</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">coords</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">"magnetic_field_abs_p</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">.png"</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] Wrote magnetic field exterior |B| diagnostic plot (probe </span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">Bx</span><span class="p">,</span> <span class="s2">"steelblue"</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">By</span><span class="p">,</span> <span class="s2">"seagreen"</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"z"</span><span class="p">,</span> <span class="n">Bz</span><span class="p">,</span> <span class="s2">"darkorange"</span><span class="p">),</span>
+            <span class="p">):</span>
+                <span class="n">_save_component_plot</span><span class="p">(</span>
+                    <span class="n">results_dir</span><span class="p">,</span>
+                    <span class="n">times</span><span class="p">,</span>
+                    <span class="n">values</span><span class="p">,</span>
+                    <span class="n">ylabel</span><span class="o">=</span><span class="sa">rf</span><span class="s2">"$B_</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">$ [T]"</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">rf</span><span class="s2">"$B_</span><span class="se">{{</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="se">}}</span><span class="s2">$ at P</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">coords</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">"magnetic_field_B</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">_p</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">.png"</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] Wrote magnetic field exterior B</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2"> plot (probe </span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error generating magnetic_field plot: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_jint_plot">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_jint_plot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_jint_plot</span><span class="p">(</span>
+    <span class="n">results_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">selected_point_ids</span><span class="p">:</span> <span class="n">PointSelection</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">include_magnitude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_auto_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Plot interior J_x/J_y/J_z (and optional |J|) time series from current-density CSV.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        results_dir: Directory containing ``current_density_interior_data.csv`` [path].</span>
+<span class="sd">        selected_point_ids: Point-ID filter (auto/all/explicit).</span>
+<span class="sd">        include_magnitude: Also write |J| diagnostic PNGs.</span>
+<span class="sd">        max_auto_points: Auto-mode ID cap.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Writes ``current_density_J*_p*.png`` under ``results_dir``.</span>
+<span class="sd">    """</span>
+    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="s2">"current_density_interior_data.csv"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">csv_path</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Skipping current_density plot: </span><span class="si">{</span><span class="n">csv_path</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+            <span class="n">csv_path</span><span class="p">,</span>
+            <span class="n">delimiter</span><span class="o">=</span><span class="s2">","</span><span class="p">,</span>
+            <span class="n">names</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span> <span class="ow">or</span> <span class="p">())</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">"time"</span><span class="p">,</span>
+            <span class="s2">"point_id"</span><span class="p">,</span>
+            <span class="s2">"JSource_mag"</span><span class="p">,</span>
+            <span class="s2">"JSource_x"</span><span class="p">,</span>
+            <span class="s2">"JSource_y"</span><span class="p">,</span>
+            <span class="s2">"JSource_z"</span><span class="p">,</span>
+            <span class="s2">"x"</span><span class="p">,</span>
+            <span class="s2">"y"</span><span class="p">,</span>
+            <span class="s2">"z"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">"[WARN] current_density_interior_data.csv is missing required "</span>
+                <span class="sa">f</span><span class="s2">"JSource columns: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">point_ids_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"point_id"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">selection_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"time"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+                <span class="n">point_ids_column</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"JSource_x"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"JSource_y"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"JSource_z"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">point_ids</span> <span class="o">=</span> <span class="n">filter_point_ids</span><span class="p">(</span>
+            <span class="n">selection_data</span><span class="p">,</span>
+            <span class="n">selected_point_ids</span><span class="p">,</span>
+            <span class="n">auto_value_cols</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="n">max_auto_points</span><span class="o">=</span><span class="n">max_auto_points</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">"J_int"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ipid</span> <span class="ow">in</span> <span class="n">point_ids</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">point_ids_column</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">==</span> <span class="n">ipid</span>
+            <span class="n">probe</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">probe</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"time"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_is_steady</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"[INFO] J_int probe </span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">: stationary dataset - CSV kept, skipping component plots"</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">Jx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"JSource_x"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">Jy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"JSource_y"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">Jz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"JSource_z"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">px</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"x"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">py</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"y"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">pz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"z"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">_probe_coords_label</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">pz</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">Jx</span><span class="p">,</span> <span class="s2">"steelblue"</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">Jy</span><span class="p">,</span> <span class="s2">"seagreen"</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">"z"</span><span class="p">,</span> <span class="n">Jz</span><span class="p">,</span> <span class="s2">"darkorange"</span><span class="p">),</span>
+            <span class="p">):</span>
+                <span class="n">_save_component_plot</span><span class="p">(</span>
+                    <span class="n">results_dir</span><span class="p">,</span>
+                    <span class="n">times</span><span class="p">,</span>
+                    <span class="n">values</span><span class="p">,</span>
+                    <span class="n">ylabel</span><span class="o">=</span><span class="sa">rf</span><span class="s2">"$J_</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">$ [A/m$^2$]"</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">rf</span><span class="s2">"$J_</span><span class="se">{{</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="se">}}</span><span class="s2">$ at P</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">coords</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">"current_density_J</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">_p</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">.png"</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] Wrote current density interior J</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2"> plot (probe </span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">include_magnitude</span><span class="p">:</span>
+                <span class="n">J_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"JSource_mag"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+                <span class="n">_save_component_plot</span><span class="p">(</span>
+                    <span class="n">results_dir</span><span class="p">,</span>
+                    <span class="n">times</span><span class="p">,</span>
+                    <span class="n">J_mag</span><span class="p">,</span>
+                    <span class="n">ylabel</span><span class="o">=</span><span class="sa">r</span><span class="s2">"$|\vec</span><span class="si">{J}</span><span class="s2">|$ [A/m$^2$]"</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">rf</span><span class="s2">"$|\vec</span><span class="se">{{</span><span class="s2">J</span><span class="se">}}</span><span class="s2">|$ at P</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">coords</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">"current_density_abs_p</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">.png"</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] Wrote current density interior |J| diagnostic plot (probe </span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error generating current_density plot: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_scalar_interior_plot">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_scalar_interior_plot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_scalar_interior_plot</span><span class="p">(</span>
+    <span class="n">results_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">csv_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">value_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">title_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">filename_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">selected_point_ids</span><span class="p">:</span> <span class="n">PointSelection</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_auto_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Generic interior scalar probe time-series plots (temperature or potential).</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        results_dir: Results directory holding the scalar CSV [path].</span>
+<span class="sd">        csv_name: CSV basename under ``results_dir``.</span>
+<span class="sd">        value_label: Short field tag for logs (e.g. ``T_int``).</span>
+<span class="sd">        ylabel: Y-axis label with units.</span>
+<span class="sd">        title_prefix: Title stem before probe id/coords.</span>
+<span class="sd">        color: Matplotlib series color.</span>
+<span class="sd">        filename_prefix: PNG basename prefix before ``_p{id}.png``.</span>
+<span class="sd">        selected_point_ids: Point-ID filter (auto/all/explicit).</span>
+<span class="sd">        max_auto_points: Auto-mode ID cap.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Writes ``{filename_prefix}_p*.png`` under ``results_dir``.</span>
+<span class="sd">    """</span>
+    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="n">csv_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">csv_path</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Skipping </span><span class="si">{</span><span class="n">value_label</span><span class="si">}</span><span class="s2"> plot: </span><span class="si">{</span><span class="n">csv_path</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">","</span><span class="p">,</span> <span class="n">skip_header</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">raw_data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">n_cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">raw_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">n_cols</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"[WARN] </span><span class="si">{</span><span class="n">csv_name</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">n_cols</span><span class="si">}</span><span class="s2"> columns; "</span>
+                <span class="s2">"expected at least 6: time, point_id, value, x, y, z"</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">x_col</span><span class="p">,</span> <span class="n">y_col</span><span class="p">,</span> <span class="n">z_col</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_cols</span> <span class="o">&gt;=</span> <span class="mi">9</span> <span class="k">else</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="n">point_ids</span> <span class="o">=</span> <span class="n">filter_point_ids</span><span class="p">(</span>
+            <span class="n">raw_data</span><span class="p">,</span>
+            <span class="n">selected_point_ids</span><span class="p">,</span>
+            <span class="n">auto_value_cols</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,),</span>
+            <span class="n">max_auto_points</span><span class="o">=</span><span class="n">max_auto_points</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">value_label</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ipid</span> <span class="ow">in</span> <span class="n">point_ids</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">==</span> <span class="n">ipid</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">times</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">_is_steady</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"[INFO] </span><span class="si">{</span><span class="n">value_label</span><span class="si">}</span><span class="s2"> probe </span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">: stationary dataset - "</span>
+                    <span class="s2">"CSV kept, skipping component plots"</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">pz</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">x_col</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_col</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">z_col</span><span class="p">]</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">_probe_coords_label</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">pz</span><span class="p">)</span>
+
+            <span class="n">_save_component_plot</span><span class="p">(</span>
+                <span class="n">results_dir</span><span class="p">,</span>
+                <span class="n">times</span><span class="p">,</span>
+                <span class="n">values</span><span class="p">,</span>
+                <span class="n">ylabel</span><span class="o">=</span><span class="n">ylabel</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="sa">rf</span><span class="s2">"</span><span class="si">{</span><span class="n">title_prefix</span><span class="si">}</span><span class="s2"> at P</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">coords</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">filename_prefix</span><span class="si">}</span><span class="s2">_p</span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">.png"</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] Wrote </span><span class="si">{</span><span class="n">value_label</span><span class="si">}</span><span class="s2"> plot image (probe </span><span class="si">{</span><span class="n">ipid</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error generating </span><span class="si">{</span><span class="n">value_label</span><span class="si">}</span><span class="s2"> plots: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_temperature_int_plot">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_temperature_int_plot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_temperature_int_plot</span><span class="p">(</span>
+    <span class="n">results_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">selected_point_ids</span><span class="p">:</span> <span class="n">PointSelection</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_auto_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Plot interior temperature probes from ``temperature_interior_data.csv``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        results_dir: Results directory [path].</span>
+<span class="sd">        selected_point_ids: Point-ID filter (auto/all/explicit).</span>
+<span class="sd">        max_auto_points: Auto-mode ID cap.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Delegates to ``generate_scalar_interior_plot`` for T [K] PNGs.</span>
+<span class="sd">    """</span>
+    <span class="n">generate_scalar_interior_plot</span><span class="p">(</span>
+        <span class="n">results_dir</span><span class="p">,</span>
+        <span class="n">csv_name</span><span class="o">=</span><span class="s2">"temperature_interior_data.csv"</span><span class="p">,</span>
+        <span class="n">value_label</span><span class="o">=</span><span class="s2">"T_int"</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Temperature [K]"</span><span class="p">,</span>
+        <span class="n">title_prefix</span><span class="o">=</span><span class="s2">"Temperature"</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span><span class="p">,</span>
+        <span class="n">filename_prefix</span><span class="o">=</span><span class="s2">"temperature"</span><span class="p">,</span>
+        <span class="n">selected_point_ids</span><span class="o">=</span><span class="n">selected_point_ids</span><span class="p">,</span>
+        <span class="n">max_auto_points</span><span class="o">=</span><span class="n">max_auto_points</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_potential_int_plot">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_potential_int_plot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_potential_int_plot</span><span class="p">(</span>
+    <span class="n">results_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">selected_point_ids</span><span class="p">:</span> <span class="n">PointSelection</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_auto_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Plot interior electric potential probes from ``potential_interior_data.csv``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        results_dir: Results directory [path].</span>
+<span class="sd">        selected_point_ids: Point-ID filter (auto/all/explicit).</span>
+<span class="sd">        max_auto_points: Auto-mode ID cap.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Delegates to ``generate_scalar_interior_plot`` for P [V] PNGs.</span>
+<span class="sd">    """</span>
+    <span class="n">generate_scalar_interior_plot</span><span class="p">(</span>
+        <span class="n">results_dir</span><span class="p">,</span>
+        <span class="n">csv_name</span><span class="o">=</span><span class="s2">"potential_interior_data.csv"</span><span class="p">,</span>
+        <span class="n">value_label</span><span class="o">=</span><span class="s2">"P_int"</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Potential [V]"</span><span class="p">,</span>
+        <span class="n">title_prefix</span><span class="o">=</span><span class="s2">"Potential"</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">"purple"</span><span class="p">,</span>
+        <span class="n">filename_prefix</span><span class="o">=</span><span class="s2">"potential"</span><span class="p">,</span>
+        <span class="n">selected_point_ids</span><span class="o">=</span><span class="n">selected_point_ids</span><span class="p">,</span>
+        <span class="n">max_auto_points</span><span class="o">=</span><span class="n">max_auto_points</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../api/processing.scripts.generate_plots.html#processing.scripts.generate_plots.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""Brief: CLI entry: generate B/J/T/P probe PNGs and optional magnetic contour map from CSVs.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: Parses ``working_dir`` and point-ID / magnitude flags from argv.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Writes plots under ``working_dir/results``; exits non-zero on missing results.</span>
+<span class="sd">    """</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Generate matplotlib plots from CSV data"</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"working_dir"</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">"?"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"Working directory containing results folder"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--b-point-ids"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">"Magnetic exterior point IDs to plot: comma-separated list such as "</span>
+            <span class="s2">"'1,2,3', or 'auto', or 'all'. Default: auto."</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--j-point-ids"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">"Current-density interior point IDs to plot: comma-separated list such as "</span>
+            <span class="s2">"'5,9,14,15,23,24', or 'auto', or 'all'. Default: auto."</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--tp-point-ids"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">"Temperature/potential point IDs to plot: comma-separated list such as "</span>
+            <span class="s2">"'1,2,3', or 'auto', or 'all'. Default: auto."</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--plot-all"</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"Plot all point IDs for B, J, and temperature/potential."</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--max-auto-points"</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"Maximum number of point IDs plotted in auto mode for each field. Default: 6."</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">"--include-magnitude-diagnostics"</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"Also write |B| and |J| magnitude diagnostic plots for time_dependent data."</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">working_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">working_dir</span>
+    <span class="n">results_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s2">"results"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">results_dir</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: Results directory not found: </span><span class="si">{</span><span class="n">results_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_all</span><span class="p">:</span>
+        <span class="n">b_point_ids</span><span class="p">:</span> <span class="n">PointSelection</span> <span class="o">=</span> <span class="s2">"all"</span>
+        <span class="n">j_point_ids</span><span class="p">:</span> <span class="n">PointSelection</span> <span class="o">=</span> <span class="s2">"all"</span>
+        <span class="n">tp_point_ids</span><span class="p">:</span> <span class="n">PointSelection</span> <span class="o">=</span> <span class="s2">"all"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">b_point_ids</span> <span class="o">=</span> <span class="n">parse_point_ids</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">b_point_ids</span><span class="p">)</span>
+            <span class="n">j_point_ids</span> <span class="o">=</span> <span class="n">parse_point_ids</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">j_point_ids</span><span class="p">)</span>
+            <span class="n">tp_point_ids</span> <span class="o">=</span> <span class="n">parse_point_ids</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">tp_point_ids</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generating plots from: </span><span class="si">{</span><span class="n">results_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Component plots are written for time_dependent datasets only."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">include_magnitude_diagnostics</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Magnitude diagnostics are enabled."</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Magnitude diagnostics are disabled."</span><span class="p">)</span>
+
+    <span class="n">generate_bext_plot</span><span class="p">(</span>
+        <span class="n">results_dir</span><span class="p">,</span>
+        <span class="n">selected_point_ids</span><span class="o">=</span><span class="n">b_point_ids</span><span class="p">,</span>
+        <span class="n">include_magnitude</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">include_magnitude_diagnostics</span><span class="p">,</span>
+        <span class="n">max_auto_points</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_auto_points</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">generate_jint_plot</span><span class="p">(</span>
+        <span class="n">results_dir</span><span class="p">,</span>
+        <span class="n">selected_point_ids</span><span class="o">=</span><span class="n">j_point_ids</span><span class="p">,</span>
+        <span class="n">include_magnitude</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">include_magnitude_diagnostics</span><span class="p">,</span>
+        <span class="n">max_auto_points</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_auto_points</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">generate_temperature_int_plot</span><span class="p">(</span>
+        <span class="n">results_dir</span><span class="p">,</span>
+        <span class="n">selected_point_ids</span><span class="o">=</span><span class="n">tp_point_ids</span><span class="p">,</span>
+        <span class="n">max_auto_points</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_auto_points</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">generate_potential_int_plot</span><span class="p">(</span>
+        <span class="n">results_dir</span><span class="p">,</span>
+        <span class="n">selected_point_ids</span><span class="o">=</span><span class="n">tp_point_ids</span><span class="p">,</span>
+        <span class="n">max_auto_points</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_auto_points</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">magnetic_field_contour_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_contour_map_from_csv</span>
+
+        <span class="n">plot_contour_map_from_csv</span><span class="p">(</span><span class="n">results_dir</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Skipping magnetic contour map plot: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Plot generation complete"</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.generate_plots</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

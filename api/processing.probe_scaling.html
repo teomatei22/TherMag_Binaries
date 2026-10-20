@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.probe_scaling module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.run_integrity module" href="processing.run_integrity.html" />
+    <link rel="prev" title="processing.geometry_params module" href="processing.geometry_params.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.run_integrity.html" title="processing.run_integrity module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.geometry_params.html" title="processing.geometry_params module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" accesskey="U">processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.probe_scaling module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.probe_scaling">
+<span id="processing-probe-scaling-module"></span><h1>processing.probe_scaling module<a class="headerlink" href="#module-processing.probe_scaling" title="Link to this heading">¶</a></h1>
+<p>Magnetic trusted-band and interior J-probe geometry scaling for FEM probes.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling._abs_le">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">_abs_le</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#_abs_le"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling._abs_le" title="Link to this definition">¶</a></dt>
+<dd><p>Build an absolute-value inequality fragment for interior probe hints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> – Axis symbol (<code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, or <code class="docutils literal notranslate"><span class="pre">z</span></code>).</p></li>
+<li><p><strong>limit</strong> – Half-extent or radius bound [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – HTML text of the form <code class="docutils literal notranslate"><span class="pre">abs(axis)</span> <span class="pre">≤</span> <span class="pre">&lt;b&gt;limit&lt;/b&gt;</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> (<em>str</em>)</p></li>
+<li><p><strong>limit</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling._b">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">_b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#_b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling._b" title="Link to this definition">¶</a></dt>
+<dd><p>Wrap a formatted coordinate in HTML bold tags for GUI probe hints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Coordinate or length to emphasize [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – HTML <code class="docutils literal notranslate"><span class="pre">&lt;b&gt;...&lt;/b&gt;</span></code> fragment.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling._fmt_coord">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">_fmt_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#_fmt_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling._fmt_coord" title="Link to this definition">¶</a></dt>
+<dd><p>Format a coordinate for HTML probe hints with compact significant digits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Coordinate or length to display [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Compact numeric text, or <code class="docutils literal notranslate"><span class="pre">&quot;0&quot;</span></code> for near-zero values.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling._l_metal_detail">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">_l_metal_detail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#_l_metal_detail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling._l_metal_detail" title="Link to this definition">¶</a></dt>
+<dd><p>Compute <code class="docutils literal notranslate"><span class="pre">L_metal_max</span></code> and a human-readable formula detail string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> – Geometry dimensions [m].</p></li>
+<li><p><strong>geometry_type</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+<li><p><strong>variant</strong> – Topology variant. Hollow detail is <code class="docutils literal notranslate"><span class="pre">R_sphere</span></code>; other spheres use <code class="docutils literal notranslate"><span class="pre">2*R_sphere</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[float, str]</strong> – <code class="docutils literal notranslate"><span class="pre">(L_metal_max</span> <span class="pre">[m],</span> <span class="pre">formula</span> <span class="pre">detail</span> <span class="pre">text)</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling._l_metal_max">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">_l_metal_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#_l_metal_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling._l_metal_max" title="Link to this definition">¶</a></dt>
+<dd><p>Characteristic metal length used to scale exterior magnetic probe bands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> – Geometry dimensions [m].</p></li>
+<li><p><strong>geometry_type</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+<li><p><strong>variant</strong> – Topology variant; hollow spheres use <code class="docutils literal notranslate"><span class="pre">R_sphere</span></code> as the metal length.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – <code class="docutils literal notranslate"><span class="pre">L_metal_max</span></code> scale length [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling._require_float">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">_require_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#_require_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling._require_float" title="Link to this definition">¶</a></dt>
+<dd><p>Require a named geometry dimension and coerce it to float.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – Geometry parameter mapping (e.g. L, R) [m].</p></li>
+<li><p><strong>name</strong> – Required key in <code class="docutils literal notranslate"><span class="pre">params</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Parameter value [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling._resolve_geometry">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">_resolve_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#_resolve_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling._resolve_geometry" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize cylinder/prism/sphere dimensions into length and cross-section radii.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> – Family-specific dimensions from <code class="docutils literal notranslate"><span class="pre">GeometryParams.probe_scaling_params</span></code> [m].</p></li>
+<li><p><strong>geometry_type</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[float, float, float, float]</strong> – <code class="docutils literal notranslate"><span class="pre">(length,</span> <span class="pre">radius,</span> <span class="pre">width,</span> <span class="pre">height)</span></code> analogues [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, float, float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling.compute_bext_probe_positions">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">compute_bext_probe_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">band_override</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#compute_bext_probe_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling.compute_bext_probe_positions" title="Link to this definition">¶</a></dt>
+<dd><p>Place exterior midplane B-field probes within the trusted magnetic band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> – Geometry dimensions [m].</p></li>
+<li><p><strong>geometry_type</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+<li><p><strong>variant</strong> – Topology variant for band computation.</p></li>
+<li><p><strong>band_override</strong> – Optional <code class="docutils literal notranslate"><span class="pre">rho_in_m</span></code>/<code class="docutils literal notranslate"><span class="pre">rho_out_m</span></code> override [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[tuple[float, float, float]]</strong> – Probe XYZ positions on the midplane (x≈0) [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+<li><p><strong>band_override</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[tuple[float, float, float]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling.compute_bext_sampling_hint">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">compute_bext_sampling_hint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#compute_bext_sampling_hint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling.compute_bext_sampling_hint" title="Link to this definition">¶</a></dt>
+<dd><p>Build an HTML hint describing the trusted exterior magnetic probe band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> – Geometry dimensions [m].</p></li>
+<li><p><strong>geometry_type</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+<li><p><strong>variant</strong> – Topology variant for band / <code class="docutils literal notranslate"><span class="pre">L_metal</span></code> detail.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – HTML sentence with midplane trusted radial band bounds [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling.compute_jint_probe_hint">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">compute_jint_probe_hint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#compute_jint_probe_hint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling.compute_jint_probe_hint" title="Link to this definition">¶</a></dt>
+<dd><p>Build an HTML hint for allowed interior current-density probe extents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> – Geometry dimensions [m].</p></li>
+<li><p><strong>geometry_type</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>str</strong> – HTML sentence describing the conductor interior box or sphere bounds [m].</p></li>
+<li><p><strong>A sphere bound is ``r &lt;= R_sphere``.</strong></p></li>
+</ul>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling.compute_jint_probe_positions">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">compute_jint_probe_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#compute_jint_probe_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling.compute_jint_probe_positions" title="Link to this definition">¶</a></dt>
+<dd><p>Place interior J-probe points from dimensionless multipliers and Bext scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> – Geometry dimensions [m].</p></li>
+<li><p><strong>geometry_type</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[tuple[float, float, float]]</strong> – Interior probe XYZ positions [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[tuple[float, float, float]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.probe_scaling.compute_magnetic_trusted_band">
+<span class="sig-prename descclassname"><span class="pre">processing.probe_scaling.</span></span><span class="sig-name descname"><span class="pre">compute_magnetic_trusted_band</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/probe_scaling.html#compute_magnetic_trusted_band"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.probe_scaling.compute_magnetic_trusted_band" title="Link to this definition">¶</a></dt>
+<dd><p>Compute exterior magnetic trusted radial band and mid-band probe radius.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> – Geometry dimensions for band scaling [m].</p></li>
+<li><p><strong>geometry_type</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code>.</p></li>
+<li><p><strong>variant</strong> – Topology variant affecting <code class="docutils literal notranslate"><span class="pre">L_metal_max</span></code> for spheres.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, float]</strong> – <code class="docutils literal notranslate"><span class="pre">rho_in_m</span></code>, <code class="docutils literal notranslate"><span class="pre">rho_out_m</span></code>, <code class="docutils literal notranslate"><span class="pre">probe_rho_m</span></code>, <code class="docutils literal notranslate"><span class="pre">L_metal_max_m</span></code> [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.probe_scaling module</a><ul>
+<li><a class="reference internal" href="#processing.probe_scaling._abs_le"><code class="docutils literal notranslate"><span class="pre">_abs_le()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling._b"><code class="docutils literal notranslate"><span class="pre">_b()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling._fmt_coord"><code class="docutils literal notranslate"><span class="pre">_fmt_coord()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling._l_metal_detail"><code class="docutils literal notranslate"><span class="pre">_l_metal_detail()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling._l_metal_max"><code class="docutils literal notranslate"><span class="pre">_l_metal_max()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling._require_float"><code class="docutils literal notranslate"><span class="pre">_require_float()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling._resolve_geometry"><code class="docutils literal notranslate"><span class="pre">_resolve_geometry()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling.compute_bext_probe_positions"><code class="docutils literal notranslate"><span class="pre">compute_bext_probe_positions()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling.compute_bext_sampling_hint"><code class="docutils literal notranslate"><span class="pre">compute_bext_sampling_hint()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling.compute_jint_probe_hint"><code class="docutils literal notranslate"><span class="pre">compute_jint_probe_hint()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling.compute_jint_probe_positions"><code class="docutils literal notranslate"><span class="pre">compute_jint_probe_positions()</span></code></a></li>
+<li><a class="reference internal" href="#processing.probe_scaling.compute_magnetic_trusted_band"><code class="docutils literal notranslate"><span class="pre">compute_magnetic_trusted_band()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.geometry_params.html"
+                          title="previous chapter">processing.geometry_params module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.run_integrity.html"
+                          title="next chapter">processing.run_integrity module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.probe_scaling.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.run_integrity.html" title="processing.run_integrity module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.geometry_params.html" title="processing.geometry_params module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.probe_scaling module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

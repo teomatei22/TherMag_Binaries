@@ -1,0 +1,7 @@
+simulations.tensor\_utils module
+================================
+
+.. automodule:: simulations.tensor_utils
+   :members:
+   :show-inheritance:
+   :undoc-members:

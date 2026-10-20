@@ -1,0 +1,7 @@
+processing.geometry\_params module
+==================================
+
+.. automodule:: processing.geometry_params
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.defaults module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.geometry_params module" href="processing.geometry_params.html" />
+    <link rel="prev" title="processing.base module" href="processing.base.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.geometry_params.html" title="processing.geometry_params module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.base.html" title="processing.base module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" accesskey="U">processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.defaults module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.defaults">
+<span id="processing-defaults-module"></span><h1>processing.defaults module<a class="headerlink" href="#module-processing.defaults" title="Link to this heading">¶</a></h1>
+<p>Validated access to user-editable post-processing defaults (glyphs, IDW, probe bands).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.defaults.BextDefaults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">BextDefaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probe_band_fraction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probe_band_fractions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_inf_trusted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_sup_trusted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_directions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#BextDefaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.BextDefaults" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Exterior magnetic trusted-band and midplane probe direction settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>probe_band_fraction</strong> – Fraction along [rho_in, rho_out] for the primary probe.</p></li>
+<li><p><strong>probe_band_fractions</strong> – Per-direction fractions within the trusted band.</p></li>
+<li><p><strong>r_inf_trusted</strong> – Inner trusted radius scale vs <code class="docutils literal notranslate"><span class="pre">L_metal_max</span></code>.</p></li>
+<li><p><strong>r_sup_trusted</strong> – Outer trusted radius scale vs <code class="docutils literal notranslate"><span class="pre">L_metal_max</span></code>.</p></li>
+<li><p><strong>point_directions</strong> – Direction vectors for midplane B probes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>BextDefaults</strong> – Immutable exterior B-probe band configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>probe_band_fraction</strong> (<em>float</em>)</p></li>
+<li><p><strong>probe_band_fractions</strong> (<em>tuple</em><em>[</em><em>float</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>r_inf_trusted</strong> (<em>float</em>)</p></li>
+<li><p><strong>r_sup_trusted</strong> (<em>float</em>)</p></li>
+<li><p><strong>point_directions</strong> (<em>tuple</em><em>[</em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>...</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.BextDefaults.point_directions">
+<span class="sig-name descname"><span class="pre">point_directions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.BextDefaults.point_directions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.BextDefaults.probe_band_fraction">
+<span class="sig-name descname"><span class="pre">probe_band_fraction</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#processing.defaults.BextDefaults.probe_band_fraction" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.BextDefaults.probe_band_fractions">
+<span class="sig-name descname"><span class="pre">probe_band_fractions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.BextDefaults.probe_band_fractions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.BextDefaults.r_inf_trusted">
+<span class="sig-name descname"><span class="pre">r_inf_trusted</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#processing.defaults.BextDefaults.r_inf_trusted" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.BextDefaults.r_sup_trusted">
+<span class="sig-name descname"><span class="pre">r_sup_trusted</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#processing.defaults.BextDefaults.r_sup_trusted" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.defaults.ExtractionDefaults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">ExtractionDefaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idw_neighbors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idw_epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_node_epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bext</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#ExtractionDefaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.ExtractionDefaults" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>IDW sampling tolerances plus Jint/Bext probe extraction defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idw_neighbors</strong> – Neighbor count for IDW probe interpolation.</p></li>
+<li><p><strong>idw_epsilon</strong> – Softening length for IDW weights [m].</p></li>
+<li><p><strong>on_node_epsilon</strong> – Exact mesh-node hit distance [m].</p></li>
+<li><p><strong>jint</strong> – Interior J-probe multipliers.</p></li>
+<li><p><strong>bext</strong> – Exterior B trusted-band and directions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ExtractionDefaults</strong> – Immutable probe-extraction settings.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idw_neighbors</strong> (<em>int</em>)</p></li>
+<li><p><strong>idw_epsilon</strong> (<em>float</em>)</p></li>
+<li><p><strong>on_node_epsilon</strong> (<em>float</em>)</p></li>
+<li><p><strong>jint</strong> (<a class="reference internal" href="#processing.defaults.JintDefaults" title="processing.defaults.JintDefaults"><em>JintDefaults</em></a>)</p></li>
+<li><p><strong>bext</strong> (<a class="reference internal" href="#processing.defaults.BextDefaults" title="processing.defaults.BextDefaults"><em>BextDefaults</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ExtractionDefaults.bext">
+<span class="sig-name descname"><span class="pre">bext</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#processing.defaults.BextDefaults" title="processing.defaults.BextDefaults"><span class="pre">BextDefaults</span></a></span><a class="headerlink" href="#processing.defaults.ExtractionDefaults.bext" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ExtractionDefaults.idw_epsilon">
+<span class="sig-name descname"><span class="pre">idw_epsilon</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#processing.defaults.ExtractionDefaults.idw_epsilon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ExtractionDefaults.idw_neighbors">
+<span class="sig-name descname"><span class="pre">idw_neighbors</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#processing.defaults.ExtractionDefaults.idw_neighbors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ExtractionDefaults.jint">
+<span class="sig-name descname"><span class="pre">jint</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#processing.defaults.JintDefaults" title="processing.defaults.JintDefaults"><span class="pre">JintDefaults</span></a></span><a class="headerlink" href="#processing.defaults.ExtractionDefaults.jint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ExtractionDefaults.on_node_epsilon">
+<span class="sig-name descname"><span class="pre">on_node_epsilon</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#processing.defaults.ExtractionDefaults.on_node_epsilon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.defaults.GeometryDetectionDefaults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">GeometryDetectionDefaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sphere_path_substrings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphere_content_markers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_geometry_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#GeometryDetectionDefaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.GeometryDetectionDefaults" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Heuristics for detecting sphere/prism/cylinder from <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sphere_path_substrings</strong> – Path/name markers implying sphere family.</p></li>
+<li><p><strong>sphere_content_markers</strong> – Geo-file text markers implying sphere family.</p></li>
+<li><p><strong>default_geometry_type</strong> – Fallback family when detection is inconclusive.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryDetectionDefaults</strong> – Immutable geometry-detection settings.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sphere_path_substrings</strong> (<em>tuple</em><em>[</em><em>str</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>sphere_content_markers</strong> (<em>tuple</em><em>[</em><em>str</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>default_geometry_type</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.GeometryDetectionDefaults.default_geometry_type">
+<span class="sig-name descname"><span class="pre">default_geometry_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#processing.defaults.GeometryDetectionDefaults.default_geometry_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.GeometryDetectionDefaults.sphere_content_markers">
+<span class="sig-name descname"><span class="pre">sphere_content_markers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.GeometryDetectionDefaults.sphere_content_markers" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.GeometryDetectionDefaults.sphere_path_substrings">
+<span class="sig-name descname"><span class="pre">sphere_path_substrings</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.GeometryDetectionDefaults.sphere_path_substrings" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.defaults.GlyphDefaults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">GlyphDefaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_density_arrow_fraction_of_extent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnetic_arrow_fraction_of_extent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#GlyphDefaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.GlyphDefaults" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Per-geometry arrow length fractions of conductor extent for vector glyphs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_density_arrow_fraction_of_extent</strong> – J-glyph fraction by family.</p></li>
+<li><p><strong>magnetic_arrow_fraction_of_extent</strong> – B-glyph fraction by family.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GlyphDefaults</strong> – Immutable glyph scale fraction maps.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_density_arrow_fraction_of_extent</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>magnetic_arrow_fraction_of_extent</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.GlyphDefaults.current_density_arrow_fraction_of_extent">
+<span class="sig-name descname"><span class="pre">current_density_arrow_fraction_of_extent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.GlyphDefaults.current_density_arrow_fraction_of_extent" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.GlyphDefaults.magnetic_arrow_fraction_of_extent">
+<span class="sig-name descname"><span class="pre">magnetic_arrow_fraction_of_extent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.GlyphDefaults.magnetic_arrow_fraction_of_extent" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.defaults.JintDefaults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">JintDefaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_multipliers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#JintDefaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.JintDefaults" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Dimensionless multipliers placing interior current-density probes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>point_multipliers</strong> – Maps with <code class="docutils literal notranslate"><span class="pre">x_l</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z_bext_scale</span></code> per probe.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>JintDefaults</strong> – Immutable interior probe multiplier set.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>point_multipliers</strong> (<em>tuple</em><em>[</em><em>Mapping</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em><em>, </em><em>...</em><em>]</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.JintDefaults.point_multipliers">
+<span class="sig-name descname"><span class="pre">point_multipliers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.JintDefaults.point_multipliers" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.defaults.ModelConfigDefaults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">ModelConfigDefaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outer_material_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_air_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_air_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_material_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#ModelConfigDefaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.ModelConfigDefaults" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Fallback GeometryIds for outer/inner material and air bodies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outer_material_id</strong> – Default conductive outer body id.</p></li>
+<li><p><strong>outer_air_id</strong> – Default exterior air body id.</p></li>
+<li><p><strong>inner_air_id</strong> – Optional cavity air body id.</p></li>
+<li><p><strong>inner_material_id</strong> – Optional inner conductive layer body id.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ModelConfigDefaults</strong> – Immutable default body-id set.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outer_material_id</strong> (<em>int</em>)</p></li>
+<li><p><strong>outer_air_id</strong> (<em>int</em>)</p></li>
+<li><p><strong>inner_air_id</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>inner_material_id</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ModelConfigDefaults.inner_air_id">
+<span class="sig-name descname"><span class="pre">inner_air_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.defaults.ModelConfigDefaults.inner_air_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ModelConfigDefaults.inner_material_id">
+<span class="sig-name descname"><span class="pre">inner_material_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.defaults.ModelConfigDefaults.inner_material_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ModelConfigDefaults.outer_air_id">
+<span class="sig-name descname"><span class="pre">outer_air_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#processing.defaults.ModelConfigDefaults.outer_air_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ModelConfigDefaults.outer_material_id">
+<span class="sig-name descname"><span class="pre">outer_material_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#processing.defaults.ModelConfigDefaults.outer_material_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">ProcessingDefaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_detection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">glyph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extraction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_layouts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#ProcessingDefaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.ProcessingDefaults" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Fully validated post-processing defaults loaded from JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_detection</strong> – Sphere/prism/cylinder detection heuristics.</p></li>
+<li><p><strong>glyph</strong> – Vector glyph arrow fractions of extent.</p></li>
+<li><p><strong>reader</strong> – VTU point/cell array selection.</p></li>
+<li><p><strong>extraction</strong> – IDW and probe-band extraction settings.</p></li>
+<li><p><strong>model_config</strong> – Fallback body IDs.</p></li>
+<li><p><strong>model_layouts</strong> – Per-<code class="docutils literal notranslate"><span class="pre">model_type</span></code> body-id layouts.</p></li>
+<li><p><strong>raw</strong> – Immutable deep copy of the source JSON object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ProcessingDefaults</strong> – Typed defaults with <code class="docutils literal notranslate"><span class="pre">to_dict</span></code> / layout helpers.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_detection</strong> (<a class="reference internal" href="#processing.defaults.GeometryDetectionDefaults" title="processing.defaults.GeometryDetectionDefaults"><em>GeometryDetectionDefaults</em></a>)</p></li>
+<li><p><strong>glyph</strong> (<a class="reference internal" href="#processing.defaults.GlyphDefaults" title="processing.defaults.GlyphDefaults"><em>GlyphDefaults</em></a>)</p></li>
+<li><p><strong>reader</strong> (<a class="reference internal" href="#processing.defaults.ReaderDefaults" title="processing.defaults.ReaderDefaults"><em>ReaderDefaults</em></a>)</p></li>
+<li><p><strong>extraction</strong> (<a class="reference internal" href="#processing.defaults.ExtractionDefaults" title="processing.defaults.ExtractionDefaults"><em>ExtractionDefaults</em></a>)</p></li>
+<li><p><strong>model_config</strong> (<a class="reference internal" href="#processing.defaults.ModelConfigDefaults" title="processing.defaults.ModelConfigDefaults"><em>ModelConfigDefaults</em></a>)</p></li>
+<li><p><strong>model_layouts</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>raw</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.extraction">
+<span class="sig-name descname"><span class="pre">extraction</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#processing.defaults.ExtractionDefaults" title="processing.defaults.ExtractionDefaults"><span class="pre">ExtractionDefaults</span></a></span><a class="headerlink" href="#processing.defaults.ProcessingDefaults.extraction" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.geometry_detection">
+<span class="sig-name descname"><span class="pre">geometry_detection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#processing.defaults.GeometryDetectionDefaults" title="processing.defaults.GeometryDetectionDefaults"><span class="pre">GeometryDetectionDefaults</span></a></span><a class="headerlink" href="#processing.defaults.ProcessingDefaults.geometry_detection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.glyph">
+<span class="sig-name descname"><span class="pre">glyph</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#processing.defaults.GlyphDefaults" title="processing.defaults.GlyphDefaults"><span class="pre">GlyphDefaults</span></a></span><a class="headerlink" href="#processing.defaults.ProcessingDefaults.glyph" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.layer_over_model_types">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">layer_over_model_types</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.ProcessingDefaults.layer_over_model_types" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">model_layouts</span></code> keys that describe layered (inner+outer) conductors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Reads <code class="docutils literal notranslate"><span class="pre">self.model_layouts</span></code> keys.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>frozenset[str]</strong> – Layout keys starting with <code class="docutils literal notranslate"><span class="pre">layer_over_</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#processing.defaults.ModelConfigDefaults" title="processing.defaults.ModelConfigDefaults"><span class="pre">ModelConfigDefaults</span></a></span><a class="headerlink" href="#processing.defaults.ProcessingDefaults.model_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.model_layouts">
+<span class="sig-name descname"><span class="pre">model_layouts</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.ProcessingDefaults.model_layouts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.raw">
+<span class="sig-name descname"><span class="pre">raw</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.ProcessingDefaults.raw" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.reader">
+<span class="sig-name descname"><span class="pre">reader</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#processing.defaults.ReaderDefaults" title="processing.defaults.ReaderDefaults"><span class="pre">ReaderDefaults</span></a></span><a class="headerlink" href="#processing.defaults.ProcessingDefaults.reader" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.defaults.ProcessingDefaults.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#ProcessingDefaults.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.ProcessingDefaults.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deep-copy the raw JSON defaults for mutable consumer settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.raw</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – Mutable deep copy of the defaults object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.defaults.ReaderDefaults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">ReaderDefaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wanted_point_arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_arrays</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#ReaderDefaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.ReaderDefaults" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>VTU/PVTU point and cell arrays enabled in the ParaView reader.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wanted_point_arrays</strong> – Point-data array names to load (T, J, B, etc.).</p></li>
+<li><p><strong>cell_arrays</strong> – Cell-data array names to load (e.g. GeometryIds).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ReaderDefaults</strong> – Immutable reader array selection.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wanted_point_arrays</strong> (<em>tuple</em><em>[</em><em>str</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>cell_arrays</strong> (<em>tuple</em><em>[</em><em>str</em><em>, </em><em>...</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ReaderDefaults.cell_arrays">
+<span class="sig-name descname"><span class="pre">cell_arrays</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.ReaderDefaults.cell_arrays" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.defaults.ReaderDefaults.wanted_point_arrays">
+<span class="sig-name descname"><span class="pre">wanted_point_arrays</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#processing.defaults.ReaderDefaults.wanted_point_arrays" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._integer">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_integer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_integer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._integer" title="Link to this definition">¶</a></dt>
+<dd><p>Require an integer-valued numeric JSON field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Parent mapping being validated.</p></li>
+<li><p><strong>key</strong> – Child key that must be an integer number.</p></li>
+<li><p><strong>path</strong> – Dot-path prefix used in error messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>int</strong> – Parsed integer value.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._load_defaults_file">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_load_defaults_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_load_defaults_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._load_defaults_file" title="Link to this definition">¶</a></dt>
+<dd><p>Load and cache validated defaults from a JSON file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – Absolute path to <code class="docutils literal notranslate"><span class="pre">post_processing_defaults.json</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ProcessingDefaults</strong> – Cached parsed defaults for <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.defaults.ProcessingDefaults" title="processing.defaults.ProcessingDefaults"><em>ProcessingDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._number">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._number" title="Link to this definition">¶</a></dt>
+<dd><p>Require a numeric (non-bool) JSON field and coerce to float.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Parent mapping being validated.</p></li>
+<li><p><strong>key</strong> – Child key that must be int/float.</p></li>
+<li><p><strong>path</strong> – Dot-path prefix used in error messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Parsed numeric value.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._number_list">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_number_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_number_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._number_list" title="Link to this definition">¶</a></dt>
+<dd><p>Require a non-empty numeric list JSON field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Parent mapping being validated.</p></li>
+<li><p><strong>key</strong> – Child key that must be a non-empty list of numbers.</p></li>
+<li><p><strong>path</strong> – Dot-path prefix used in error messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[float, …]</strong> – Immutable list of floats.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._object">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._object" title="Link to this definition">¶</a></dt>
+<dd><p>Require a nested JSON object field during defaults validation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Parent mapping being validated.</p></li>
+<li><p><strong>key</strong> – Child key that must map to a dict.</p></li>
+<li><p><strong>path</strong> – Dot-path prefix used in error messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Mapping[str, Any]</strong> – The nested object value.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Mapping</em>[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._optional_integer">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_optional_integer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_optional_integer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._optional_integer" title="Link to this definition">¶</a></dt>
+<dd><p>Parse an optional integer JSON field, preserving <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Parent mapping being validated.</p></li>
+<li><p><strong>key</strong> – Child key that may be <code class="docutils literal notranslate"><span class="pre">None</span></code> or an integer.</p></li>
+<li><p><strong>path</strong> – Dot-path prefix used in error messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>int | None</strong> – Parsed integer, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when the field is null/absent as <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._parse_bext">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_parse_bext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_parse_bext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._parse_bext" title="Link to this definition">¶</a></dt>
+<dd><p>Validate exterior B trusted-band scales and midplane probe directions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <code class="docutils literal notranslate"><span class="pre">extraction.bext_defaults</span></code> object from defaults JSON.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>BextDefaults</strong> – Parsed magnetic probe-band configuration.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.defaults.BextDefaults" title="processing.defaults.BextDefaults"><em>BextDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._parse_defaults">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_parse_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_parse_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._parse_defaults" title="Link to this definition">¶</a></dt>
+<dd><p>Validate the full post-processing defaults JSON object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – Root object from <code class="docutils literal notranslate"><span class="pre">post_processing_defaults.json</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ProcessingDefaults</strong> – Fully typed and validated defaults tree.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.defaults.ProcessingDefaults" title="processing.defaults.ProcessingDefaults"><em>ProcessingDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._parse_extraction">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_parse_extraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_parse_extraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._parse_extraction" title="Link to this definition">¶</a></dt>
+<dd><p>Validate IDW tolerances and nested Jint/Bext extraction defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <code class="docutils literal notranslate"><span class="pre">extraction</span></code> object from defaults JSON.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ExtractionDefaults</strong> – Parsed IDW and probe extraction settings.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.defaults.ExtractionDefaults" title="processing.defaults.ExtractionDefaults"><em>ExtractionDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._parse_geometry_detection">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_parse_geometry_detection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_parse_geometry_detection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._parse_geometry_detection" title="Link to this definition">¶</a></dt>
+<dd><p>Validate and parse the <code class="docutils literal notranslate"><span class="pre">geometry_detection</span></code> defaults section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <code class="docutils literal notranslate"><span class="pre">geometry_detection</span></code> object from defaults JSON.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryDetectionDefaults</strong> – Parsed detection heuristics.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.defaults.GeometryDetectionDefaults" title="processing.defaults.GeometryDetectionDefaults"><em>GeometryDetectionDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._parse_glyph">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_parse_glyph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_parse_glyph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._parse_glyph" title="Link to this definition">¶</a></dt>
+<dd><p>Validate per-family J and B glyph arrow fractions of extent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <code class="docutils literal notranslate"><span class="pre">glyph</span></code> object from defaults JSON.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GlyphDefaults</strong> – Parsed current-density and magnetic glyph fractions.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.defaults.GlyphDefaults" title="processing.defaults.GlyphDefaults"><em>GlyphDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._parse_jint">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_parse_jint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_parse_jint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._parse_jint" title="Link to this definition">¶</a></dt>
+<dd><p>Validate interior J-probe dimensionless point multipliers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <code class="docutils literal notranslate"><span class="pre">extraction.jint_defaults</span></code> object from defaults JSON.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>JintDefaults</strong> – Parsed interior probe multipliers.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.defaults.JintDefaults" title="processing.defaults.JintDefaults"><em>JintDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._parse_model_layouts">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_parse_model_layouts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_parse_model_layouts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._parse_model_layouts" title="Link to this definition">¶</a></dt>
+<dd><p>Validate per-<code class="docutils literal notranslate"><span class="pre">model_type</span></code> conductive/air body-id layouts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <code class="docutils literal notranslate"><span class="pre">model_layouts</span></code> object from defaults JSON.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Mapping[str, Mapping[str, Any]]</strong> – Immutable layout map keyed by model type.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Mapping</em>[str, <em>Mapping</em>[str, <em>Any</em>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._string_list">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_string_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_string_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._string_list" title="Link to this definition">¶</a></dt>
+<dd><p>Require a non-empty-string list JSON field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Parent mapping being validated.</p></li>
+<li><p><strong>key</strong> – Child key that must be a list of non-empty strings.</p></li>
+<li><p><strong>path</strong> – Dot-path prefix used in error messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[str, …]</strong> – Immutable list of strings.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[str, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults._validate_positive">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">_validate_positive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#_validate_positive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults._validate_positive" title="Link to this definition">¶</a></dt>
+<dd><p>Assert a numeric default is strictly positive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Candidate numeric default.</p></li>
+<li><p><strong>path</strong> – Dot-path used in the error message.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – The same <code class="docutils literal notranslate"><span class="pre">value</span></code> when <code class="docutils literal notranslate"><span class="pre">value</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>float</em>)</p></li>
+<li><p><strong>path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults.deep_merge_dict">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">deep_merge_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#deep_merge_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.deep_merge_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively merge overlay settings onto a deep-copied base dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – Base settings mapping (not mutated).</p></li>
+<li><p><strong>overlay</strong> – Override mapping whose nested dicts merge recursively.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – New merged mapping.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>overlay</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults.format_csv_float">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">format_csv_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#format_csv_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.format_csv_float" title="Link to this definition">¶</a></dt>
+<dd><p>Format a CSV numeric cell using truncated scientific notation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Coercible numeric value [any].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Truncated scientific string suitable for probe CSV columns.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults.load_post_processing_settings">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">load_post_processing_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cwd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#load_post_processing_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.load_post_processing_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Load defaults and optionally merge run-local <code class="docutils literal notranslate"><span class="pre">processing_config.json</span></code> overlays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> – Optional FEM run directory; when set, merges <code class="docutils literal notranslate"><span class="pre">results/processing_config.json</span></code>.</p></li>
+<li><p><strong>path</strong> – Optional explicit defaults JSON path.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – Mutable post-processing settings for ParaView scripts.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cwd</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>path</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults.load_processing_defaults">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">load_processing_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#load_processing_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.load_processing_defaults" title="Link to this definition">¶</a></dt>
+<dd><p>Load packaged or explicit post-processing defaults JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – Optional defaults file; defaults to the package <code class="docutils literal notranslate"><span class="pre">post_processing_defaults.json</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ProcessingDefaults</strong> – Validated defaults instance.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.defaults.ProcessingDefaults" title="processing.defaults.ProcessingDefaults"><em>ProcessingDefaults</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults.scientific_tick_values">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">scientific_tick_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#scientific_tick_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.scientific_tick_values" title="Link to this definition">¶</a></dt>
+<dd><p>Build evenly spaced, truncated tick values for scientific color bars.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower</strong> – Color-bar / axis lower bound [field units].</p></li>
+<li><p><strong>upper</strong> – Color-bar / axis upper bound [field units].</p></li>
+<li><p><strong>count</strong> – Desired number of ticks (minimum 2 for a span).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[float]</strong> – Deduplicated truncated tick positions.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower</strong> (<em>float</em>)</p></li>
+<li><p><strong>upper</strong> (<em>float</em>)</p></li>
+<li><p><strong>count</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults.truncate_float">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">truncate_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#truncate_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.truncate_float" title="Link to this definition">¶</a></dt>
+<dd><p>Truncate a float via scientific formatting then parse back to float.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Numeric value [any].</p></li>
+<li><p><strong>decimals</strong> – Mantissa digits kept after truncation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Value after truncate-through-scientific round-trip.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>float</em>)</p></li>
+<li><p><strong>decimals</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.defaults.truncate_scientific">
+<span class="sig-prename descclassname"><span class="pre">processing.defaults.</span></span><span class="sig-name descname"><span class="pre">truncate_scientific</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/defaults.html#truncate_scientific"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.defaults.truncate_scientific" title="Link to this definition">¶</a></dt>
+<dd><p>Format a float in truncated scientific notation for CSV/plot ticks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Numeric value to format [any].</p></li>
+<li><p><strong>decimals</strong> – Mantissa digits kept after truncation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Scientific string with truncated (not rounded) mantissa.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>float</em>)</p></li>
+<li><p><strong>decimals</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.defaults module</a><ul>
+<li><a class="reference internal" href="#processing.defaults.BextDefaults"><code class="docutils literal notranslate"><span class="pre">BextDefaults</span></code></a><ul>
+<li><a class="reference internal" href="#processing.defaults.BextDefaults.point_directions"><code class="docutils literal notranslate"><span class="pre">BextDefaults.point_directions</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.BextDefaults.probe_band_fraction"><code class="docutils literal notranslate"><span class="pre">BextDefaults.probe_band_fraction</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.BextDefaults.probe_band_fractions"><code class="docutils literal notranslate"><span class="pre">BextDefaults.probe_band_fractions</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.BextDefaults.r_inf_trusted"><code class="docutils literal notranslate"><span class="pre">BextDefaults.r_inf_trusted</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.BextDefaults.r_sup_trusted"><code class="docutils literal notranslate"><span class="pre">BextDefaults.r_sup_trusted</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.defaults.ExtractionDefaults"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults</span></code></a><ul>
+<li><a class="reference internal" href="#processing.defaults.ExtractionDefaults.bext"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.bext</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ExtractionDefaults.idw_epsilon"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.idw_epsilon</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ExtractionDefaults.idw_neighbors"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.idw_neighbors</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ExtractionDefaults.jint"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.jint</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ExtractionDefaults.on_node_epsilon"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.on_node_epsilon</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.defaults.GeometryDetectionDefaults"><code class="docutils literal notranslate"><span class="pre">GeometryDetectionDefaults</span></code></a><ul>
+<li><a class="reference internal" href="#processing.defaults.GeometryDetectionDefaults.default_geometry_type"><code class="docutils literal notranslate"><span class="pre">GeometryDetectionDefaults.default_geometry_type</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.GeometryDetectionDefaults.sphere_content_markers"><code class="docutils literal notranslate"><span class="pre">GeometryDetectionDefaults.sphere_content_markers</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.GeometryDetectionDefaults.sphere_path_substrings"><code class="docutils literal notranslate"><span class="pre">GeometryDetectionDefaults.sphere_path_substrings</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.defaults.GlyphDefaults"><code class="docutils literal notranslate"><span class="pre">GlyphDefaults</span></code></a><ul>
+<li><a class="reference internal" href="#processing.defaults.GlyphDefaults.current_density_arrow_fraction_of_extent"><code class="docutils literal notranslate"><span class="pre">GlyphDefaults.current_density_arrow_fraction_of_extent</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.GlyphDefaults.magnetic_arrow_fraction_of_extent"><code class="docutils literal notranslate"><span class="pre">GlyphDefaults.magnetic_arrow_fraction_of_extent</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.defaults.JintDefaults"><code class="docutils literal notranslate"><span class="pre">JintDefaults</span></code></a><ul>
+<li><a class="reference internal" href="#processing.defaults.JintDefaults.point_multipliers"><code class="docutils literal notranslate"><span class="pre">JintDefaults.point_multipliers</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.defaults.ModelConfigDefaults"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults</span></code></a><ul>
+<li><a class="reference internal" href="#processing.defaults.ModelConfigDefaults.inner_air_id"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults.inner_air_id</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ModelConfigDefaults.inner_material_id"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults.inner_material_id</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ModelConfigDefaults.outer_air_id"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults.outer_air_id</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ModelConfigDefaults.outer_material_id"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults.outer_material_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults</span></code></a><ul>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.extraction"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.extraction</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.geometry_detection"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.geometry_detection</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.glyph"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.glyph</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.layer_over_model_types"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.layer_over_model_types</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.model_config"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.model_config</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.model_layouts"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.model_layouts</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.raw"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.raw</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.reader"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.reader</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ProcessingDefaults.to_dict"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.defaults.ReaderDefaults"><code class="docutils literal notranslate"><span class="pre">ReaderDefaults</span></code></a><ul>
+<li><a class="reference internal" href="#processing.defaults.ReaderDefaults.cell_arrays"><code class="docutils literal notranslate"><span class="pre">ReaderDefaults.cell_arrays</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.ReaderDefaults.wanted_point_arrays"><code class="docutils literal notranslate"><span class="pre">ReaderDefaults.wanted_point_arrays</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.defaults._integer"><code class="docutils literal notranslate"><span class="pre">_integer()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._load_defaults_file"><code class="docutils literal notranslate"><span class="pre">_load_defaults_file()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._number"><code class="docutils literal notranslate"><span class="pre">_number()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._number_list"><code class="docutils literal notranslate"><span class="pre">_number_list()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._object"><code class="docutils literal notranslate"><span class="pre">_object()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._optional_integer"><code class="docutils literal notranslate"><span class="pre">_optional_integer()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._parse_bext"><code class="docutils literal notranslate"><span class="pre">_parse_bext()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._parse_defaults"><code class="docutils literal notranslate"><span class="pre">_parse_defaults()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._parse_extraction"><code class="docutils literal notranslate"><span class="pre">_parse_extraction()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._parse_geometry_detection"><code class="docutils literal notranslate"><span class="pre">_parse_geometry_detection()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._parse_glyph"><code class="docutils literal notranslate"><span class="pre">_parse_glyph()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._parse_jint"><code class="docutils literal notranslate"><span class="pre">_parse_jint()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._parse_model_layouts"><code class="docutils literal notranslate"><span class="pre">_parse_model_layouts()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._string_list"><code class="docutils literal notranslate"><span class="pre">_string_list()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults._validate_positive"><code class="docutils literal notranslate"><span class="pre">_validate_positive()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.deep_merge_dict"><code class="docutils literal notranslate"><span class="pre">deep_merge_dict()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.format_csv_float"><code class="docutils literal notranslate"><span class="pre">format_csv_float()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.load_post_processing_settings"><code class="docutils literal notranslate"><span class="pre">load_post_processing_settings()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.load_processing_defaults"><code class="docutils literal notranslate"><span class="pre">load_processing_defaults()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.scientific_tick_values"><code class="docutils literal notranslate"><span class="pre">scientific_tick_values()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.truncate_float"><code class="docutils literal notranslate"><span class="pre">truncate_float()</span></code></a></li>
+<li><a class="reference internal" href="#processing.defaults.truncate_scientific"><code class="docutils literal notranslate"><span class="pre">truncate_scientific()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.base.html"
+                          title="previous chapter">processing.base module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.geometry_params.html"
+                          title="next chapter">processing.geometry_params module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.defaults.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.geometry_params.html" title="processing.geometry_params module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.base.html" title="processing.base module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.defaults module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

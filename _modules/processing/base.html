@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.base &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.base</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Abstract ParaView post-processor base for FEM VTU glyphs, cameras, and exports."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">paraview.simple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview.simple</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">paraview</span><span class="o">.</span><span class="n">simple</span><span class="o">.</span><span class="n">_DisableFirstRenderCameraReset</span><span class="p">()</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">paraview</span><span class="w"> </span><span class="kn">import</span> <span class="n">servermanager</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">servermanager</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">paraview</span><span class="w"> </span><span class="kn">import</span> <span class="n">numpy_support</span> <span class="k">as</span> <span class="n">ns</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">paraview.servermanager</span><span class="w"> </span><span class="kn">import</span> <span class="n">vtkPVGeneralSettings</span>
+    <span class="n">vtkPVGeneralSettings</span><span class="o">.</span><span class="n">GetInstance</span><span class="p">()</span><span class="o">.</span><span class="n">SetUseOffscreenRenderingForScreenshots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">processing.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_post_processing_settings</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_post_processing_settings</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">processing.geometry_params</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeometryParams</span><span class="p">,</span> <span class="n">ModelConfig</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">geometry_params</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeometryParams</span><span class="p">,</span> <span class="n">ModelConfig</span>
+
+
+<div class="viewcode-block" id="BasePostProcessor">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BasePostProcessor</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Shared ParaView pipeline helpers for TherMag FEM result visualization.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        working_dir: Optional FEM run directory; defaults to ``os.getcwd()``.</span>
+<span class="sd">        verbose: When ``True``, print setup and export progress.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        BasePostProcessor: Abstract base; subclasses implement ``run()``.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="BasePostProcessor.truncate_scientific">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.truncate_scientific">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_scientific</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Format a float in truncated scientific notation for labels/CSV.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            value: Numeric value [any].</span>
+<span class="sd">            decimals: Mantissa digits kept after truncation.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Truncated scientific string from defaults helper.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">processing.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">truncate_scientific</span> <span class="k">as</span> <span class="n">_truncate_scientific</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">truncate_scientific</span> <span class="k">as</span> <span class="n">_truncate_scientific</span>
+        <span class="k">return</span> <span class="n">_truncate_scientific</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">decimals</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.format_csv_float">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.format_csv_float">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_csv_float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Format a CSV numeric cell using truncated scientific notation.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            value: Coercible numeric value [any].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Truncated scientific string suitable for probe CSV columns.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">processing.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_csv_float</span> <span class="k">as</span> <span class="n">_format_csv_float</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_csv_float</span> <span class="k">as</span> <span class="n">_format_csv_float</span>
+        <span class="k">return</span> <span class="n">_format_csv_float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.scientific_tick_values">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.scientific_tick_values">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scientific_tick_values</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Build evenly spaced truncated tick values for scientific color bars.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            lower: Axis/color-bar lower bound [field units].</span>
+<span class="sd">            upper: Axis/color-bar upper bound [field units].</span>
+<span class="sd">            count: Desired tick count.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[float]: Deduplicated truncated tick positions.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">processing.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">scientific_tick_values</span> <span class="k">as</span> <span class="n">_scientific_tick_values</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">scientific_tick_values</span> <span class="k">as</span> <span class="n">_scientific_tick_values</span>
+        <span class="k">return</span> <span class="n">_scientific_tick_values</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor._describe_output">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor._describe_output">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_describe_output</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Human-readable label for a screenshot/animation output stem.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            filename: Output file name (e.g. ``temperature_map.png``).</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Display label such as ``temperature map``.</span>
+<span class="sd">        """</span>
+        <span class="n">stem</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">known</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"temperature_map"</span><span class="p">:</span> <span class="s2">"temperature map"</span><span class="p">,</span>
+            <span class="s2">"current_density_vector_map"</span><span class="p">:</span> <span class="s2">"current density vector map"</span><span class="p">,</span>
+            <span class="s2">"magnetic_flux_density_vector_map"</span><span class="p">:</span> <span class="s2">"magnetic flux density vector map"</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">stem</span> <span class="ow">in</span> <span class="n">known</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">known</span><span class="p">[</span><span class="n">stem</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">stem</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Discover VTU/PVTU results, geometry, and model layout for a FEM run.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            working_dir: FEM run directory with ``geometry/`` and ``geometry.geo``.</span>
+<span class="sd">            verbose: When ``True``, log discovered file type and model.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Sets ``self.geometry``, ``self.config``, ``self.vtu_files``, and I/O dirs.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cwd</span> <span class="o">=</span> <span class="n">working_dir</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span> <span class="s2">"geometry"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span> <span class="s2">"results"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span> <span class="o">=</span> <span class="n">load_post_processing_settings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">geo_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span> <span class="s2">"geometry.geo"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">GeometryParams</span><span class="o">.</span><span class="n">from_geo_file</span><span class="p">(</span><span class="n">geo_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">run_integrity</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_geometry_interpretation</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">log_geometry_interpretation</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">log_geometry_interpretation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log_geometry_interpretation</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geometry_type</span><span class="p">,</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">"variant"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_discover_files</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_steady_state</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_time_dependent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ModelConfig</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timestep_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_intervals</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_setup</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BasePostProcessor.physical_time_for_vtu_index">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.physical_time_for_vtu_index">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">physical_time_for_vtu_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtu_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Map a VTU file index to physical simulation time from ``case.sif``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            vtu_index: Zero-based index among discovered VTU/PVTU files.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float: Physical time ``(index + 1) * output_intervals * timestep_size`` [s].</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_steady_state</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timestep_size</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_intervals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">timestep_size</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">output_intervals</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">case_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"case.sif"</span>
+            <span class="k">if</span> <span class="n">case_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">sif_text</span> <span class="o">=</span> <span class="n">case_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+                    <span class="n">size_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                        <span class="sa">r</span><span class="s2">"(?mi)^\s*Timestep Sizes\s*=\s*([^\s!]+)"</span><span class="p">,</span>
+                        <span class="n">sif_text</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">size_match</span><span class="p">:</span>
+                        <span class="n">timestep_size</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">size_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+                    <span class="n">exec_intervals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_result_output_exec_interval</span><span class="p">(</span><span class="n">sif_text</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">exec_intervals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">output_intervals</span> <span class="o">=</span> <span class="n">exec_intervals</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">output_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                            <span class="sa">r</span><span class="s2">"(?mi)^\s*Output Intervals\s*=\s*([^\s!]+)"</span><span class="p">,</span>
+                            <span class="n">sif_text</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">output_match</span><span class="p">:</span>
+                            <span class="n">output_intervals</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">output_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                    <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_timestep_size</span> <span class="o">=</span> <span class="n">timestep_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_intervals</span> <span class="o">=</span> <span class="n">output_intervals</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">vtu_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_intervals</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timestep_size</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor._parse_result_output_exec_interval">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor._parse_result_output_exec_interval">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_result_output_exec_interval</span><span class="p">(</span><span class="n">sif_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Read ``Exec Intervals`` from the ResultOutput / VTU solver block in a SIF.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            sif_text: Full Elmer ``case.sif`` text.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            int | None: Exec interval for VTU writes, or ``None`` if not found.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">block_match</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"(?mis)^\s*Solver\s+\d+\s*$(.*?)^\s*End\s*$"</span><span class="p">,</span>
+            <span class="n">sif_text</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="n">block_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">is_result_output</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"resultoutput"</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">"(?mi)^\s*Output\s+Format\s*=\s*[</span><span class="se">\"</span><span class="s2">']?vtu"</span><span class="p">,</span>
+                    <span class="n">block</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_result_output</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">exec_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">"(?mi)^\s*Exec\s+Intervals\s*=\s*([0-9]+)"</span><span class="p">,</span>
+                <span class="n">block</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">exec_match</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">exec_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor._discover_files">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor._discover_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_discover_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Discover sorted VTU or PVTU result files under ``geometry/``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Scans ``self.in_dir``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[str]: Sorted ``.pvtu`` paths if present, else ``.vtu`` paths.</span>
+<span class="sd">        """</span>
+        <span class="n">pvtu_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_dir</span><span class="p">,</span> <span class="s2">"*.pvtu"</span><span class="p">)))</span>
+        <span class="n">vtu_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_dir</span><span class="p">,</span> <span class="s2">"*.vtu"</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">pvtu_files</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pvtu_files</span>
+        <span class="k">elif</span> <span class="n">vtu_files</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">vtu_files</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No .vtu or .pvtu files found in: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">in_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor._log_setup">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor._log_setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Optionally print discovered file type, steady/transient mode, and model.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.verbose``, ``self.vtu_files``, ``self.config``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Prints a one-line setup summary when verbose.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">file_type</span> <span class="o">=</span> <span class="s2">"PVTU"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'.pvtu'</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"VTU"</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">file_type</span><span class="si">}</span><span class="s2"> files | "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="p">(</span><span class="s1">'Steady'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">is_steady_state</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'Time Dependent'</span><span class="p">)</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_type</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.make_reader">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.make_reader">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Open VTU/PVTU data with configured point/cell arrays for FEM fields.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: ParaView source display name.</span>
+<span class="sd">            files: Single path or list of VTU/PVTU paths.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Any: ParaView reader proxy with pipeline updated.</span>
+<span class="sd">        """</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">OpenDataFile</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">RenameSource</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s1">'TimeArray'</span><span class="p">):</span>
+            <span class="n">src</span><span class="o">.</span><span class="n">TimeArray</span> <span class="o">=</span> <span class="s1">'None'</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s1">'PointArrayStatus'</span><span class="p">):</span>
+            <span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span><span class="p">[</span><span class="s2">"reader"</span><span class="p">]</span>
+            <span class="n">wanted</span> <span class="o">=</span> <span class="n">rd</span><span class="p">[</span><span class="s2">"wanted_point_arrays"</span><span class="p">]</span>
+            <span class="n">src</span><span class="o">.</span><span class="n">PointArrayStatus</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">wanted</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s2">"PointArrayInfo"</span><span class="p">,</span> <span class="n">wanted</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s2">"CellArrayStatus"</span><span class="p">):</span>
+            <span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span><span class="p">[</span><span class="s2">"reader"</span><span class="p">]</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="n">rd</span><span class="p">[</span><span class="s2">"cell_arrays"</span><span class="p">]</span>
+            <span class="n">cell_info</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s2">"CellArrayInfo"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cell_info</span><span class="p">:</span>
+                <span class="n">src</span><span class="o">.</span><span class="n">CellArrayStatus</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">cell_info</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">src</span><span class="o">.</span><span class="n">CellArrayStatus</span> <span class="o">=</span> <span class="n">cells</span>
+
+        <span class="n">src</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">src</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.setup_layout">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.setup_layout">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render_view</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Assign the render view to a fixed-size ParaView layout for screenshots.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            render_view: Active ParaView render view.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Any: Layout proxy sized 1560 x 788.</span>
+<span class="sd">        """</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">GetLayout</span><span class="p">()</span> <span class="ow">or</span> <span class="n">CreateLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">AssignView</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">SetSize</span><span class="p">(</span><span class="mi">1560</span><span class="p">,</span> <span class="mi">788</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">layout</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.set_threshold_between">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.set_threshold_between">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_threshold_between</span><span class="p">(</span><span class="n">threshold</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Configure a ParaView Threshold filter to keep GeometryIds in [lower, upper].</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            threshold: ParaView Threshold filter proxy.</span>
+<span class="sd">            lower: Inclusive lower GeometryIds bound.</span>
+<span class="sd">            upper: Inclusive upper GeometryIds bound.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Sets Between-mode thresholds on ``threshold``.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">threshold</span><span class="o">.</span><span class="n">ThresholdRange</span> <span class="o">=</span> <span class="p">[</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">threshold</span><span class="o">.</span><span class="n">LowerThreshold</span> <span class="o">=</span> <span class="n">lower</span>
+            <span class="n">threshold</span><span class="o">.</span><span class="n">UpperThreshold</span> <span class="o">=</span> <span class="n">upper</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">threshold</span><span class="o">.</span><span class="n">ThresholdMethod</span> <span class="o">=</span> <span class="s1">'Between'</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.get_geometry_glyph_fraction">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.get_geometry_glyph_fraction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_geometry_glyph_fraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">override</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Resolve glyph arrow length as a fraction of conductor extent for a field.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            field: Field key (``current_density`` or ``magnetic``).</span>
+<span class="sd">            override: Optional explicit fraction replacing the geometry default.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float: Arrow length fraction of characteristic extent.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">override</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">override</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span><span class="p">[</span><span class="s2">"glyph"</span><span class="p">]</span>
+        <span class="n">geom</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geometry_type</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">_arrow_fraction_of_extent_</span><span class="si">{</span><span class="n">geom</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing glyph setting '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' in post_processing_defaults.json"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.glyph_extent_span">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.glyph_extent_span">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">glyph_extent_span</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extent_source</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Characteristic spatial span for glyph scaling from data bounds or geometry.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            extent_source: Optional ParaView source whose bounds define the span [m].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float: Max axis span of bounds, else ``geometry.characteristic_extent()`` [m].</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">extent_source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">extent_source</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+                <span class="n">bounds</span> <span class="o">=</span> <span class="n">extent_source</span><span class="o">.</span><span class="n">GetDataInformation</span><span class="p">()</span><span class="o">.</span><span class="n">GetBounds</span><span class="p">()</span>
+                <span class="n">span</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                    <span class="n">bounds</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">span</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">span</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">characteristic_extent</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.glyph_max_sample_points">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.glyph_max_sample_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">glyph_max_sample_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Maximum glyph sample points from ``post_processing_defaults.json``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            field: Field key used to look up ``glyph.{field}_max_sample_points``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            int: Non-negative max sample points (``0`` means all points).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the glyph sample-points key is missing from defaults JSON.</span>
+<span class="sd">            ValueError: If the configured value is not a valid integer.</span>
+<span class="sd">        """</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">_max_sample_points"</span>
+        <span class="n">glyph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"glyph"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">glyph</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">glyph</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing glyph setting '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' in post_processing_defaults.json"</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">glyph</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Invalid glyph setting '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' in post_processing_defaults.json: </span><span class="si">{</span><span class="n">glyph</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">!r}</span><span class="s2">"</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.vector_glyph_scale_factor">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.vector_glyph_scale_factor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vector_glyph_scale_factor</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">extent_source</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">magnitude_source</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">array_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">magnitude_ref</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">scale_by_magnitude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">arrow_fraction</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Compute ParaView glyph ScaleFactor from extent fraction and optional |V| ref.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            field: Field key for glyph fraction lookup (``current_density`` / ``magnetic``).</span>
+<span class="sd">            extent_source: Optional source for spatial span [m].</span>
+<span class="sd">            magnitude_source: Optional source for 99th-percentile magnitude when scaling by |V|.</span>
+<span class="sd">            array_name: Point-data vector array name when deriving magnitude ref.</span>
+<span class="sd">            magnitude_ref: Optional explicit magnitude reference [field units].</span>
+<span class="sd">            scale_by_magnitude: When ``True``, divide span x fraction by magnitude ref.</span>
+<span class="sd">            arrow_fraction: Optional override of geometry glyph fraction.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float: Glyph ``ScaleFactor`` so peak arrows match fraction of extent [m / field].</span>
+<span class="sd">        """</span>
+        <span class="n">frac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_geometry_glyph_fraction</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">arrow_fraction</span><span class="p">)</span>
+        <span class="n">span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_extent_span</span><span class="p">(</span><span class="n">extent_source</span> <span class="k">if</span> <span class="n">extent_source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">magnitude_source</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">span</span> <span class="o">&lt;=</span> <span class="mf">1.0e-30</span><span class="p">:</span>
+            <span class="n">span</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">characteristic_extent</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">scale_by_magnitude</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">frac</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
+
+        <span class="n">ref</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">magnitude_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">magnitude_ref</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">magnitude_ref</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">magnitude_ref</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">magnitude_source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">array_name</span> <span class="ow">and</span> <span class="n">servermanager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">magnitude_source</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">servermanager</span><span class="o">.</span><span class="n">Fetch</span><span class="p">(</span><span class="n">magnitude_source</span><span class="p">)</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="n">array_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Point array '</span><span class="si">{</span><span class="n">array_name</span><span class="si">}</span><span class="s2">' not found for glyph scaling"</span><span class="p">)</span>
+            <span class="n">vec</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">vec</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Point array '</span><span class="si">{</span><span class="n">array_name</span><span class="si">}</span><span class="s2">' is empty for glyph scaling"</span><span class="p">)</span>
+            <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">vec</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">mags</span><span class="p">,</span> <span class="mi">99</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ref</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">mags</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ref</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ref</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">frac</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">span</span><span class="p">)</span> <span class="o">/</span> <span class="n">ref</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.configure_vector_glyph">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.configure_vector_glyph">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure_vector_glyph</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">glyph</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">array_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">scale_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">scale_by_magnitude</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">max_sample_points</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Configure orientation, scale mode, and spatial sampling on a Glyph filter.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            glyph: ParaView Glyph filter proxy.</span>
+<span class="sd">            array_name: Point-data vector array for orientation (and optional magnitude).</span>
+<span class="sd">            scale_factor: Glyph ``ScaleFactor`` from ``vector_glyph_scale_factor`` [m / field].</span>
+<span class="sd">            scale_by_magnitude: When ``True``, scale arrows by vector magnitude.</span>
+<span class="sd">            max_sample_points: Cap for uniform sampling; ``&lt;=0`` uses all points.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Updates ``glyph`` pipeline settings.</span>
+<span class="sd">        """</span>
+        <span class="n">glyph</span><span class="o">.</span><span class="n">OrientationArray</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"POINTS"</span><span class="p">,</span> <span class="n">array_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">scale_by_magnitude</span><span class="p">:</span>
+            <span class="n">glyph</span><span class="o">.</span><span class="n">ScaleArray</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"POINTS"</span><span class="p">,</span> <span class="n">array_name</span><span class="p">]</span>
+            <span class="n">glyph</span><span class="o">.</span><span class="n">VectorScaleMode</span> <span class="o">=</span> <span class="s2">"Scale by Magnitude"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">glyph</span><span class="o">.</span><span class="n">ScaleArray</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"POINTS"</span><span class="p">,</span> <span class="s2">""</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">glyph</span><span class="o">.</span><span class="n">ScaleArray</span> <span class="o">=</span> <span class="s2">"No scale array"</span>
+        <span class="n">glyph</span><span class="o">.</span><span class="n">ScaleFactor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">scale_factor</span><span class="p">)</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_sample_points</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">glyph</span><span class="o">.</span><span class="n">GlyphMode</span> <span class="o">=</span> <span class="s2">"All Points"</span>
+            <span class="n">glyph</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="s2">"Uniform Spatial Distribution (Volume Sampling)"</span><span class="p">,</span>
+            <span class="s2">"Uniform Spatial Distribution (Bounds Based)"</span><span class="p">,</span>
+            <span class="s2">"Every Nth Point"</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">glyph</span><span class="o">.</span><span class="n">GlyphMode</span> <span class="o">=</span> <span class="n">mode</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">glyph</span><span class="o">.</span><span class="n">GlyphMode</span> <span class="o">=</span> <span class="s2">"All Points"</span>
+            <span class="n">glyph</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">glyph</span><span class="o">.</span><span class="n">MaximumNumberOfSamplePoints</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">glyph</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.animation_frame_last">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.animation_frame_last">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">animation_frame_last</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reader</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Configure animation for multi-step VTU series and return the last frame index.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            reader: ParaView reader proxy for the time series.</span>
+<span class="sd">            files: Ordered VTU/PVTU paths constituting the series.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple[bool, int]: ``(is_animated, last_frame_index)``; steady runs return ``(False, 0)``.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">reader</span><span class="o">.</span><span class="n">TimeArray</span> <span class="o">=</span> <span class="s2">"None"</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">anim</span> <span class="o">=</span> <span class="n">GetAnimationScene</span><span class="p">()</span>
+        <span class="n">anim</span><span class="o">.</span><span class="n">UpdateAnimationUsingDataTimeSteps</span><span class="p">()</span>
+        <span class="n">reader</span><span class="o">.</span><span class="n">TimeArray</span> <span class="o">=</span> <span class="s2">"None"</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">GetTimeKeeper</span><span class="p">(),</span> <span class="s2">"TimestepValues"</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">ts</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">anim</span><span class="o">.</span><span class="n">PlayMode</span> <span class="o">=</span> <span class="s2">"Sequence"</span>
+        <span class="n">anim</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">anim</span><span class="o">.</span><span class="n">NumberOfFrames</span> <span class="o">-</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.global_vector_magnitude_hi">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.global_vector_magnitude_hi">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">global_vector_magnitude_hi</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">array_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">frame_last</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Scan all animation frames for the global peak vector magnitude.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            source: ParaView source exposing the vector point array.</span>
+<span class="sd">            array_name: Point-data vector array name (e.g. current density or B).</span>
+<span class="sd">            frame_last: Inclusive last animation frame index.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float | None: Global max magnitude [field units], or ``None`` if unavailable.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">servermanager</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">anim</span> <span class="o">=</span> <span class="n">GetAnimationScene</span><span class="p">()</span>
+        <span class="n">global_hi</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">GetTimeKeeper</span><span class="p">(),</span> <span class="s2">"TimestepValues"</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[])]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">anim</span><span class="o">.</span><span class="n">GoToFirst</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">frame_last</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">times</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+                        <span class="n">source</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">source</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+                    <span class="n">arr</span> <span class="o">=</span> <span class="n">servermanager</span><span class="o">.</span><span class="n">Fetch</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="n">array_name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">vec</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">vec</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+                            <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">vec</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+                            <span class="n">peak</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">mags</span><span class="p">))</span>
+                            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">peak</span><span class="p">):</span>
+                                <span class="n">global_hi</span> <span class="o">=</span> <span class="n">peak</span> <span class="k">if</span> <span class="n">global_hi</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">global_hi</span><span class="p">,</span> <span class="n">peak</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">anim</span><span class="o">.</span><span class="n">GoToNext</span><span class="p">()</span>
+            <span class="n">anim</span><span class="o">.</span><span class="n">GoToFirst</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">anim</span><span class="o">.</span><span class="n">GoToFirst</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">global_hi</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.lock_lut_to_range">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.lock_lut_to_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lock_lut_to_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lut</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Lock a color transfer function to a fixed [0, hi] magnitude range.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            lut: ParaView lookup table / color transfer function.</span>
+<span class="sd">            hi: Upper magnitude bound for the LUT [field units].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Disables automatic rescale on ``lut``.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span> <span class="ow">or</span> <span class="n">hi</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">lut</span><span class="o">.</span><span class="n">RescaleTransferFunction</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">hi</span><span class="p">))</span>
+            <span class="n">lut</span><span class="o">.</span><span class="n">AutomaticRescaleRangeMode</span> <span class="o">=</span> <span class="s2">"Never"</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.style_conductive_surface">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.style_conductive_surface">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">style_conductive_surface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">render_view</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Color conductive bodies by GeometryIds categories (outer/inner material).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            display: ParaView display representation for the conductive surface.</span>
+<span class="sd">            render_view: Active render view (scalar bar hidden).</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Applies categorical GeometryIds coloring for materials.</span>
+<span class="sd">        """</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">Representation</span> <span class="o">=</span> <span class="s2">"Surface"</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">Opacity</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">DataAxesGrid</span><span class="o">.</span><span class="n">GridAxesVisibility</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">ColorBy</span><span class="p">(</span><span class="n">display</span><span class="p">,</span> <span class="p">(</span><span class="s2">"CELLS"</span><span class="p">,</span> <span class="s2">"GeometryIds"</span><span class="p">))</span>
+        <span class="n">geometry_lut</span> <span class="o">=</span> <span class="n">GetColorTransferFunction</span><span class="p">(</span><span class="s2">"GeometryIds"</span><span class="p">)</span>
+        <span class="n">geometry_lut</span><span class="o">.</span><span class="n">InterpretValuesAsCategories</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">annotations</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">outer_material_id</span><span class="p">)),</span>
+            <span class="s2">"Outer material"</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">indexed_colors</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.18</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">]</span>
+        <span class="n">inner_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">inner_material_id</span>
+        <span class="k">if</span> <span class="n">inner_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_type</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"layer_over_"</span><span class="p">):</span>
+            <span class="n">annotations</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">inner_id</span><span class="p">)),</span> <span class="s2">"Inner material"</span><span class="p">])</span>
+            <span class="n">indexed_colors</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mf">0.93</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">])</span>
+
+        <span class="n">geometry_lut</span><span class="o">.</span><span class="n">Annotations</span> <span class="o">=</span> <span class="n">annotations</span>
+        <span class="n">geometry_lut</span><span class="o">.</span><span class="n">IndexedColors</span> <span class="o">=</span> <span class="n">indexed_colors</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">LookupTable</span> <span class="o">=</span> <span class="n">geometry_lut</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">SetScalarBarVisibility</span><span class="p">(</span><span class="n">render_view</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">HideScalarBarIfNotNeeded</span><span class="p">(</span><span class="n">geometry_lut</span><span class="p">,</span> <span class="n">render_view</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.setup_camera">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.setup_camera">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render_view</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Place an isometric parallel camera scaled to the conductor extent.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            render_view: Active ParaView render view.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Sets camera position, focal point, view-up, and parallel scale.</span>
+<span class="sd">        """</span>
+        <span class="n">geom_scale</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">characteristic_extent</span><span class="p">(),</span> <span class="mf">1.0e-9</span><span class="p">)</span>
+        <span class="n">isometric</span> <span class="o">=</span> <span class="mf">0.57735026919</span>
+        <span class="n">cam_distance</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">geom_scale</span>
+        <span class="n">render_view</span><span class="o">.</span><span class="n">CameraPosition</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">cam_distance</span> <span class="o">*</span> <span class="n">isometric</span><span class="p">,</span>
+            <span class="n">cam_distance</span> <span class="o">*</span> <span class="n">isometric</span><span class="p">,</span>
+            <span class="n">cam_distance</span> <span class="o">*</span> <span class="n">isometric</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">render_view</span><span class="o">.</span><span class="n">CameraFocalPoint</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+        <span class="n">render_view</span><span class="o">.</span><span class="n">CameraViewUp</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">render_view</span><span class="o">.</span><span class="n">CameraParallelProjection</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">render_view</span><span class="o">.</span><span class="n">CameraParallelScale</span> <span class="o">=</span> <span class="mf">1.15</span> <span class="o">*</span> <span class="n">geom_scale</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.cleanup">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.cleanup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">objects</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Hide and delete temporary ParaView pipeline objects after export.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            objects: ParaView proxies to hide and delete.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Best-effort cleanup; errors are ignored.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Hide</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Delete</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.save_image">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.save_image">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">view_or_layout</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Save a still screenshot of the current view into ``results/``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            filename: Output image name under ``self.out_dir`` (e.g. ``temperature_map.png``).</span>
+<span class="sd">            view_or_layout: ParaView view or layout to capture.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes the screenshot file; prints OK/error status.</span>
+<span class="sd">        """</span>
+        <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_describe_output</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Saving </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> screenshot"</span><span class="p">)</span>
+        <span class="n">vr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1560</span><span class="p">,</span> <span class="mi">788</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">SaveScreenshot</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">out_path</span><span class="p">,</span> <span class="n">viewOrLayout</span><span class="o">=</span><span class="n">view_or_layout</span><span class="p">,</span> <span class="n">ImageResolution</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">vr</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] Wrote </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> screenshot"</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error saving screenshot </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">SaveScreenshot</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">out_path</span><span class="p">,</span> <span class="n">viewOrLayout</span><span class="o">=</span><span class="n">view_or_layout</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] Wrote </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> screenshot (fallback)"</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fallback failed: </span><span class="si">{</span><span class="n">e2</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.save_animation">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.save_animation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">view_or_layout</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">frame_window</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">fps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Export a time-series animation (AVI/MP4) of the FEM field visualization.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            filename: Desired animation name under ``self.out_dir`` (``.mp4`` or ``.avi``).</span>
+<span class="sd">            view_or_layout: ParaView view or layout to capture.</span>
+<span class="sd">            frame_window: Inclusive ``[first, last]`` animation frame indices.</span>
+<span class="sd">            fps: Optional frames per second; defaults to 1.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes a valid animation file when possible; warns on failure.</span>
+<span class="sd">        """</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_describe_output</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">actual_fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span><span class="p">)</span> <span class="k">if</span> <span class="n">fps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">min_valid_bytes</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Saving </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> animation at </span><span class="si">{</span><span class="n">actual_fps</span><span class="si">}</span><span class="s2"> FPS"</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">check_success</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">"""Brief: Verify an animation file exists and exceeds a minimum byte size.</span>
+
+<span class="sd">            Inputs:</span>
+<span class="sd">                path: Candidate animation file path.</span>
+
+<span class="sd">            Outputs:</span>
+<span class="sd">                bool: ``True`` when the file looks successfully written.</span>
+<span class="sd">            """</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">min_valid_bytes</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  File not found or too small: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".mp4"</span><span class="p">):</span>
+            <span class="n">avi_name</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s2">".avi"</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">"win32"</span><span class="p">:</span>
+                <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">filename</span><span class="p">,</span> <span class="n">avi_name</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">avi_name</span><span class="p">,</span> <span class="n">filename</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">"[INFO] Writing animation as AVI "</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">filename</span><span class="p">]</span>
+
+        <span class="n">vr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1560</span><span class="p">,</span> <span class="mi">788</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+            <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">candidate</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">SaveAnimation</span><span class="p">(</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="n">out_path</span><span class="p">,</span>
+                    <span class="n">viewOrLayout</span><span class="o">=</span><span class="n">view_or_layout</span><span class="p">,</span>
+                    <span class="n">ImageResolution</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">vr</span><span class="p">),</span>
+                    <span class="n">FrameWindow</span><span class="o">=</span><span class="n">frame_window</span><span class="p">,</span>
+                    <span class="n">FrameRate</span><span class="o">=</span><span class="n">actual_fps</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">check_success</span><span class="p">(</span><span class="n">out_path</span><span class="p">):</span>
+                    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">" (AVI)"</span> <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".avi"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".mp4"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] Wrote </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> animation</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error saving </span><span class="si">{</span><span class="n">candidate</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: Failed to create animation for </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BasePostProcessor.run">
+<a class="viewcode-back" href="../../api/processing.base.html#processing.base.BasePostProcessor.run">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Execute the concrete post-processing pipeline (maps, glyphs, or probes).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses run state initialized in ``__init__``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Subclass writes results under ``self.out_dir``.</span>
+<span class="sd">        """</span>
+        <span class="k">pass</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.base</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

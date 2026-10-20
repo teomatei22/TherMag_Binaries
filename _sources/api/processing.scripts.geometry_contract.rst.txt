@@ -1,0 +1,7 @@
+processing.scripts.geometry\_contract module
+============================================
+
+.. automodule:: processing.scripts.geometry_contract
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>domain.sweep_manifest &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.sweep_manifest</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for domain.sweep_manifest</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Sweep project manifest entries linking scaled geometry runs to observables."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+
+<div class="viewcode-block" id="SweepRunEntry">
+<a class="viewcode-back" href="../../api/domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SweepRunEntry</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: One scaled FEM run in a parameter sweep (coefficient, value, and run directory).</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        coeff: Multiplicative sweep coefficient applied to the base parameter.</span>
+<span class="sd">        param_val: Absolute geometric parameter value after scaling [m].</span>
+<span class="sd">        swept_param: Name of the swept geometry parameter (e.g. ``L``).</span>
+<span class="sd">        run_dir: Path string to this coefficient's run directory.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SweepRunEntry: Immutable per-coefficient sweep run locator.</span>
+<span class="sd">    """</span>
+    <span class="n">coeff</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">param_val</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">swept_param</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">run_dir</span><span class="p">:</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="SweepRunEntry.from_dict">
+<a class="viewcode-back" href="../../api/domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SweepRunEntry</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize a sweep run entry from a mapping.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with ``coeff``, ``param_val``, ``run_dir``, optional ``swept_param``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            SweepRunEntry: Immutable sweep run entry.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">coeff</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"coeff"</span><span class="p">]),</span>
+            <span class="n">param_val</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"param_val"</span><span class="p">]),</span>
+            <span class="n">swept_param</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"swept_param"</span><span class="p">,</span> <span class="s2">"L"</span><span class="p">)),</span>
+            <span class="n">run_dir</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"run_dir"</span><span class="p">]),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SweepRunEntry.to_dict">
+<a class="viewcode-back" href="../../api/domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize this sweep run entry for manifest persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: JSON-serializable run-entry mapping.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"coeff"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="p">,</span>
+            <span class="s2">"param_val"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_val</span><span class="p">,</span>
+            <span class="s2">"swept_param"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">swept_param</span><span class="p">,</span>
+            <span class="s2">"run_dir"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="SweepRunEntry.resolve_run_dir">
+<a class="viewcode-back" href="../../api/domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.resolve_run_dir">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Resolve the on-disk run directory relative to the sweep manifest.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            manifest_dir: Directory containing the sweep manifest file.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: Existing run directory when found; otherwise the stored ``run_dir`` path.</span>
+<span class="sd">        """</span>
+        <span class="n">run_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">run_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">run_dir</span>
+
+        <span class="n">candidates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">run_dir</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">manifest_dir</span> <span class="o">/</span> <span class="n">run_dir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">manifest_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">swept_param</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">candidate</span>
+
+        <span class="k">return</span> <span class="n">run_dir</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SweepManifest">
+<a class="viewcode-back" href="../../api/domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SweepManifest</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Sweep metadata (parameter, base geometry, observables) and per-run entries.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        swept_param: Name of the swept geometry parameter (e.g. ``L``).</span>
+<span class="sd">        observables: Observable names collected across sweep runs.</span>
+<span class="sd">        base_val: Base absolute value of the swept parameter before scaling [m].</span>
+<span class="sd">        L0: Reference cylinder/sphere length used for scaling [m].</span>
+<span class="sd">        R0: Reference radius used for scaling [m].</span>
+<span class="sd">        runs: Ordered list of per-coefficient ``SweepRunEntry`` records.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SweepManifest: Immutable sweep project metadata and run index.</span>
+<span class="sd">    """</span>
+
+    <span class="n">swept_param</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">observables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">base_val</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">L0</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">R0</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">runs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SweepRunEntry</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SweepManifest.from_dict">
+<a class="viewcode-back" href="../../api/domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SweepManifest</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize a sweep manifest from a mapping.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with ``swept_param``, ``base_val``, ``L0``, ``R0``, and ``runs``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            SweepManifest: Immutable sweep manifest.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">swept_param</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"swept_param"</span><span class="p">]),</span>
+            <span class="n">observables</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"observables"</span><span class="p">,</span> <span class="p">[])],</span>
+            <span class="n">base_val</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"base_val"</span><span class="p">]),</span>
+            <span class="n">L0</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"L0"</span><span class="p">]),</span>
+            <span class="n">R0</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"R0"</span><span class="p">]),</span>
+            <span class="n">runs</span><span class="o">=</span><span class="p">[</span><span class="n">SweepRunEntry</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"runs"</span><span class="p">,</span> <span class="p">[])],</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SweepManifest.to_dict">
+<a class="viewcode-back" href="../../api/domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize the sweep manifest for JSON persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: JSON-serializable sweep manifest mapping.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"swept_param"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">swept_param</span><span class="p">,</span>
+            <span class="s2">"observables"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observables</span><span class="p">),</span>
+            <span class="s2">"base_val"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_val</span><span class="p">,</span>
+            <span class="s2">"L0"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">L0</span><span class="p">,</span>
+            <span class="s2">"R0"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">R0</span><span class="p">,</span>
+            <span class="s2">"runs"</span><span class="p">:</span> <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">],</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.sweep_manifest</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

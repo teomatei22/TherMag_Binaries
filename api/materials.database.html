@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>materials.database module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="materials.repository module" href="materials.repository.html" />
+    <link rel="prev" title="materials package" href="materials.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="materials.repository.html" title="materials.repository module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="materials.html" title="materials package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="materials.html" accesskey="U">materials package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">materials.database module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-materials.database">
+<span id="materials-database-module"></span><h1>materials.database module<a class="headerlink" href="#module-materials.database" title="Link to this heading">¶</a></h1>
+<p>Material models, property tables, and in-memory FEM material database.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="materials.database.Material">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">materials.database.</span></span><span class="sig-name descname"><span class="pre">Material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#Material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.Material" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Named FEM material with classification flags and constitutive properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Material display name used as the registry key.</p></li>
+<li><p><strong>classification</strong> – Model classification flags (anisotropy, T-dependence, etc.).</p></li>
+<li><p><strong>properties</strong> – Scalar, tensor, and tabulated constitutive properties.</p></li>
+<li><p><strong>description</strong> – Optional human-readable material description.</p></li>
+<li><p><strong>source_file</strong> – Optional path to the JSON file this material was loaded from.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Material</strong> – Named FEM material definition with classification and properties.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>classification</strong> (<a class="reference internal" href="#materials.database.MaterialClassification" title="materials.database.MaterialClassification"><em>MaterialClassification</em></a>)</p></li>
+<li><p><strong>properties</strong> (<a class="reference internal" href="#materials.database.MaterialProperties" title="materials.database.MaterialProperties"><em>MaterialProperties</em></a>)</p></li>
+<li><p><strong>description</strong> (<em>str</em>)</p></li>
+<li><p><strong>source_file</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.Material.classification">
+<span class="sig-name descname"><span class="pre">classification</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#materials.database.MaterialClassification" title="materials.database.MaterialClassification"><span class="pre">MaterialClassification</span></a></span><a class="headerlink" href="#materials.database.Material.classification" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.Material.description">
+<span class="sig-name descname"><span class="pre">description</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#materials.database.Material.description" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.Material.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#Material.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.Material.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize a material from a mapping and optional source path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Mapping with <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>, <code class="docutils literal notranslate"><span class="pre">classification</span></code>, <code class="docutils literal notranslate"><span class="pre">properties</span></code>.</p></li>
+<li><p><strong>source_file</strong> – Optional path of the JSON file that provided <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Material</strong> – Material instance linked to <code class="docutils literal notranslate"><span class="pre">source_file</span></code> when given.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>source_file</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#materials.database.Material" title="materials.database.Material"><em>Material</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.Material.is_anisotropic">
+<span class="sig-name descname"><span class="pre">is_anisotropic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#Material.is_anisotropic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.Material.is_anisotropic" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the material uses anisotropic constitutive tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.classification.anisotropic</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> when anisotropic.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.Material.is_hysteresis">
+<span class="sig-name descname"><span class="pre">is_hysteresis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#Material.is_hysteresis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.Material.is_hysteresis" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the material includes magnetic hysteresis (e.g. HB curve).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.classification.hysteresis</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> when hysteresis is enabled.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.Material.is_temperature_dependent">
+<span class="sig-name descname"><span class="pre">is_temperature_dependent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#Material.is_temperature_dependent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.Material.is_temperature_dependent" title="Link to this definition">¶</a></dt>
+<dd><p>Whether material properties vary with temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.classification.temperature_dependent</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> when temperature-dependent.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.Material.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#materials.database.Material.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.Material.properties">
+<span class="sig-name descname"><span class="pre">properties</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#materials.database.MaterialProperties" title="materials.database.MaterialProperties"><span class="pre">MaterialProperties</span></a></span><a class="headerlink" href="#materials.database.Material.properties" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.Material.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#Material.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.Material.save" title="Link to this definition">¶</a></dt>
+<dd><p>Write the material JSON to disk and record <code class="docutils literal notranslate"><span class="pre">source_file</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> – Destination path; falls back to <code class="docutils literal notranslate"><span class="pre">self.source_file</span></code> when omitted.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes JSON and sets <code class="docutils literal notranslate"><span class="pre">self.source_file</span></code> to the written path.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.Material.source_file">
+<span class="sig-name descname"><span class="pre">source_file</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#materials.database.Material.source_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.Material.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#Material.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.Material.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize the material for JSON persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – Mapping of name, description, classification, and properties.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="materials.database.MaterialClassification">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">materials.database.</span></span><span class="sig-name descname"><span class="pre">MaterialClassification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">anisotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_dependent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_permittivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hysteresis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialClassification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialClassification" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Flags describing anisotropic, T-dependent, permittivity, or hysteresis models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>anisotropic</strong> – Whether constitutive tensors are anisotropic.</p></li>
+<li><p><strong>temperature_dependent</strong> – Whether properties vary with temperature.</p></li>
+<li><p><strong>variable_permittivity</strong> – Whether relative permittivity is variable.</p></li>
+<li><p><strong>hysteresis</strong> – Whether magnetic hysteresis (e.g. HB curve) is enabled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MaterialClassification</strong> – Boolean flags classifying a material model.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>anisotropic</strong> (<em>bool</em>)</p></li>
+<li><p><strong>temperature_dependent</strong> (<em>bool</em>)</p></li>
+<li><p><strong>variable_permittivity</strong> (<em>bool</em>)</p></li>
+<li><p><strong>hysteresis</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialClassification.anisotropic">
+<span class="sig-name descname"><span class="pre">anisotropic</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#materials.database.MaterialClassification.anisotropic" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialClassification.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialClassification.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialClassification.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize classification flags from a mapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – Mapping with optional boolean classification keys.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MaterialClassification</strong> – Classification instance with defaults for missing keys.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#materials.database.MaterialClassification" title="materials.database.MaterialClassification"><em>MaterialClassification</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialClassification.hysteresis">
+<span class="sig-name descname"><span class="pre">hysteresis</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#materials.database.MaterialClassification.hysteresis" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialClassification.temperature_dependent">
+<span class="sig-name descname"><span class="pre">temperature_dependent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#materials.database.MaterialClassification.temperature_dependent" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialClassification.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialClassification.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialClassification.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize classification flags for JSON persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, bool]</strong> – Mapping of classification flag names to booleans.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, bool]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialClassification.variable_permittivity">
+<span class="sig-name descname"><span class="pre">variable_permittivity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#materials.database.MaterialClassification.variable_permittivity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">materials.database.</span></span><span class="sig-name descname"><span class="pre">MaterialDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configs_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>In-memory registry of builtin and user-configured FEM materials.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>configs_dir</strong> – Optional extra directory of user JSON materials overlaid on builtins.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MaterialDatabase</strong> – Name-keyed in-memory registry of loaded FEM materials.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>configs_dir</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase._load_builtin_materials">
+<span class="sig-name descname"><span class="pre">_load_builtin_materials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase._load_builtin_materials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase._load_builtin_materials" title="Link to this definition">¶</a></dt>
+<dd><p>Load packaged default materials into the registry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Reads JSON from the materials package directory.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Inserts builtin materials into <code class="docutils literal notranslate"><span class="pre">self._materials</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase._load_config_files">
+<span class="sig-name descname"><span class="pre">_load_config_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase._load_config_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase._load_config_files" title="Link to this definition">¶</a></dt>
+<dd><p>Overlay user material JSON files from <code class="docutils literal notranslate"><span class="pre">configs_dir</span></code> when distinct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.configs_dir</span></code> if set and different from the package dir.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Merges user materials into <code class="docutils literal notranslate"><span class="pre">self._materials</span></code> by name.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase._materials">
+<span class="sig-name descname"><span class="pre">_materials</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#materials.database.Material" title="materials.database.Material"><span class="pre">Material</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#materials.database.MaterialDatabase._materials" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase.add_material">
+<span class="sig-name descname"><span class="pre">add_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase.add_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase.add_material" title="Link to this definition">¶</a></dt>
+<dd><p>Register or replace a material in the in-memory database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>material</strong> – Material instance keyed by <code class="docutils literal notranslate"><span class="pre">material.name</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Updates <code class="docutils literal notranslate"><span class="pre">self._materials</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>material</strong> (<a class="reference internal" href="#materials.database.Material" title="materials.database.Material"><em>Material</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase.get_all_materials">
+<span class="sig-name descname"><span class="pre">get_all_materials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase.get_all_materials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase.get_all_materials" title="Link to this definition">¶</a></dt>
+<dd><p>Return a shallow copy of the full material registry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Reads <code class="docutils literal notranslate"><span class="pre">self._materials</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Material]</strong> – Name-keyed copy of registered materials.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <a class="reference internal" href="#materials.database.Material" title="materials.database.Material"><em>Material</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase.get_anisotropic_materials">
+<span class="sig-name descname"><span class="pre">get_anisotropic_materials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase.get_anisotropic_materials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase.get_anisotropic_materials" title="Link to this definition">¶</a></dt>
+<dd><p>Return materials classified as anisotropic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Filters via <code class="docutils literal notranslate"><span class="pre">get_materials_by_classification</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[Material]</strong> – Anisotropic materials.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#materials.database.Material" title="materials.database.Material"><em>Material</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase.get_isotropic_materials">
+<span class="sig-name descname"><span class="pre">get_isotropic_materials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase.get_isotropic_materials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase.get_isotropic_materials" title="Link to this definition">¶</a></dt>
+<dd><p>Return materials classified as isotropic (not anisotropic).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Filters via <code class="docutils literal notranslate"><span class="pre">get_materials_by_classification</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[Material]</strong> – Isotropic materials.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#materials.database.Material" title="materials.database.Material"><em>Material</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase.get_material">
+<span class="sig-name descname"><span class="pre">get_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase.get_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase.get_material" title="Link to this definition">¶</a></dt>
+<dd><p>Look up a material by exact name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Material display name key.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Material | None</strong> – Matching material, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if absent.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#materials.database.Material" title="materials.database.Material"><em>Material</em></a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase.get_material_names">
+<span class="sig-name descname"><span class="pre">get_material_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase.get_material_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase.get_material_names" title="Link to this definition">¶</a></dt>
+<dd><p>List registered material names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Reads <code class="docutils literal notranslate"><span class="pre">self._materials</span></code> keys.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[str]</strong> – Material names currently in the registry.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase.get_materials_by_classification">
+<span class="sig-name descname"><span class="pre">get_materials_by_classification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">anisotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_dependent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hysteresis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase.get_materials_by_classification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase.get_materials_by_classification" title="Link to this definition">¶</a></dt>
+<dd><p>Filter materials by optional classification flag criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>anisotropic</strong> – Required anisotropic flag, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to ignore.</p></li>
+<li><p><strong>temperature_dependent</strong> – Required T-dependent flag, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to ignore.</p></li>
+<li><p><strong>hysteresis</strong> – Required hysteresis flag, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to ignore.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[Material]</strong> – Materials matching all provided criteria.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>anisotropic</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>temperature_dependent</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>hysteresis</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="#materials.database.Material" title="materials.database.Material"><em>Material</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialDatabase.save_material">
+<span class="sig-name descname"><span class="pre">save_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialDatabase.save_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialDatabase.save_material" title="Link to this definition">¶</a></dt>
+<dd><p>Persist a registered material to a JSON file under the configs directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Registered material name to save.</p></li>
+<li><p><strong>file_path</strong> – Optional destination; defaults to <code class="docutils literal notranslate"><span class="pre">configs_dir/&lt;name&gt;.json</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes the material JSON via <code class="docutils literal notranslate"><span class="pre">MaterialRepository.save</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>file_path</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">materials.database.</span></span><span class="sig-name descname"><span class="pre">MaterialProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_capacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electric_conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_permittivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_permeability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seebeck_coefficient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_conductivity_tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electric_conductivity_tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seebeck_coefficient_tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_conductivity_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electric_conductivity_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hb_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialProperties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialProperties" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Scalar, tensor, and tabulated thermo-electromagnetic material properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>density</strong> – Mass density [kg/m^3].</p></li>
+<li><p><strong>heat_capacity</strong> – Specific heat capacity [J/(kg K)].</p></li>
+<li><p><strong>heat_conductivity</strong> – Isotropic thermal conductivity [W/(m K)].</p></li>
+<li><p><strong>electric_conductivity</strong> – Isotropic electric conductivity [S/m].</p></li>
+<li><p><strong>relative_permittivity</strong> – Relative permittivity (dimensionless).</p></li>
+<li><p><strong>relative_permeability</strong> – Relative permeability (dimensionless).</p></li>
+<li><p><strong>seebeck_coefficient</strong> – Isotropic Seebeck coefficient [V/K].</p></li>
+<li><p><strong>heat_conductivity_tensor</strong> – Optional anisotropic thermal conductivity tensor.</p></li>
+<li><p><strong>electric_conductivity_tensor</strong> – Optional anisotropic electric conductivity tensor.</p></li>
+<li><p><strong>seebeck_coefficient_tensor</strong> – Optional anisotropic Seebeck coefficient tensor.</p></li>
+<li><p><strong>heat_conductivity_table</strong> – Optional T-dependent thermal conductivity table.</p></li>
+<li><p><strong>electric_conductivity_table</strong> – Optional T-dependent electric conductivity table.</p></li>
+<li><p><strong>hb_curve</strong> – Optional magnetic H-B hysteresis curve table.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MaterialProperties</strong> – Scalar, tensor, and tabulated constitutive property values.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>density</strong> (<em>float</em>)</p></li>
+<li><p><strong>heat_capacity</strong> (<em>float</em>)</p></li>
+<li><p><strong>heat_conductivity</strong> (<em>float</em>)</p></li>
+<li><p><strong>electric_conductivity</strong> (<em>float</em>)</p></li>
+<li><p><strong>relative_permittivity</strong> (<em>float</em>)</p></li>
+<li><p><strong>relative_permeability</strong> (<em>float</em>)</p></li>
+<li><p><strong>seebeck_coefficient</strong> (<em>float</em>)</p></li>
+<li><p><strong>heat_conductivity_tensor</strong> (<em>list</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>electric_conductivity_tensor</strong> (<em>list</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>seebeck_coefficient_tensor</strong> (<em>list</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>heat_conductivity_table</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>float</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>electric_conductivity_table</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>float</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>hb_curve</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>float</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.density">
+<span class="sig-name descname"><span class="pre">density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#materials.database.MaterialProperties.density" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.electric_conductivity">
+<span class="sig-name descname"><span class="pre">electric_conductivity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></span><a class="headerlink" href="#materials.database.MaterialProperties.electric_conductivity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.electric_conductivity_table">
+<span class="sig-name descname"><span class="pre">electric_conductivity_table</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#materials.database.MaterialProperties.electric_conductivity_table" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.electric_conductivity_tensor">
+<span class="sig-name descname"><span class="pre">electric_conductivity_tensor</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#materials.database.MaterialProperties.electric_conductivity_tensor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialProperties.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialProperties.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize scalar, tensor, and table material properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – Mapping of property names to scalars, tensors, or tables.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MaterialProperties</strong> – Properties instance with defaults for missing scalars.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#materials.database.MaterialProperties" title="materials.database.MaterialProperties"><em>MaterialProperties</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.hb_curve">
+<span class="sig-name descname"><span class="pre">hb_curve</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#materials.database.MaterialProperties.hb_curve" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.heat_capacity">
+<span class="sig-name descname"><span class="pre">heat_capacity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#materials.database.MaterialProperties.heat_capacity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.heat_conductivity">
+<span class="sig-name descname"><span class="pre">heat_conductivity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#materials.database.MaterialProperties.heat_conductivity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.heat_conductivity_table">
+<span class="sig-name descname"><span class="pre">heat_conductivity_table</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#materials.database.MaterialProperties.heat_conductivity_table" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.heat_conductivity_tensor">
+<span class="sig-name descname"><span class="pre">heat_conductivity_tensor</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#materials.database.MaterialProperties.heat_conductivity_tensor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.relative_permeability">
+<span class="sig-name descname"><span class="pre">relative_permeability</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#materials.database.MaterialProperties.relative_permeability" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.relative_permittivity">
+<span class="sig-name descname"><span class="pre">relative_permittivity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#materials.database.MaterialProperties.relative_permittivity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.seebeck_coefficient">
+<span class="sig-name descname"><span class="pre">seebeck_coefficient</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></span><a class="headerlink" href="#materials.database.MaterialProperties.seebeck_coefficient" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.seebeck_coefficient_tensor">
+<span class="sig-name descname"><span class="pre">seebeck_coefficient_tensor</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#materials.database.MaterialProperties.seebeck_coefficient_tensor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.database.MaterialProperties.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#MaterialProperties.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.MaterialProperties.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize material properties, omitting unset tensor/table fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – JSON-serializable properties mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="materials.database.get_material_database">
+<span class="sig-prename descclassname"><span class="pre">materials.database.</span></span><span class="sig-name descname"><span class="pre">get_material_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configs_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/database.html#get_material_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.database.get_material_database" title="Link to this definition">¶</a></dt>
+<dd><p>Return the process-wide material database, recreating when <code class="docutils literal notranslate"><span class="pre">configs_dir</span></code> is set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>configs_dir</strong> – Optional user materials directory; forces rebuild when not <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MaterialDatabase</strong> – Shared database instance.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>configs_dir</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#materials.database.MaterialDatabase" title="materials.database.MaterialDatabase"><em>MaterialDatabase</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">materials.database module</a><ul>
+<li><a class="reference internal" href="#materials.database.Material"><code class="docutils literal notranslate"><span class="pre">Material</span></code></a><ul>
+<li><a class="reference internal" href="#materials.database.Material.classification"><code class="docutils literal notranslate"><span class="pre">Material.classification</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.description"><code class="docutils literal notranslate"><span class="pre">Material.description</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.from_dict"><code class="docutils literal notranslate"><span class="pre">Material.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.is_anisotropic"><code class="docutils literal notranslate"><span class="pre">Material.is_anisotropic()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.is_hysteresis"><code class="docutils literal notranslate"><span class="pre">Material.is_hysteresis()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.is_temperature_dependent"><code class="docutils literal notranslate"><span class="pre">Material.is_temperature_dependent()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.name"><code class="docutils literal notranslate"><span class="pre">Material.name</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.properties"><code class="docutils literal notranslate"><span class="pre">Material.properties</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.save"><code class="docutils literal notranslate"><span class="pre">Material.save()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.source_file"><code class="docutils literal notranslate"><span class="pre">Material.source_file</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.Material.to_dict"><code class="docutils literal notranslate"><span class="pre">Material.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#materials.database.MaterialClassification"><code class="docutils literal notranslate"><span class="pre">MaterialClassification</span></code></a><ul>
+<li><a class="reference internal" href="#materials.database.MaterialClassification.anisotropic"><code class="docutils literal notranslate"><span class="pre">MaterialClassification.anisotropic</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialClassification.from_dict"><code class="docutils literal notranslate"><span class="pre">MaterialClassification.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialClassification.hysteresis"><code class="docutils literal notranslate"><span class="pre">MaterialClassification.hysteresis</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialClassification.temperature_dependent"><code class="docutils literal notranslate"><span class="pre">MaterialClassification.temperature_dependent</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialClassification.to_dict"><code class="docutils literal notranslate"><span class="pre">MaterialClassification.to_dict()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialClassification.variable_permittivity"><code class="docutils literal notranslate"><span class="pre">MaterialClassification.variable_permittivity</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase</span></code></a><ul>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase._load_builtin_materials"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase._load_builtin_materials()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase._load_config_files"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase._load_config_files()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase._materials"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase._materials</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase.add_material"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase.add_material()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase.get_all_materials"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase.get_all_materials()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase.get_anisotropic_materials"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase.get_anisotropic_materials()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase.get_isotropic_materials"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase.get_isotropic_materials()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase.get_material"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase.get_material()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase.get_material_names"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase.get_material_names()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase.get_materials_by_classification"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase.get_materials_by_classification()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialDatabase.save_material"><code class="docutils literal notranslate"><span class="pre">MaterialDatabase.save_material()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties"><code class="docutils literal notranslate"><span class="pre">MaterialProperties</span></code></a><ul>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.density"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.density</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.electric_conductivity"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.electric_conductivity</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.electric_conductivity_table"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.electric_conductivity_table</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.electric_conductivity_tensor"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.electric_conductivity_tensor</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.from_dict"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.hb_curve"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.hb_curve</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.heat_capacity"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.heat_capacity</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.heat_conductivity"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.heat_conductivity</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.heat_conductivity_table"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.heat_conductivity_table</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.heat_conductivity_tensor"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.heat_conductivity_tensor</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.relative_permeability"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.relative_permeability</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.relative_permittivity"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.relative_permittivity</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.seebeck_coefficient"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.seebeck_coefficient</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.seebeck_coefficient_tensor"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.seebeck_coefficient_tensor</span></code></a></li>
+<li><a class="reference internal" href="#materials.database.MaterialProperties.to_dict"><code class="docutils literal notranslate"><span class="pre">MaterialProperties.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#materials.database.get_material_database"><code class="docutils literal notranslate"><span class="pre">get_material_database()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="materials.html"
+                          title="previous chapter">materials package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="materials.repository.html"
+                          title="next chapter">materials.repository module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/materials.database.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="materials.repository.html" title="materials.repository module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="materials.html" title="materials package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="materials.html" >materials package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">materials.database module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

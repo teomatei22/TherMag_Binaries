@@ -1,0 +1,7 @@
+geometries.sphere module
+========================
+
+.. automodule:: geometries.sphere
+   :members:
+   :show-inheritance:
+   :undoc-members:

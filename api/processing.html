@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing package &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts package" href="processing.scripts.html" />
+    <link rel="prev" title="materials.repository module" href="materials.repository.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.html" title="processing.scripts package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="materials.repository.html" title="materials.repository module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">API reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing">
+<span id="processing-package"></span><h1>processing package<a class="headerlink" href="#module-processing" title="Link to this heading">¶</a></h1>
+<p>ParaView post-processing scripts for TherMag</p>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="processing.scripts.html">processing.scripts package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.scripts.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.current_density_interior.html">processing.scripts.current_density_interior module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.CurrentDensityInterior"><code class="docutils literal notranslate"><span class="pre">CurrentDensityInterior</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.current_density_vector_map.html">processing.scripts.current_density_vector_map module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.CurrentDensityVectorMap"><code class="docutils literal notranslate"><span class="pre">CurrentDensityVectorMap</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.current_density_vector_map.html#processing.scripts.current_density_vector_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.generate_plots.html">processing.scripts.generate_plots module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._evenly_spaced_ids"><code class="docutils literal notranslate"><span class="pre">_evenly_spaced_ids()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._format_probe_coord"><code class="docutils literal notranslate"><span class="pre">_format_probe_coord()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._is_steady"><code class="docutils literal notranslate"><span class="pre">_is_steady()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._probe_coords_label"><code class="docutils literal notranslate"><span class="pre">_probe_coords_label()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._save_component_plot"><code class="docutils literal notranslate"><span class="pre">_save_component_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._top_ids_by_value"><code class="docutils literal notranslate"><span class="pre">_top_ids_by_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._unique_sorted_point_ids"><code class="docutils literal notranslate"><span class="pre">_unique_sorted_point_ids()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots._vector_probe_layout"><code class="docutils literal notranslate"><span class="pre">_vector_probe_layout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.filter_point_ids"><code class="docutils literal notranslate"><span class="pre">filter_point_ids()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_bext_plot"><code class="docutils literal notranslate"><span class="pre">generate_bext_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_jint_plot"><code class="docutils literal notranslate"><span class="pre">generate_jint_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_potential_int_plot"><code class="docutils literal notranslate"><span class="pre">generate_potential_int_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_scalar_interior_plot"><code class="docutils literal notranslate"><span class="pre">generate_scalar_interior_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.generate_temperature_int_plot"><code class="docutils literal notranslate"><span class="pre">generate_temperature_int_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.generate_plots.html#processing.scripts.generate_plots.parse_point_ids"><code class="docutils literal notranslate"><span class="pre">parse_point_ids()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.geometry_contract.html">processing.scripts.geometry_contract module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract"><code class="docutils literal notranslate"><span class="pre">GeometryContract</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract._infer_contract"><code class="docutils literal notranslate"><span class="pre">_infer_contract()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.contract_from_text"><code class="docutils literal notranslate"><span class="pre">contract_from_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.domain_radius_from_geo_text"><code class="docutils literal notranslate"><span class="pre">domain_radius_from_geo_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.domain_radius_m"><code class="docutils literal notranslate"><span class="pre">domain_radius_m()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.first_value"><code class="docutils literal notranslate"><span class="pre">first_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.geo_code_text"><code class="docutils literal notranslate"><span class="pre">geo_code_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.load_geometry_contract"><code class="docutils literal notranslate"><span class="pre">load_geometry_contract()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.load_mesh_name_ids"><code class="docutils literal notranslate"><span class="pre">load_mesh_name_ids()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.metal_sphere_radius_m"><code class="docutils literal notranslate"><span class="pre">metal_sphere_radius_m()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.parse_geo_assignments"><code class="docutils literal notranslate"><span class="pre">parse_geo_assignments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.physical_names"><code class="docutils literal notranslate"><span class="pre">physical_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.strip_geo_comment"><code class="docutils literal notranslate"><span class="pre">strip_geo_comment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.interior_probe_common.html">processing.scripts.interior_probe_common module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler"><code class="docutils literal notranslate"><span class="pre">InteriorProbeSampler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin"><code class="docutils literal notranslate"><span class="pre">ProbeRegionMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.load_jint_probe_points_from_config"><code class="docutils literal notranslate"><span class="pre">load_jint_probe_points_from_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.normalize_probe_dict"><code class="docutils literal notranslate"><span class="pre">normalize_probe_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html">processing.scripts.magnetic_field_contour_map module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.MagneticFieldContourMap"><code class="docutils literal notranslate"><span class="pre">MagneticFieldContourMap</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._contour_period_frame_indices"><code class="docutils literal notranslate"><span class="pre">_contour_period_frame_indices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._default_bext_xyz_for_contour"><code class="docutils literal notranslate"><span class="pre">_default_bext_xyz_for_contour()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._fmt_B_csv"><code class="docutils literal notranslate"><span class="pre">_fmt_B_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._fmt_B_sci"><code class="docutils literal notranslate"><span class="pre">_fmt_B_sci()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._fmt_time_int_s"><code class="docutils literal notranslate"><span class="pre">_fmt_time_int_s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._global_contour_levels"><code class="docutils literal notranslate"><span class="pre">_global_contour_levels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._import_paraview_stack"><code class="docutils literal notranslate"><span class="pre">_import_paraview_stack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._load_bext_probes_for_plot"><code class="docutils literal notranslate"><span class="pre">_load_bext_probes_for_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._matplotlib_available"><code class="docutils literal notranslate"><span class="pre">_matplotlib_available()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._probe_xyz"><code class="docutils literal notranslate"><span class="pre">_probe_xyz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._probes_from_xyz"><code class="docutils literal notranslate"><span class="pre">_probes_from_xyz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._read_bext_from_processing_config"><code class="docutils literal notranslate"><span class="pre">_read_bext_from_processing_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._resolve_contour_period_s"><code class="docutils literal notranslate"><span class="pre">_resolve_contour_period_s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._stability_rows_from_magnetic_field_csv"><code class="docutils literal notranslate"><span class="pre">_stability_rows_from_magnetic_field_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map._write_stability_from_available_csvs"><code class="docutils literal notranslate"><span class="pre">_write_stability_from_available_csvs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.analyze_probe_stability"><code class="docutils literal notranslate"><span class="pre">analyze_probe_stability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.plot_contour_map_from_csv"><code class="docutils literal notranslate"><span class="pre">plot_contour_map_from_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.render_magnetic_contour_png"><code class="docutils literal notranslate"><span class="pre">render_magnetic_contour_png()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.write_contour_period_pngs"><code class="docutils literal notranslate"><span class="pre">write_contour_period_pngs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_contour_map.html#processing.scripts.magnetic_field_contour_map.write_probe_stability_txt"><code class="docutils literal notranslate"><span class="pre">write_probe_stability_txt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html">processing.scripts.magnetic_field_exterior module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.MagneticFieldExterior"><code class="docutils literal notranslate"><span class="pre">MagneticFieldExterior</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_exterior.html#processing.scripts.magnetic_field_exterior.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.magnetic_field_vector_map.html">processing.scripts.magnetic_field_vector_map module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_vector_map.html#processing.scripts.magnetic_field_vector_map.MagneticFieldVectorMap"><code class="docutils literal notranslate"><span class="pre">MagneticFieldVectorMap</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.magnetic_field_vector_map.html#processing.scripts.magnetic_field_vector_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.sweep_plot.html">processing.scripts.sweep_plot module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._append_probe_series"><code class="docutils literal notranslate"><span class="pre">_append_probe_series()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._csv_column_names"><code class="docutils literal notranslate"><span class="pre">_csv_column_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._csv_has_multiple_times"><code class="docutils literal notranslate"><span class="pre">_csv_has_multiple_times()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._format_probe_coord"><code class="docutils literal notranslate"><span class="pre">_format_probe_coord()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._probe_coords_label"><code class="docutils literal notranslate"><span class="pre">_probe_coords_label()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._probe_location"><code class="docutils literal notranslate"><span class="pre">_probe_location()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._read_probe_series"><code class="docutils literal notranslate"><span class="pre">_read_probe_series()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot._row_magnitude"><code class="docutils literal notranslate"><span class="pre">_row_magnitude()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.sweep_plot.html#processing.scripts.sweep_plot.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="processing.scripts.temperature_map.html">processing.scripts.temperature_map module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.temperature_map.html#processing.scripts.temperature_map.TemperatureMap"><code class="docutils literal notranslate"><span class="pre">TemperatureMap</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.scripts.temperature_map.html#processing.scripts.temperature_map.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="processing.base.html">processing.base module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor._abc_impl"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._abc_impl</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor._describe_output"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._describe_output()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor._discover_files"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._discover_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor._log_setup"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._log_setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor._parse_result_output_exec_interval"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._parse_result_output_exec_interval()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.animation_frame_last"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.animation_frame_last()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.cleanup"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.cleanup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.configure_vector_glyph"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.configure_vector_glyph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.format_csv_float"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.format_csv_float()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.get_geometry_glyph_fraction"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.get_geometry_glyph_fraction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.global_vector_magnitude_hi"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.global_vector_magnitude_hi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.glyph_extent_span"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.glyph_extent_span()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.glyph_max_sample_points"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.glyph_max_sample_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.lock_lut_to_range"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.lock_lut_to_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.make_reader"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.make_reader()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.physical_time_for_vtu_index"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.physical_time_for_vtu_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.run"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.save_animation"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.save_animation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.save_image"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.save_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.scientific_tick_values"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.scientific_tick_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.set_threshold_between"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.set_threshold_between()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.setup_camera"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.setup_camera()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.setup_layout"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.setup_layout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.style_conductive_surface"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.style_conductive_surface()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.truncate_scientific"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.truncate_scientific()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.base.html#processing.base.BasePostProcessor.vector_glyph_scale_factor"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.vector_glyph_scale_factor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.defaults.html">processing.defaults module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.BextDefaults"><code class="docutils literal notranslate"><span class="pre">BextDefaults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.BextDefaults.point_directions"><code class="docutils literal notranslate"><span class="pre">BextDefaults.point_directions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.BextDefaults.probe_band_fraction"><code class="docutils literal notranslate"><span class="pre">BextDefaults.probe_band_fraction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.BextDefaults.probe_band_fractions"><code class="docutils literal notranslate"><span class="pre">BextDefaults.probe_band_fractions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.BextDefaults.r_inf_trusted"><code class="docutils literal notranslate"><span class="pre">BextDefaults.r_inf_trusted</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.BextDefaults.r_sup_trusted"><code class="docutils literal notranslate"><span class="pre">BextDefaults.r_sup_trusted</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.ExtractionDefaults"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ExtractionDefaults.bext"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.bext</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ExtractionDefaults.idw_epsilon"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.idw_epsilon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ExtractionDefaults.idw_neighbors"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.idw_neighbors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ExtractionDefaults.jint"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.jint</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ExtractionDefaults.on_node_epsilon"><code class="docutils literal notranslate"><span class="pre">ExtractionDefaults.on_node_epsilon</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.GeometryDetectionDefaults"><code class="docutils literal notranslate"><span class="pre">GeometryDetectionDefaults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.GeometryDetectionDefaults.default_geometry_type"><code class="docutils literal notranslate"><span class="pre">GeometryDetectionDefaults.default_geometry_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.GeometryDetectionDefaults.sphere_content_markers"><code class="docutils literal notranslate"><span class="pre">GeometryDetectionDefaults.sphere_content_markers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.GeometryDetectionDefaults.sphere_path_substrings"><code class="docutils literal notranslate"><span class="pre">GeometryDetectionDefaults.sphere_path_substrings</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.GlyphDefaults"><code class="docutils literal notranslate"><span class="pre">GlyphDefaults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.GlyphDefaults.current_density_arrow_fraction_of_extent"><code class="docutils literal notranslate"><span class="pre">GlyphDefaults.current_density_arrow_fraction_of_extent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.GlyphDefaults.magnetic_arrow_fraction_of_extent"><code class="docutils literal notranslate"><span class="pre">GlyphDefaults.magnetic_arrow_fraction_of_extent</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.JintDefaults"><code class="docutils literal notranslate"><span class="pre">JintDefaults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.JintDefaults.point_multipliers"><code class="docutils literal notranslate"><span class="pre">JintDefaults.point_multipliers</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.ModelConfigDefaults"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ModelConfigDefaults.inner_air_id"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults.inner_air_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ModelConfigDefaults.inner_material_id"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults.inner_material_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ModelConfigDefaults.outer_air_id"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults.outer_air_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ModelConfigDefaults.outer_material_id"><code class="docutils literal notranslate"><span class="pre">ModelConfigDefaults.outer_material_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.extraction"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.extraction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.geometry_detection"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.geometry_detection</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.glyph"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.glyph</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.layer_over_model_types"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.layer_over_model_types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.model_config"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.model_layouts"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.model_layouts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.raw"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.raw</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.reader"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.reader</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ProcessingDefaults.to_dict"><code class="docutils literal notranslate"><span class="pre">ProcessingDefaults.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.ReaderDefaults"><code class="docutils literal notranslate"><span class="pre">ReaderDefaults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ReaderDefaults.cell_arrays"><code class="docutils literal notranslate"><span class="pre">ReaderDefaults.cell_arrays</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.defaults.html#processing.defaults.ReaderDefaults.wanted_point_arrays"><code class="docutils literal notranslate"><span class="pre">ReaderDefaults.wanted_point_arrays</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._integer"><code class="docutils literal notranslate"><span class="pre">_integer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._load_defaults_file"><code class="docutils literal notranslate"><span class="pre">_load_defaults_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._number"><code class="docutils literal notranslate"><span class="pre">_number()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._number_list"><code class="docutils literal notranslate"><span class="pre">_number_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._object"><code class="docutils literal notranslate"><span class="pre">_object()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._optional_integer"><code class="docutils literal notranslate"><span class="pre">_optional_integer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._parse_bext"><code class="docutils literal notranslate"><span class="pre">_parse_bext()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._parse_defaults"><code class="docutils literal notranslate"><span class="pre">_parse_defaults()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._parse_extraction"><code class="docutils literal notranslate"><span class="pre">_parse_extraction()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._parse_geometry_detection"><code class="docutils literal notranslate"><span class="pre">_parse_geometry_detection()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._parse_glyph"><code class="docutils literal notranslate"><span class="pre">_parse_glyph()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._parse_jint"><code class="docutils literal notranslate"><span class="pre">_parse_jint()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._parse_model_layouts"><code class="docutils literal notranslate"><span class="pre">_parse_model_layouts()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._string_list"><code class="docutils literal notranslate"><span class="pre">_string_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults._validate_positive"><code class="docutils literal notranslate"><span class="pre">_validate_positive()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.deep_merge_dict"><code class="docutils literal notranslate"><span class="pre">deep_merge_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.format_csv_float"><code class="docutils literal notranslate"><span class="pre">format_csv_float()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.load_post_processing_settings"><code class="docutils literal notranslate"><span class="pre">load_post_processing_settings()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.load_processing_defaults"><code class="docutils literal notranslate"><span class="pre">load_processing_defaults()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.scientific_tick_values"><code class="docutils literal notranslate"><span class="pre">scientific_tick_values()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.truncate_float"><code class="docutils literal notranslate"><span class="pre">truncate_float()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.defaults.html#processing.defaults.truncate_scientific"><code class="docutils literal notranslate"><span class="pre">truncate_scientific()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.geometry_params.html">processing.geometry_params module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams"><code class="docutils literal notranslate"><span class="pre">GeometryParams</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.H"><code class="docutils literal notranslate"><span class="pre">GeometryParams.H</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.L"><code class="docutils literal notranslate"><span class="pre">GeometryParams.L</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.R"><code class="docutils literal notranslate"><span class="pre">GeometryParams.R</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.R_cap"><code class="docutils literal notranslate"><span class="pre">GeometryParams.R_cap</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.R_sph"><code class="docutils literal notranslate"><span class="pre">GeometryParams.R_sph</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.R_sphere"><code class="docutils literal notranslate"><span class="pre">GeometryParams.R_sphere</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.T_inner"><code class="docutils literal notranslate"><span class="pre">GeometryParams.T_inner</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.T_outer"><code class="docutils literal notranslate"><span class="pre">GeometryParams.T_outer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.W"><code class="docutils literal notranslate"><span class="pre">GeometryParams.W</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.cavity_thickness_m"><code class="docutils literal notranslate"><span class="pre">GeometryParams.cavity_thickness_m()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.characteristic_extent"><code class="docutils literal notranslate"><span class="pre">GeometryParams.characteristic_extent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.from_geo_file"><code class="docutils literal notranslate"><span class="pre">GeometryParams.from_geo_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.geometry_type"><code class="docutils literal notranslate"><span class="pre">GeometryParams.geometry_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.is_two_layer"><code class="docutils literal notranslate"><span class="pre">GeometryParams.is_two_layer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.probe_scaling_params"><code class="docutils literal notranslate"><span class="pre">GeometryParams.probe_scaling_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.GeometryParams.variant"><code class="docutils literal notranslate"><span class="pre">GeometryParams.variant</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig"><code class="docutils literal notranslate"><span class="pre">ModelConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.conductive_analysis_range"><code class="docutils literal notranslate"><span class="pre">ModelConfig.conductive_analysis_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.detect"><code class="docutils literal notranslate"><span class="pre">ModelConfig.detect()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.geometry_type"><code class="docutils literal notranslate"><span class="pre">ModelConfig.geometry_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.inner_air_id"><code class="docutils literal notranslate"><span class="pre">ModelConfig.inner_air_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.inner_material_id"><code class="docutils literal notranslate"><span class="pre">ModelConfig.inner_material_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.model_type"><code class="docutils literal notranslate"><span class="pre">ModelConfig.model_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.outer_air_id"><code class="docutils literal notranslate"><span class="pre">ModelConfig.outer_air_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.outer_material_id"><code class="docutils literal notranslate"><span class="pre">ModelConfig.outer_material_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.geometry_params.html#processing.geometry_params.ModelConfig.validate_outer_air_sampling"><code class="docutils literal notranslate"><span class="pre">ModelConfig.validate_outer_air_sampling()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.probe_scaling.html">processing.probe_scaling module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling._abs_le"><code class="docutils literal notranslate"><span class="pre">_abs_le()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling._b"><code class="docutils literal notranslate"><span class="pre">_b()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling._fmt_coord"><code class="docutils literal notranslate"><span class="pre">_fmt_coord()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling._l_metal_detail"><code class="docutils literal notranslate"><span class="pre">_l_metal_detail()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling._l_metal_max"><code class="docutils literal notranslate"><span class="pre">_l_metal_max()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling._require_float"><code class="docutils literal notranslate"><span class="pre">_require_float()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling._resolve_geometry"><code class="docutils literal notranslate"><span class="pre">_resolve_geometry()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling.compute_bext_probe_positions"><code class="docutils literal notranslate"><span class="pre">compute_bext_probe_positions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling.compute_bext_sampling_hint"><code class="docutils literal notranslate"><span class="pre">compute_bext_sampling_hint()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling.compute_jint_probe_hint"><code class="docutils literal notranslate"><span class="pre">compute_jint_probe_hint()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling.compute_jint_probe_positions"><code class="docutils literal notranslate"><span class="pre">compute_jint_probe_positions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.probe_scaling.html#processing.probe_scaling.compute_magnetic_trusted_band"><code class="docutils literal notranslate"><span class="pre">compute_magnetic_trusted_band()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.run_integrity.html">processing.run_integrity module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.run_integrity.html#processing.run_integrity._log_path"><code class="docutils literal notranslate"><span class="pre">_log_path()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.run_integrity.html#processing.run_integrity.append_run_integrity"><code class="docutils literal notranslate"><span class="pre">append_run_integrity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.run_integrity.html#processing.run_integrity.log_geometry_interpretation"><code class="docutils literal notranslate"><span class="pre">log_geometry_interpretation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.run_integrity.html#processing.run_integrity.log_solver_completion"><code class="docutils literal notranslate"><span class="pre">log_solver_completion()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.run_integrity.html#processing.run_integrity.log_time_coverage"><code class="docutils literal notranslate"><span class="pre">log_time_coverage()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processing.sampling.html">processing.sampling module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processing.sampling.html#processing.sampling.idw_interpolate_vectors"><code class="docutils literal notranslate"><span class="pre">idw_interpolate_vectors()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.sampling.html#processing.sampling.idw_weights"><code class="docutils literal notranslate"><span class="pre">idw_weights()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.sampling.html#processing.sampling.select_nearest_indices"><code class="docutils literal notranslate"><span class="pre">select_nearest_indices()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="materials.repository.html"
+                          title="previous chapter">materials.repository module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.html"
+                          title="next chapter">processing.scripts package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.html" title="processing.scripts package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="materials.repository.html" title="materials.repository module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

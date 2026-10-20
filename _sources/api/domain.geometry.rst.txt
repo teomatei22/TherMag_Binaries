@@ -1,0 +1,7 @@
+domain.geometry module
+======================
+
+.. automodule:: domain.geometry
+   :members:
+   :show-inheritance:
+   :undoc-members:

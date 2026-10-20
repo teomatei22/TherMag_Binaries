@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.run_integrity &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.run_integrity</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.run_integrity</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Append concrete run-integrity evidence to logs without aggregate status."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+
+
+
+<div class="viewcode-block" id="_log_path">
+<a class="viewcode-back" href="../../api/processing.run_integrity.html#processing.run_integrity._log_path">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_log_path</span><span class="p">(</span><span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Resolve and ensure the run-integrity log file path under the run directory.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        cwd: FEM run working directory containing ``logs/`` [path].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        Path: Absolute path to ``logs/run_integrity.log`` (parent created if missing).</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"logs"</span> <span class="o">/</span> <span class="s2">"run_integrity.log"</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="append_run_integrity">
+<a class="viewcode-back" href="../../api/processing.run_integrity.html#processing.run_integrity.append_run_integrity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">append_run_integrity</span><span class="p">(</span><span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">check_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Append one timestamped integrity check line to the run log.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        cwd: FEM run working directory [path].</span>
+<span class="sd">        check_name: Short check identifier (e.g. ``solver_completion``).</span>
+<span class="sd">        detail: Free-text evidence for the check.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Appends a UTC-stamped TSV line to ``run_integrity.log``.</span>
+<span class="sd">    """</span>
+    <span class="n">stamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%SZ"</span><span class="p">)</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stamp</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">check_name</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">detail</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="k">with</span> <span class="n">_log_path</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="log_time_coverage">
+<a class="viewcode-back" href="../../api/processing.run_integrity.html#processing.run_integrity.log_time_coverage">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_time_coverage</span><span class="p">(</span>
+    <span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">times</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">expected_time_dependent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Record and validate probe/time-series coverage against VTU steps.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        cwd: FEM run working directory [path].</span>
+<span class="sd">        source: Probe or script name used as the check key prefix.</span>
+<span class="sd">        times: Sampled physical times written by the probe [s].</span>
+<span class="sd">        expected_time_dependent: ``True`` when the run has multiple VTU steps.</span>
+<span class="sd">        n_steps: Number of VTU timesteps expected for unique-time coverage.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Logs coverage detail; raises ``RuntimeError`` if coverage is insufficient.</span>
+<span class="sd">    """</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">expected_time_dependent</span><span class="p">:</span>
+        <span class="n">detail</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2"> time sample(s) "</span>
+            <span class="sa">f</span><span class="s2">"across </span><span class="si">{</span><span class="n">n_steps</span><span class="si">}</span><span class="s2"> VTU step(s); "</span>
+            <span class="sa">f</span><span class="s2">"range=[</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">]"</span>
+            <span class="k">if</span> <span class="n">values</span>
+            <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">: expected time_dependent coverage but wrote no times"</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">detail</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_steps</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_steps</span><span class="p">:</span>
+            <span class="c1"># one time per step is enough; multi-probe writes repeat the same times</span>
+            <span class="n">unique</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_steps</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">: expected </span><span class="si">{</span><span class="n">n_steps</span><span class="si">}</span><span class="s2"> unique times, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">: steady-state coverage with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2"> sample row(s)"</span>
+    <span class="n">append_run_integrity</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">_time_coverage"</span><span class="p">,</span> <span class="n">detail</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="log_solver_completion">
+<a class="viewcode-back" href="../../api/processing.run_integrity.html#processing.run_integrity.log_solver_completion">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_solver_completion</span><span class="p">(</span><span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">all_done</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Record Elmer/solver exit evidence and fail on unclean completion.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        cwd: FEM run working directory [path].</span>
+<span class="sd">        return_code: Process return code, or ``None`` if unknown.</span>
+<span class="sd">        all_done: Whether the solver emitted an ALL DONE / success marker.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Logs completion; raises ``RuntimeError`` when exit is unclean.</span>
+<span class="sd">    """</span>
+    <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"return_code=</span><span class="si">{</span><span class="n">return_code</span><span class="si">!s}</span><span class="s2">; ALL_DONE=</span><span class="si">{</span><span class="s1">'yes'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">all_done</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'no'</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">append_run_integrity</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s2">"solver_completion"</span><span class="p">,</span> <span class="n">detail</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">all_done</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Solver did not complete cleanly (</span><span class="si">{</span><span class="n">detail</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="log_geometry_interpretation">
+<a class="viewcode-back" href="../../api/processing.run_integrity.html#processing.run_integrity.log_geometry_interpretation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_geometry_interpretation</span><span class="p">(</span><span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Record interpreted geometry family and hollow/layer variant for the run.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        cwd: FEM run working directory [path].</span>
+<span class="sd">        family: Geometry family (``cylinder``, ``prism``, ``sphere``).</span>
+<span class="sd">        variant: Topology variant (``full``, ``hollow``, ``layer_over_*``).</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Appends a ``geometry_interpretation`` integrity line.</span>
+<span class="sd">    """</span>
+    <span class="n">append_run_integrity</span><span class="p">(</span>
+        <span class="n">cwd</span><span class="p">,</span>
+        <span class="s2">"geometry_interpretation"</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"family=</span><span class="si">{</span><span class="n">family</span><span class="si">}</span><span class="s2">; variant=</span><span class="si">{</span><span class="n">variant</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.run_integrity</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

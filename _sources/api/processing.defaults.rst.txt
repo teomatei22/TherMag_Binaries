@@ -1,0 +1,7 @@
+processing.defaults module
+==========================
+
+.. automodule:: processing.defaults
+   :members:
+   :show-inheritance:
+   :undoc-members:

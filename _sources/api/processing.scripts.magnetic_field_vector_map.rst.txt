@@ -1,0 +1,7 @@
+processing.scripts.magnetic\_field\_vector\_map module
+======================================================
+
+.. automodule:: processing.scripts.magnetic_field_vector_map
+   :members:
+   :show-inheritance:
+   :undoc-members:

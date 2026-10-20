@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.scripts.geometry_contract &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=1eac167c" />
+    <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.geometry_contract</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.scripts.geometry_contract</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Canonical geometry metadata (family/variant/radii) shared by sphere-family post-processing."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
+
+
+<div class="viewcode-block" id="strip_geo_comment">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.strip_geo_comment">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">strip_geo_comment</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Strip a Gmsh ``//`` line comment and surrounding whitespace.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        line: Raw ``.geo`` source line.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Code portion before ``//``, stripped.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"//"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="geo_code_text">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.geo_code_text">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">geo_code_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Join non-empty, comment-stripped lines of a ``.geo`` text into clean code.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        text: Full ``geometry.geo`` source.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Comment-free code with blank lines removed.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">clean</span> <span class="k">for</span> <span class="n">clean</span> <span class="ow">in</span> <span class="p">(</span><span class="n">strip_geo_comment</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span> <span class="k">if</span> <span class="n">clean</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="parse_geo_assignments">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.parse_geo_assignments">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_geo_assignments</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">passes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Evaluate successive ``name = expr;`` assignments from Gmsh geo text.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        text: ``.geo`` source with numeric assignments.</span>
+<span class="sd">        passes: Max multi-pass resolution iterations for dependency order.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        dict: Mapping of symbol name - finite float value.</span>
+<span class="sd">    """</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">safe</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Pi"</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+        <span class="s2">"pi"</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+        <span class="s2">"Sin"</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">,</span>
+        <span class="s2">"Cos"</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">,</span>
+        <span class="s2">"Tan"</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">,</span>
+        <span class="s2">"Sqrt"</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">,</span>
+        <span class="s2">"Min"</span><span class="p">:</span> <span class="nb">min</span><span class="p">,</span>
+        <span class="s2">"Max"</span><span class="p">:</span> <span class="nb">max</span><span class="p">,</span>
+        <span class="s2">"Abs"</span><span class="p">:</span> <span class="nb">abs</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\s*([A-Za-z_]\w*)\s*=\s*([^;]+)\s*;"</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">passes</span><span class="p">):</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">strip_geo_comment</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">pat</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">key</span><span class="p">,</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">token</span> <span class="ow">in</span> <span class="n">expr</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"{"</span><span class="p">,</span> <span class="s2">"}"</span><span class="p">,</span> <span class="s1">'"'</span><span class="p">,</span> <span class="s2">"'"</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="p">{</span><span class="s2">"__builtins__"</span><span class="p">:</span> <span class="p">{}},</span> <span class="p">{</span><span class="o">**</span><span class="n">safe</span><span class="p">,</span> <span class="o">**</span><span class="n">values</span><span class="p">})</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+                <span class="n">value_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">!=</span> <span class="n">value_f</span><span class="p">:</span>
+                    <span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_f</span>
+                    <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">changed</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">values</span></div>
+
+
+
+<div class="viewcode-block" id="physical_names">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.physical_names">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">physical_names</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Volume"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Collect Physical Volume/Surface/Line names declared in geo text (lowercased).</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        text: ``.geo`` source.</span>
+<span class="sd">        dimension: Gmsh physical entity kind (default ``Volume``).</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        set: Lowercased physical region names.</span>
+<span class="sd">    """</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">geo_code_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">rf</span><span class="s2">"Physical\s+</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">dimension</span><span class="p">)</span><span class="si">}</span><span class="s2">\s*\(\s*[</span><span class="se">\"</span><span class="s2">']([^</span><span class="se">\"</span><span class="s2">']+)[</span><span class="se">\"</span><span class="s2">']"</span><span class="p">,</span>
+        <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">pat</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">code</span><span class="p">)}</span></div>
+
+
+
+<div class="viewcode-block" id="first_value">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.first_value">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">first_value</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Return the first finite float among named keys in a geo assignment map.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        values: Symbol float map from ``parse_geo_assignments``.</span>
+<span class="sd">        names: Preferred key names in priority order.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float | None: First finite value found, else ``None``.</span>
+<span class="sd">    """</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="domain_radius_m">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.domain_radius_m">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">domain_radius_m</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Air-domain radius from ``R_sph``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        values: Symbol map from ``parse_geo_assignments``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float | None: Positive outer air radius [m], else ``None``.</span>
+<span class="sd">    """</span>
+    <span class="n">air</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R_sph"</span><span class="p">,))</span>
+    <span class="k">if</span> <span class="n">air</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">air</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">air</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="metal_sphere_radius_m">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.metal_sphere_radius_m">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">metal_sphere_radius_m</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Metal sphere radius from ``R_sphere``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        values: Symbol map from ``parse_geo_assignments``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float | None: Positive metal radius [m], else ``None``.</span>
+<span class="sd">    """</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R_sphere"</span><span class="p">,))</span>
+    <span class="k">if</span> <span class="n">radius</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">radius</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">radius</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="domain_radius_from_geo_text">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.domain_radius_from_geo_text">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">domain_radius_from_geo_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a positive air-domain radius ``R_sph`` from geo text.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        text: ``.geo`` source defining the simulation domain.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Domain radius [m].</span>
+<span class="sd">    """</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">parse_geo_assignments</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">domain_radius_m</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">radius</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">radius</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"geometry.geo must define a positive R_sph domain radius"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="GeometryContract">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.GeometryContract">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GeometryContract</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Frozen dataclass of geometry family, variant, and characteristic radii [m].</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        family: Geometry family string (``sphere``, ``prism``, ``cylinder``, …).</span>
+<span class="sd">        variant: Topology variant (``full``, ``hollow``, ``layer_over_*``).</span>
+<span class="sd">        domain_radius_m: Outer simulation-domain radius [m].</span>
+<span class="sd">        body_outer_radius_m: Conductor outer radius for spheres [m].</span>
+<span class="sd">        layer_interface_radius_m: Optional layer interface radius [m].</span>
+<span class="sd">        cavity_radius_m: Inner cavity radius for hollow variants [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryContract: Immutable geometry metadata for probe/map scripts.</span>
+<span class="sd">    """</span>
+    <span class="n">family</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">domain_radius_m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">body_outer_radius_m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">layer_interface_radius_m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">cavity_radius_m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_sphere</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Whether this contract describes a sphere-family geometry.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: GeometryContract instance.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            bool: ``True`` when ``family == "sphere"``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">family</span> <span class="o">==</span> <span class="s2">"sphere"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_hollow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Whether the variant includes an inner cavity (hollow / layer_over_hollow).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: GeometryContract instance.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            bool: ``True`` for hollow-bearing variants.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"hollow"</span><span class="p">,</span> <span class="s2">"layer_over_hollow"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_infer_contract">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract._infer_contract">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_infer_contract</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeometryContract</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Infer family/variant and radii from geo assignments and Physical names.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        text: Full ``geometry.geo`` source.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryContract: Parsed contract.</span>
+<span class="sd">    """</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">parse_geo_assignments</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">geo_code_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">volumes</span> <span class="o">=</span> <span class="n">physical_names</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s2">"Volume"</span><span class="p">)</span>
+
+    <span class="n">has_prism</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"W"</span><span class="p">,))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"H"</span><span class="p">,))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="n">sphere_flag</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"geometry_family_sphere"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+    <span class="n">prism_flag</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"geometry_family_prism"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+    <span class="n">cylinder_flag</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"geometry_family_cylinder"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+    <span class="n">has_canonical_sphere_body</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R_sphere"</span><span class="p">,))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">sphere_flag</span> <span class="ow">or</span> <span class="n">has_canonical_sphere_body</span><span class="p">:</span>
+        <span class="n">family</span> <span class="o">=</span> <span class="s2">"sphere"</span>
+    <span class="k">elif</span> <span class="n">prism_flag</span> <span class="ow">or</span> <span class="n">has_prism</span><span class="p">:</span>
+        <span class="n">family</span> <span class="o">=</span> <span class="s2">"prism"</span>
+    <span class="k">elif</span> <span class="n">cylinder_flag</span> <span class="ow">or</span> <span class="s2">"cylinder("</span> <span class="ow">in</span> <span class="n">code</span> <span class="ow">or</span> <span class="s2">"R"</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
+        <span class="n">family</span> <span class="o">=</span> <span class="s2">"cylinder"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">family</span> <span class="o">=</span> <span class="s2">"unknown"</span>
+
+    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="n">domain_radius</span> <span class="o">=</span> <span class="n">domain_radius_m</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+        <span class="n">body_outer</span> <span class="o">=</span> <span class="n">metal_sphere_radius_m</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+        <span class="n">layer_interface</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R_layer_interface"</span><span class="p">,))</span>
+        <span class="n">cavity</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R_cavity"</span><span class="p">,))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">domain_radius</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R_sph"</span><span class="p">,))</span>
+        <span class="n">body_outer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">layer_interface</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cavity</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">vals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"geometry_variant_layer_over_hollow"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="n">variant</span> <span class="o">=</span> <span class="s2">"layer_over_hollow"</span>
+    <span class="k">elif</span> <span class="n">vals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"geometry_variant_layer_over_full"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="n">variant</span> <span class="o">=</span> <span class="s2">"layer_over_full"</span>
+    <span class="k">elif</span> <span class="n">vals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"geometry_variant_hollow"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="n">variant</span> <span class="o">=</span> <span class="s2">"hollow"</span>
+    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="n">has_inner_air</span> <span class="o">=</span> <span class="s2">"inner_air"</span> <span class="ow">in</span> <span class="n">volumes</span>
+        <span class="n">has_inner_conductor</span> <span class="o">=</span> <span class="s2">"inner_material"</span> <span class="ow">in</span> <span class="n">volumes</span>
+        <span class="k">if</span> <span class="n">has_inner_air</span> <span class="ow">and</span> <span class="n">has_inner_conductor</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">body_outer</span><span class="p">,</span> <span class="n">layer_interface</span><span class="p">,</span> <span class="n">cavity</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="s2">"layer_over_hollow"</span>
+        <span class="k">elif</span> <span class="n">has_inner_air</span> <span class="ow">and</span> <span class="n">cavity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="s2">"hollow"</span>
+        <span class="k">elif</span> <span class="n">has_inner_conductor</span> <span class="ow">and</span> <span class="n">layer_interface</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="s2">"layer_over_full"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="s2">"full"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">has_inner_air</span> <span class="o">=</span> <span class="s2">"inner_air"</span> <span class="ow">in</span> <span class="n">volumes</span>
+        <span class="n">has_inner_conductor</span> <span class="o">=</span> <span class="s2">"inner_material"</span> <span class="ow">in</span> <span class="n">volumes</span>
+        <span class="k">if</span> <span class="n">has_inner_air</span> <span class="ow">and</span> <span class="n">has_inner_conductor</span><span class="p">:</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="s2">"layer_over_hollow"</span>
+        <span class="k">elif</span> <span class="n">has_inner_air</span><span class="p">:</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="s2">"hollow"</span>
+        <span class="k">elif</span> <span class="n">has_inner_conductor</span><span class="p">:</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="s2">"layer_over_full"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="s2">"full"</span>
+
+    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"sphere"</span> <span class="ow">and</span> <span class="n">variant</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"hollow"</span><span class="p">,</span> <span class="s2">"layer_over_hollow"</span><span class="p">):</span>
+        <span class="n">cavity</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">GeometryContract</span><span class="p">(</span>
+        <span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">,</span>
+        <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">,</span>
+        <span class="n">domain_radius_m</span><span class="o">=</span><span class="n">domain_radius</span><span class="p">,</span>
+        <span class="n">body_outer_radius_m</span><span class="o">=</span><span class="n">body_outer</span><span class="p">,</span>
+        <span class="n">layer_interface_radius_m</span><span class="o">=</span><span class="n">layer_interface</span><span class="p">,</span>
+        <span class="n">cavity_radius_m</span><span class="o">=</span><span class="n">cavity</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_geometry_contract">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.load_geometry_contract">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_geometry_contract</span><span class="p">(</span><span class="n">run_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"."</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeometryContract</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load ``GeometryContract`` from ``geometry.geo`` under a FEM run directory.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        run_dir: Run root containing ``geometry.geo`` (case-insensitive) [path].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryContract: Inferred contract, or empty-text fallback if geo missing.</span>
+<span class="sd">    """</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">run_dir</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"geometry.geo"</span><span class="p">,</span> <span class="s2">"Geometry.geo"</span><span class="p">,</span> <span class="s2">"geometry.GEO"</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">_infer_contract</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_infer_contract</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="contract_from_text">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.contract_from_text">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">contract_from_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeometryContract</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build a ``GeometryContract`` directly from in-memory geo source text.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        text: ``.geo`` source string.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryContract: Result of ``_infer_contract``.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">_infer_contract</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_mesh_name_ids">
+<a class="viewcode-back" href="../../../api/processing.scripts.geometry_contract.html#processing.scripts.geometry_contract.load_mesh_name_ids">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_mesh_name_ids</span><span class="p">(</span><span class="n">run_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"."</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Parse Elmer/Gmsh ``mesh.names`` ``$name = id`` entries into a name-id map.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        run_dir: Run root; looks under ``geometry/mesh.names`` or ``mesh.names`` [path].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        dict: Lowercased region name integer GeometryId; empty if file missing.</span>
+<span class="sd">    """</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">run_dir</span><span class="p">)</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"geometry"</span> <span class="o">/</span> <span class="s2">"mesh.names"</span><span class="p">,</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">"mesh.names"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">continue</span>
+        <span class="n">out</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"$"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"="</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"="</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">left</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">right</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="k">return</span> <span class="p">{}</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.geometry_contract</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

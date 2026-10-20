@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.scripts.interior_probe_common &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=1eac167c" />
+    <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.interior_probe_common</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.scripts.interior_probe_common</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Shared interior (J_int) probe sampling with air/conductor region detection and IDW interp."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">_this_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">_parent</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_this_dir</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_p</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_parent</span><span class="p">,</span> <span class="n">_this_dir</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_p</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">_this_dir</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">_this_dir</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_this_dir</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePostProcessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometry_contract</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_geometry_contract</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">MergeBlocks</span><span class="p">,</span> <span class="n">Threshold</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview</span><span class="w"> </span><span class="kn">import</span> <span class="n">numpy_support</span> <span class="k">as</span> <span class="n">ns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paraview</span><span class="w"> </span><span class="kn">import</span> <span class="n">servermanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sampling</span><span class="w"> </span><span class="kn">import</span> <span class="n">idw_weights</span><span class="p">,</span> <span class="n">select_nearest_indices</span>
+
+
+<div class="viewcode-block" id="load_jint_probe_points_from_config">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.load_jint_probe_points_from_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_jint_probe_points_from_config</span><span class="p">(</span>
+    <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">script_names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load J_int ``probe_points`` from processing config for named script entries.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        config_path: Path to ``processing_config.json`` [path].</span>
+<span class="sd">        script_names: Script ``name`` values to search for probe parameters.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        list | None: Probe point entries, or ``None`` if config missing / unset.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">want</span> <span class="ow">in</span> <span class="n">script_names</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"scripts"</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">script</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="n">want</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parameters"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+            <span class="n">probe_points</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"probe_points"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">probe_points</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">probe_points</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"probe_points"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"jint"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="normalize_probe_dict">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.normalize_probe_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_probe_dict</span><span class="p">(</span><span class="n">probe</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Validate and coerce a probe dict to float ``x,y,z`` keys.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        probe: Mapping expected to contain ``x``, ``y``, ``z`` [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        dict | None: ``{"x","y","z"}`` floats, or ``None`` if invalid.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"x"</span><span class="p">])</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"y"</span><span class="p">])</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="s2">"z"</span><span class="p">])</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="n">z</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="ProbeRegionMixin">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProbeRegionMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Classify probe xyz into conductor / outer_air / inner_air via geometry contract.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        self: Host post-processor providing ``cwd``, ``geometry``, and ``config``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        mixin: Region helpers for sphere/prism/cylinder hollow and air tests.</span>
+<span class="sd">    """</span>
+<div class="viewcode-block" id="ProbeRegionMixin._geometry_contract">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._geometry_contract">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_geometry_contract</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Load and cache ``GeometryContract`` for the current run directory.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Mixin host with ``cwd`` [path].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            GeometryContract: Cached contract instance.</span>
+<span class="sd">        """</span>
+        <span class="n">cached</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_cached_geometry_contract"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cached</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cached</span> <span class="o">=</span> <span class="n">load_geometry_contract</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"cwd"</span><span class="p">,</span> <span class="s2">"."</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cached_geometry_contract</span> <span class="o">=</span> <span class="n">cached</span>
+        <span class="k">return</span> <span class="n">cached</span></div>
+
+
+<div class="viewcode-block" id="ProbeRegionMixin._effective_geometry_type">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._effective_geometry_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_effective_geometry_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Resolve geometry family from contract, falling back to ``geometry.geometry_type``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Mixin host.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Lowercased family (``sphere``, ``prism``, ``cylinder``, …).</span>
+<span class="sd">        """</span>
+        <span class="n">contract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_contract</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">contract</span><span class="o">.</span><span class="n">family</span> <span class="o">!=</span> <span class="s2">"unknown"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">contract</span><span class="o">.</span><span class="n">family</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">"geometry_type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ProbeRegionMixin._sphere_radii">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._sphere_radii">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sphere_radii</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return sphere body/layer/cavity/domain radii required for material-body sampling.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Mixin host whose sphere contract has metal radius ``R_sphere`` and domain ``R_sph``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple: ``(r_outer, r_layer, r_cavity, r_domain)`` in metres (``None`` where absent).</span>
+<span class="sd">        """</span>
+        <span class="n">contract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_contract</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">contract</span><span class="o">.</span><span class="n">is_sphere</span> <span class="ow">or</span> <span class="n">contract</span><span class="o">.</span><span class="n">body_outer_radius_m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">"Sphere material-body sampling requires R_sphere; "</span>
+                <span class="s2">"R_sph is the simulation-domain radius."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">contract</span><span class="o">.</span><span class="n">body_outer_radius_m</span><span class="p">),</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">contract</span><span class="o">.</span><span class="n">layer_interface_radius_m</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">contract</span><span class="o">.</span><span class="n">layer_interface_radius_m</span><span class="p">),</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">contract</span><span class="o">.</span><span class="n">cavity_radius_m</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">contract</span><span class="o">.</span><span class="n">cavity_radius_m</span><span class="p">),</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">contract</span><span class="o">.</span><span class="n">domain_radius_m</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">contract</span><span class="o">.</span><span class="n">domain_radius_m</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProbeRegionMixin._is_inside_inner_cavity">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._is_inside_inner_cavity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_inside_inner_cavity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Test whether (x,y,z) lies in the hollow inner cavity (air) region.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Mixin host.</span>
+<span class="sd">            x: Probe x [m].</span>
+<span class="sd">            y: Probe y [m].</span>
+<span class="sd">            z: Probe z [m].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            bool: ``True`` if inside cavity for hollow sphere/prism/cylinder topologies.</span>
+<span class="sd">        """</span>
+        <span class="n">contract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_contract</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">contract</span><span class="o">.</span><span class="n">is_hollow</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">inner_air_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">geo_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effective_geometry_type</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">r_cavity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sphere_radii</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">r_cavity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">r_cavity</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">cavity_thickness_m</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">T</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">W_inn</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">W</span> <span class="o">-</span> <span class="n">T</span><span class="p">)</span>
+            <span class="n">H_inn</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">H</span> <span class="o">-</span> <span class="n">T</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">L</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">W_inn</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">H_inn</span>
+
+        <span class="n">R</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">T</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">L</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">:</span>
+            <span class="n">rho</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span><span class="p">))</span>
+            <span class="n">R_inn</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">R</span> <span class="o">-</span> <span class="n">T</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">rho</span> <span class="o">&lt;=</span> <span class="n">R_inn</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ProbeRegionMixin._is_in_air_region">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.ProbeRegionMixin._is_in_air_region">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_in_air_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Test whether (x,y,z) is in outer or inner air (not solid conductor).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Mixin host.</span>
+<span class="sd">            x: Probe x [m].</span>
+<span class="sd">            y: Probe y [m].</span>
+<span class="sd">            z: Probe z [m].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            bool: ``True`` for exterior air, domain exterior, or hollow cavity air.</span>
+<span class="sd">        """</span>
+        <span class="n">geo_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effective_geometry_type</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+            <span class="n">contract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_contract</span><span class="p">()</span>
+            <span class="n">r_outer</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">r_cavity</span><span class="p">,</span> <span class="n">r_domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sphere_radii</span><span class="p">()</span>
+            <span class="n">r3</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">r_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">r3</span> <span class="o">&gt;</span> <span class="n">r_domain</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">r3</span> <span class="o">&gt;</span> <span class="n">r_outer</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">contract</span><span class="o">.</span><span class="n">is_hollow</span> <span class="ow">and</span> <span class="n">r_cavity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">r3</span> <span class="o">&lt;=</span> <span class="n">r_cavity</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">cavity_thickness_m</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+            <span class="n">in_axial</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">L</span> <span class="o">/</span> <span class="mf">2.0</span>
+            <span class="n">in_y</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">W</span>
+            <span class="n">in_z</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">H</span>
+            <span class="k">if</span> <span class="n">T</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">W_inn</span><span class="p">,</span> <span class="n">H_inn</span> <span class="o">=</span> <span class="n">W</span> <span class="o">-</span> <span class="n">T</span><span class="p">,</span> <span class="n">H</span> <span class="o">-</span> <span class="n">T</span>
+                <span class="k">if</span> <span class="n">in_axial</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">W_inn</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">H_inn</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">in_axial</span> <span class="ow">and</span> <span class="n">in_y</span> <span class="ow">and</span> <span class="n">in_z</span><span class="p">)</span>
+
+        <span class="n">R</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">L</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="ow">or</span> <span class="n">rho</span> <span class="o">&gt;</span> <span class="n">R</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">T</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_inside_inner_cavity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="InteriorProbeSampler">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InteriorProbeSampler</span><span class="p">(</span><span class="n">ProbeRegionMixin</span><span class="p">,</span> <span class="n">BasePostProcessor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: ParaView IDW sampler for interior J, T, and φ at configured probe points.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        working_dir: FEM run directory [path].</span>
+<span class="sd">        verbose: Enable verbose logging.</span>
+<span class="sd">        probe_points: Optional explicit probes; else scaled J_int defaults.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        InteriorProbeSampler: Post-processor with ``sample_at_point`` IDW API.</span>
+<span class="sd">    """</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">probe_points</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Initialize sampler, validate IDW config, and resolve probe point list.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Sampler instance.</span>
+<span class="sd">            working_dir: FEM run directory [path].</span>
+<span class="sd">            verbose: Verbose flag.</span>
+<span class="sd">            probe_points: Optional list/tuples/dicts of probe xyz [m].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Sets ``probe_points``, IDW settings cache, and extraction config.</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pp_settings</span><span class="p">[</span><span class="s2">"extraction"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jint_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">[</span><span class="s2">"jint_defaults"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_required_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">probe_points</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">probe</span> <span class="ow">in</span> <span class="n">probe_points</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">probe</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">probe</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">"y"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">"z"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe</span><span class="p">[</span><span class="mi">2</span><span class="p">])}</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">probe</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">normalized</span> <span class="o">=</span> <span class="n">normalize_probe_dict</span><span class="p">(</span><span class="n">probe</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">normalized</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">normalized</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">:</span>
+            <span class="n">gtype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geometry_type</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">geo_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">probe_scaling_params</span><span class="p">()</span>
+            <span class="n">variant</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">"variant"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"full"</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">variant</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"hollow"</span><span class="p">:</span>
+                    <span class="n">geo_params</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">T_outer</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">variant</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"layer_over_hollow"</span><span class="p">:</span>
+                    <span class="n">geo_params</span><span class="p">[</span><span class="s2">"T_inner"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">T_inner</span><span class="p">)</span>
+                    <span class="n">geo_params</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">T_outer</span><span class="p">)</span>
+            
+            <span class="kn">from</span><span class="w"> </span><span class="nn">probe_scaling</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_jint_probe_positions</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="n">z</span><span class="p">}</span>
+                <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">compute_jint_probe_positions</span><span class="p">(</span>
+                    <span class="n">geo_params</span><span class="p">,</span>
+                    <span class="n">gtype</span><span class="p">,</span>
+                    <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Using default Jint probe points: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">)</span><span class="si">}</span><span class="s2"> points"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Destructor that clears ParaView pipeline cache objects.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Sampler instance.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Best-effort ``_clear_cache``.</span>
+<span class="sd">        """</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="InteriorProbeSampler._validate_required_config">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._validate_required_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_required_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Ensure extraction IDW keys and J_int point multipliers exist in settings.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Sampler with ``pp_settings["extraction"]``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Raises ``KeyError`` if required keys are missing.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"idw_neighbors"</span><span class="p">,</span> <span class="s2">"idw_epsilon"</span><span class="p">,</span> <span class="s2">"on_node_epsilon"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing required extraction config key: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"point_multipliers"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jint_cfg</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">"Missing extraction.jint_defaults.point_multipliers"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InteriorProbeSampler._clear_cache">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._clear_cache">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Destroy cached ParaView objects for the current VTU/region threshold.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Sampler instance.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Clears ``_cache`` / ``_cache_key`` after cleanup.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"objects"</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="InteriorProbeSampler._material_names">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._material_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_material_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">cached</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_cached_material_names"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cached</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cached</span>
+
+        <span class="n">names</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">project_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"project.json"</span>
+        <span class="k">if</span> <span class="n">project_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">project_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+                <span class="n">materials</span> <span class="o">=</span> <span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"materials"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"materials"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
+                <span class="n">simulation</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"simulation"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">sim_key</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="s2">"outer_material"</span><span class="p">,</span> <span class="s2">"outer_material_name"</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s2">"inner_material"</span><span class="p">,</span> <span class="s2">"inner_material_name"</span><span class="p">),</span>
+                <span class="p">):</span>
+                    <span class="n">snapshot</span> <span class="o">=</span> <span class="n">materials</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"outer"</span> <span class="k">if</span> <span class="n">region</span> <span class="o">==</span> <span class="s2">"outer_material"</span> <span class="k">else</span> <span class="s2">"inner"</span><span class="p">)</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sim_key</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+                        <span class="n">names</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_material_names</span> <span class="o">=</span> <span class="n">names</span>
+        <span class="k">return</span> <span class="n">names</span></div>
+
+
+<div class="viewcode-block" id="InteriorProbeSampler._conductive_region">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._conductive_region">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_conductive_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">inner_material_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_type</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"layer_over_"</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">"outer_material"</span>
+
+        <span class="n">geo_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effective_geometry_type</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">r_layer</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sphere_radii</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">r_layer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">"outer_material"</span>
+            <span class="n">radius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span><span class="p">))</span>
+            <span class="k">return</span> <span class="s2">"inner_material"</span> <span class="k">if</span> <span class="n">radius</span> <span class="o">&lt;=</span> <span class="n">r_layer</span> <span class="k">else</span> <span class="s2">"outer_material"</span>
+
+        <span class="k">if</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+            <span class="n">w_mid</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">W</span><span class="p">)</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">T_outer</span><span class="p">)</span>
+            <span class="n">h_mid</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">H</span><span class="p">)</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">T_outer</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">w_mid</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">h_mid</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">"inner_material"</span>
+            <span class="k">return</span> <span class="s2">"outer_material"</span>
+
+        <span class="n">r_mid</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">R</span><span class="p">)</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">T_outer</span><span class="p">)</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">"inner_material"</span> <span class="k">if</span> <span class="n">rho</span> <span class="o">&lt;=</span> <span class="n">r_mid</span> <span class="k">else</span> <span class="s2">"outer_material"</span></div>
+
+
+<div class="viewcode-block" id="InteriorProbeSampler._probe_expected_region">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._probe_expected_region">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_probe_expected_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Classify probe xyz into ``inner_air``, ``outer_air``, or a material region.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Sampler instance.</span>
+<span class="sd">            x: Probe x [m].</span>
+<span class="sd">            y: Probe y [m].</span>
+<span class="sd">            z: Probe z [m].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Expected sampling region name.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_in_air_region</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">"inner_air"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_inside_inner_cavity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"outer_air"</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conductive_region</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InteriorProbeSampler._sampling_region_ids">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._sampling_region_ids">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sampling_region_ids</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">expected_region</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Map expected region name to (in_air, GeometryIds, region label) for Threshold.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Sampler with ``config`` air/conductor IDs.</span>
+<span class="sd">            expected_region: ``inner_air`` / ``outer_air`` / material region.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple: ``(in_air, air_ids_tuple, region_label)``.</span>
+<span class="sd">        """</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">expected_region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">expected</span> <span class="o">==</span> <span class="s2">"inner_air"</span><span class="p">:</span>
+            <span class="n">contract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_contract</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">contract</span><span class="o">.</span><span class="n">is_hollow</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Probe requested inner_air sampling for a non-hollow geometry."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">inner_air_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">"Probe requested inner_air sampling, but model_config has no inner_air_id."</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">inner_air_id</span><span class="p">),),</span> <span class="s2">"inner_air"</span>
+        <span class="k">if</span> <span class="n">expected</span> <span class="o">==</span> <span class="s2">"outer_air"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">outer_air_id</span><span class="p">),),</span> <span class="s2">"outer_air"</span>
+        <span class="k">if</span> <span class="n">expected</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"outer_material"</span><span class="p">,</span> <span class="s2">"inner_material"</span><span class="p">):</span>
+            <span class="n">material_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_material_names</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">expected</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">material_name</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">material_name</span> <span class="k">else</span> <span class="n">expected</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(),</span> <span class="n">label</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(),</span> <span class="s2">"conductor"</span></div>
+
+
+<div class="viewcode-block" id="InteriorProbeSampler._prepare_cache">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler._prepare_cache">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_cache</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">vtu_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">in_air</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">air_ids</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Build or reuse VTU Threshold+MergeBlocks cache of J/T/P point arrays.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Sampler instance.</span>
+<span class="sd">            vtu_file: VTU path for this timestep [path].</span>
+<span class="sd">            in_air: Threshold air GeometryIds when true; else conductive range.</span>
+<span class="sd">            air_ids: Outer/inner air GeometryId tuple when ``in_air``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict: Cache with ``points_np``, J/T/P arrays, and ParaView ``objects``.</span>
+<span class="sd">        """</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">vtu_file</span><span class="p">,</span> <span class="n">in_air</span><span class="p">,</span> <span class="n">air_ids</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span> <span class="o">==</span> <span class="n">key</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_reader</span><span class="p">(</span><span class="s2">"current_int_vtu"</span><span class="p">,</span> <span class="n">vtu_file</span><span class="p">)</span>
+        <span class="n">reader</span><span class="o">.</span><span class="n">PointArrayStatus</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">"potential flux"</span><span class="p">,</span>
+            <span class="s2">"temperature flux"</span><span class="p">,</span>
+            <span class="s2">"sourcecurrentx"</span><span class="p">,</span>
+            <span class="s2">"sourcecurrenty"</span><span class="p">,</span>
+            <span class="s2">"sourcecurrentz"</span><span class="p">,</span>
+            <span class="s2">"temperature"</span><span class="p">,</span>
+            <span class="s2">"potential"</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">reader</span><span class="o">.</span><span class="n">UpdatePipeline</span><span class="p">()</span>
+        <span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">reader</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">in_air</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">air_ids</span><span class="p">:</span>
+                <span class="n">air_ids</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">outer_air_id</span><span class="p">),)</span>
+            <span class="n">low_id</span><span class="p">,</span> <span class="n">high_id</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">air_ids</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">air_ids</span><span class="p">)</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">Threshold</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="s2">"Threshold_air_J_int"</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">Threshold</span><span class="p">(</span><span class="n">registrationName</span><span class="o">=</span><span class="s2">"Threshold_conductor_J_int"</span><span class="p">,</span> <span class="n">Input</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
+            <span class="n">low_id</span><span class="p">,</span> <span class="n">high_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">conductive_analysis_range</span><span class="p">()</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">Scalars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"CELLS"</span><span class="p">,</span> <span class="s2">"GeometryIds"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_threshold_between</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">low_id</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">high_id</span><span class="p">))</span>
+        <span class="n">merged</span> <span class="o">=</span> <span class="n">MergeBlocks</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+        <span class="n">objects</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">th</span><span class="p">,</span> <span class="n">merged</span><span class="p">])</span>
+
+        <span class="n">vtk_data</span> <span class="o">=</span> <span class="n">servermanager</span><span class="o">.</span><span class="n">Fetch</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">vtk_data</span><span class="o">.</span><span class="n">GetPoints</span><span class="p">()</span>
+        <span class="n">points_np</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ns</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">GetData</span><span class="p">())</span> <span class="k">if</span> <span class="n">points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">point_data</span> <span class="o">=</span> <span class="n">vtk_data</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"objects"</span><span class="p">:</span> <span class="n">objects</span><span class="p">,</span>
+            <span class="s2">"points_np"</span><span class="p">:</span> <span class="n">points_np</span><span class="p">,</span>
+            <span class="s2">"JOhm_array"</span><span class="p">:</span> <span class="n">point_data</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="s2">"potential flux"</span><span class="p">),</span>
+            <span class="s2">"JSourceX_array"</span><span class="p">:</span> <span class="n">point_data</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="s2">"sourcecurrentx"</span><span class="p">),</span>
+            <span class="s2">"JSourceY_array"</span><span class="p">:</span> <span class="n">point_data</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="s2">"sourcecurrenty"</span><span class="p">),</span>
+            <span class="s2">"JSourceZ_array"</span><span class="p">:</span> <span class="n">point_data</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="s2">"sourcecurrentz"</span><span class="p">),</span>
+            <span class="s2">"T_array"</span><span class="p">:</span> <span class="n">point_data</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="s2">"temperature"</span><span class="p">),</span>
+            <span class="s2">"P_array"</span><span class="p">:</span> <span class="n">point_data</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="s2">"potential"</span><span class="p">),</span>
+            <span class="s2">"sampling_ids"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">air_ids</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">air_ids</span>
+                <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">conductive_analysis_range</span><span class="p">())</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span></div>
+
+
+<div class="viewcode-block" id="InteriorProbeSampler.sample_at_point">
+<a class="viewcode-back" href="../../../api/processing.scripts.interior_probe_common.html#processing.scripts.interior_probe_common.InteriorProbeSampler.sample_at_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">vtu_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: IDW-sample J, T, and P at (x,y,z) in the probe's expected mesh region.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Sampler instance.</span>
+<span class="sd">            x: Probe x [m].</span>
+<span class="sd">            y: Probe y [m].</span>
+<span class="sd">            z: Probe z [m].</span>
+<span class="sd">            vtu_file: Optional VTU path; defaults to first timestep [path].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict: ``Jx,Jy,Jz,T,P``, nearest point, sample_region, and IDW diagnostics.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">vtu_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vtu_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">expected_region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_probe_expected_region</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">in_air</span><span class="p">,</span> <span class="n">air_ids</span><span class="p">,</span> <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_region_ids</span><span class="p">(</span><span class="n">expected_region</span><span class="p">)</span>
+
+        <span class="n">cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_cache</span><span class="p">(</span><span class="n">vtu_file</span><span class="p">,</span> <span class="n">in_air</span><span class="p">,</span> <span class="n">air_ids</span><span class="o">=</span><span class="n">air_ids</span><span class="p">)</span>
+        <span class="n">points_np</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="s2">"points_np"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">points_np</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"No mesh points available for IDW interpolation in region </span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2">."</span>
+            <span class="p">)</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">points_np</span> <span class="o">-</span> <span class="n">target</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">[</span><span class="s2">"idw_neighbors"</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">points_np</span><span class="p">))</span>
+        <span class="n">nn_idx</span> <span class="o">=</span> <span class="n">select_nearest_indices</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">d_k</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span>
+        <span class="n">weights</span><span class="p">,</span> <span class="n">exact_local</span><span class="p">,</span> <span class="n">diagnostics</span> <span class="o">=</span> <span class="n">idw_weights</span><span class="p">(</span>
+            <span class="n">d_k</span><span class="p">,</span>
+            <span class="n">epsilon</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">[</span><span class="s2">"idw_epsilon"</span><span class="p">]),</span>
+            <span class="n">on_node_epsilon</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ext_cfg</span><span class="p">[</span><span class="s2">"on_node_epsilon"</span><span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">exact_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nn_idx</span><span class="p">[</span><span class="n">exact_local</span><span class="p">])</span> <span class="k">if</span> <span class="n">exact_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_idw_scalar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">"""Brief: IDW (or exact-node) interpolate a scalar VTK point array at the probe.</span>
+
+<span class="sd">            Inputs:</span>
+<span class="sd">                arr: VTK data array (or ``None``).</span>
+<span class="sd">                name: Array name for error messages.</span>
+
+<span class="sd">            Outputs:</span>
+<span class="sd">                float: Interpolated scalar [array units].</span>
+<span class="sd">            """</span>
+            <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing required point array '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+            <span class="n">np_arr</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np_arr</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Point array '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' is empty."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">exact_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np_arr</span><span class="p">[</span><span class="n">exact_idx</span><span class="p">])</span>
+            <span class="k">assert</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np_arr</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">weights</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_idw_vector</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">            </span><span class="sd">"""Brief: IDW (or exact-node) interpolate a 3-vector VTK point array at the probe.</span>
+
+<span class="sd">            Inputs:</span>
+<span class="sd">                arr: VTK vector array (or ``None``).</span>
+<span class="sd">                name: Array name for error messages.</span>
+
+<span class="sd">            Outputs:</span>
+<span class="sd">                tuple: ``(vx, vy, vz)`` interpolated components [array units].</span>
+<span class="sd">            """</span>
+            <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing required point array '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+            <span class="n">np_arr</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np_arr</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Point array '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' is empty."</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">exact_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">vec</span> <span class="o">=</span> <span class="n">np_arr</span><span class="p">[</span><span class="n">exact_idx</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np_arr</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="n">JOhmx</span><span class="p">,</span> <span class="n">JOhmy</span><span class="p">,</span> <span class="n">JOhmz</span> <span class="o">=</span> <span class="n">_idw_vector</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s2">"JOhm_array"</span><span class="p">],</span> <span class="s2">"potential flux"</span><span class="p">)</span>
+        <span class="n">JSourcex</span> <span class="o">=</span> <span class="n">_idw_scalar</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s2">"JSourceX_array"</span><span class="p">],</span> <span class="s2">"sourcecurrentx"</span><span class="p">)</span>
+        <span class="n">JSourcey</span> <span class="o">=</span> <span class="n">_idw_scalar</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s2">"JSourceY_array"</span><span class="p">],</span> <span class="s2">"sourcecurrenty"</span><span class="p">)</span>
+        <span class="n">JSourcez</span> <span class="o">=</span> <span class="n">_idw_scalar</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s2">"JSourceZ_array"</span><span class="p">],</span> <span class="s2">"sourcecurrentz"</span><span class="p">)</span>
+
+        <span class="n">JSeebeckx</span> <span class="o">=</span> <span class="n">JSourcex</span> <span class="o">-</span> <span class="n">JOhmx</span>
+        <span class="n">JSeebecky</span> <span class="o">=</span> <span class="n">JSourcey</span> <span class="o">-</span> <span class="n">JOhmy</span>
+        <span class="n">JSeebeckz</span> <span class="o">=</span> <span class="n">JSourcez</span> <span class="o">-</span> <span class="n">JOhmz</span>
+
+        <span class="n">T_val</span> <span class="o">=</span> <span class="n">_idw_scalar</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s2">"T_array"</span><span class="p">],</span> <span class="s2">"temperature"</span><span class="p">)</span>
+        <span class="n">P_val</span> <span class="o">=</span> <span class="n">_idw_scalar</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s2">"P_array"</span><span class="p">],</span> <span class="s2">"potential"</span><span class="p">)</span>
+        <span class="n">nearest_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">distances</span><span class="p">))</span>
+        <span class="n">nearest_point</span> <span class="o">=</span> <span class="n">points_np</span><span class="p">[</span><span class="n">nearest_idx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"JOhmx"</span><span class="p">:</span> <span class="n">JOhmx</span><span class="p">,</span>
+            <span class="s2">"JOhmy"</span><span class="p">:</span> <span class="n">JOhmy</span><span class="p">,</span>
+            <span class="s2">"JOhmz"</span><span class="p">:</span> <span class="n">JOhmz</span><span class="p">,</span>
+            <span class="s2">"JSeebeckx"</span><span class="p">:</span> <span class="n">JSeebeckx</span><span class="p">,</span>
+            <span class="s2">"JSeebecky"</span><span class="p">:</span> <span class="n">JSeebecky</span><span class="p">,</span>
+            <span class="s2">"JSeebeckz"</span><span class="p">:</span> <span class="n">JSeebeckz</span><span class="p">,</span>
+            <span class="s2">"JSourcex"</span><span class="p">:</span> <span class="n">JSourcex</span><span class="p">,</span>
+            <span class="s2">"JSourcey"</span><span class="p">:</span> <span class="n">JSourcey</span><span class="p">,</span>
+            <span class="s2">"JSourcez"</span><span class="p">:</span> <span class="n">JSourcez</span><span class="p">,</span>
+            <span class="s2">"T"</span><span class="p">:</span> <span class="n">T_val</span><span class="p">,</span>
+            <span class="s2">"P"</span><span class="p">:</span> <span class="n">P_val</span><span class="p">,</span>
+            <span class="s2">"mesh_distance"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">diagnostics</span><span class="p">[</span><span class="s2">"mesh_distance"</span><span class="p">]),</span>
+            <span class="s2">"nearest_point"</span><span class="p">:</span> <span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">nearest_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">nearest_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">nearest_point</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="p">),</span>
+            <span class="s2">"sample_region"</span><span class="p">:</span> <span class="n">region</span><span class="p">,</span>
+            <span class="s2">"idw_neighbors_used"</span><span class="p">:</span> <span class="n">diagnostics</span><span class="p">[</span><span class="s2">"idw_neighbors_used"</span><span class="p">],</span>
+            <span class="s2">"idw_exact_node_hit"</span><span class="p">:</span> <span class="n">diagnostics</span><span class="p">[</span><span class="s2">"idw_exact_node_hit"</span><span class="p">],</span>
+            <span class="s2">"idw_support_radius_m"</span><span class="p">:</span> <span class="n">diagnostics</span><span class="p">[</span><span class="s2">"idw_support_radius_m"</span><span class="p">],</span>
+            <span class="s2">"idw_support_mean_distance_m"</span><span class="p">:</span> <span class="n">diagnostics</span><span class="p">[</span><span class="s2">"idw_support_mean_distance_m"</span><span class="p">],</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.interior_probe_common</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

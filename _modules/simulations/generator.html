@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>simulations.generator &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.generator</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for simulations.generator</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Assemble Elmer SIF files from topology, driver, and material snippets."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">config.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_application_defaults</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">tensor_utils</span>
+
+
+<div class="viewcode-block" id="MaterialModel">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.MaterialModel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaterialModel</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Supported thermoelectric/magnetic material constitutive models.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: enumeration of SIF material snippet kinds.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        MaterialModel: Enum member selecting a materials ``*.sif.inc`` snippet.</span>
+<span class="sd">    """</span>
+
+    <span class="n">SIMPLE</span> <span class="o">=</span> <span class="s2">"simple"</span>
+    <span class="n">TDEP</span> <span class="o">=</span> <span class="s2">"Tdep"</span>
+    <span class="n">ANISOTROPY</span> <span class="o">=</span> <span class="s2">"anisotropy"</span>
+    <span class="n">HYSTERESIS</span> <span class="o">=</span> <span class="s2">"hysteresis"</span></div>
+
+
+
+<div class="viewcode-block" id="DriverType">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.DriverType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DriverType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Thermal/electrical driving transient used for BC and timestepping.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: enumeration of steady, harmonic, and sawtooth drivers.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        DriverType: Enum member selecting a drivers ``*.sif.inc`` snippet.</span>
+<span class="sd">    """</span>
+
+    <span class="n">STEADY</span> <span class="o">=</span> <span class="s2">"steady"</span>
+    <span class="n">HARMONIC</span> <span class="o">=</span> <span class="s2">"harmonic"</span>
+    <span class="n">SAWTOOTH</span> <span class="o">=</span> <span class="s2">"sawtooth"</span></div>
+
+
+
+<div class="viewcode-block" id="SifBaseType">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifBaseType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SifBaseType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: SIF base topology matching geometry variants (bodies and BCs).</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: enumeration aligned with full/hollow/layered mesh topologies.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SifBaseType: Enum member selecting a templates ``*_base.sif`` file.</span>
+<span class="sd">    """</span>
+
+    <span class="n">FULL</span> <span class="o">=</span> <span class="s2">"full"</span>
+    <span class="n">HOLLOW</span> <span class="o">=</span> <span class="s2">"hollow"</span>
+    <span class="n">LAYER_OVER_HOLLOW</span> <span class="o">=</span> <span class="s2">"layer_over_hollow"</span>
+    <span class="n">LAYER_OVER_FULL</span> <span class="o">=</span> <span class="s2">"layer_over_full"</span></div>
+
+
+
+<div class="viewcode-block" id="DriverParams">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.DriverParams">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DriverParams</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Temperatures and time-stepping values substituted into driver SIFs.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        t_cold: Cold-end boundary temperature [K].</span>
+<span class="sd">        t_hot: Hot-end boundary temperature [K].</span>
+<span class="sd">        t_mean: Mean temperature for harmonic drives [K].</span>
+<span class="sd">        t_amplitude: Half-range amplitude for harmonic drives [K].</span>
+<span class="sd">        frequency: Harmonic frequency if used [Hz].</span>
+<span class="sd">        t_min: Minimum sawtooth temperature [K].</span>
+<span class="sd">        t_max: Maximum sawtooth temperature [K].</span>
+<span class="sd">        period: Sawtooth/harmonic period if used [s].</span>
+<span class="sd">        timestep_size: Elmer timestep size [s].</span>
+<span class="sd">        timestep_intervals: Number of timesteps [dimensionless].</span>
+<span class="sd">        output_intervals: Result output interval in steps [dimensionless].</span>
+<span class="sd">        physical_total_time: Optional physical duration overriding interval count [s].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        DriverParams: Dataclass consumed by driver block substitution.</span>
+<span class="sd">    """</span>
+
+    <span class="n">t_cold</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">t_hot</span><span class="p">:</span> <span class="nb">float</span>
+
+    <span class="n">t_mean</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">t_amplitude</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+
+    <span class="n">t_min</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">t_max</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+
+    <span class="n">timestep_size</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">timestep_intervals</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">output_intervals</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">physical_total_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="BoundaryConfig">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.BoundaryConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BoundaryConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Map hot/cold/infinity BC numbers onto mesh physical surface IDs.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        bc_hot_num: Elmer Boundary Condition number for the hot end.</span>
+<span class="sd">        bc_hot_boundary: Target mesh boundary tag for the hot end.</span>
+<span class="sd">        bc_cold_num: Elmer Boundary Condition number for the cold end.</span>
+<span class="sd">        bc_cold_boundary: Target mesh boundary tag for the cold end.</span>
+<span class="sd">        bc_infinity_num: Elmer Boundary Condition number for infinity.</span>
+<span class="sd">        bc_infinity_boundary: Target mesh boundary tag for infinity.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        BoundaryConfig: Topology BC numbering used when filling SIF placeholders.</span>
+<span class="sd">    """</span>
+
+    <span class="n">bc_hot_num</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">bc_hot_boundary</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">bc_cold_num</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">bc_cold_boundary</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">bc_infinity_num</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">bc_infinity_boundary</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
+<div class="viewcode-block" id="GeometryTopology">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.GeometryTopology">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GeometryTopology</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Body and boundary topology for one SIF base geometry family.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        boundary_config: Hot/cold/infinity BC numbering for this topology.</span>
+<span class="sd">        outer_air_body: Target body ID of the surrounding air region.</span>
+<span class="sd">        inner_air_body: Optional inner cavity air body ID.</span>
+<span class="sd">        material_bodies: Ordered conductor body IDs (outer, then inner if layered).</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryTopology: Frozen topology record keyed by ``SifBaseType``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">boundary_config</span><span class="p">:</span> <span class="n">BoundaryConfig</span>
+    <span class="n">outer_air_body</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">inner_air_body</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">material_bodies</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
+
+
+
+<span class="n">TOPOLOGY_CONFIGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">SifBaseType</span><span class="o">.</span><span class="n">FULL</span><span class="p">:</span> <span class="n">GeometryTopology</span><span class="p">(</span>
+        <span class="n">boundary_config</span><span class="o">=</span><span class="n">BoundaryConfig</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="n">outer_air_body</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">material_bodies</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+    <span class="p">),</span>
+    <span class="n">SifBaseType</span><span class="o">.</span><span class="n">HOLLOW</span><span class="p">:</span> <span class="n">GeometryTopology</span><span class="p">(</span>
+        <span class="n">boundary_config</span><span class="o">=</span><span class="n">BoundaryConfig</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="n">outer_air_body</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">inner_air_body</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">material_bodies</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+    <span class="p">),</span>
+    <span class="n">SifBaseType</span><span class="o">.</span><span class="n">LAYER_OVER_HOLLOW</span><span class="p">:</span> <span class="n">GeometryTopology</span><span class="p">(</span>
+        <span class="n">boundary_config</span><span class="o">=</span><span class="n">BoundaryConfig</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+        <span class="n">outer_air_body</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">inner_air_body</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">material_bodies</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">SifBaseType</span><span class="o">.</span><span class="n">LAYER_OVER_FULL</span><span class="p">:</span> <span class="n">GeometryTopology</span><span class="p">(</span>
+        <span class="n">boundary_config</span><span class="o">=</span><span class="n">BoundaryConfig</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="n">outer_air_body</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">material_bodies</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">BOUNDARY_CONFIGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">base_type</span><span class="p">:</span> <span class="n">topology</span><span class="o">.</span><span class="n">boundary_config</span> <span class="k">for</span> <span class="n">base_type</span><span class="p">,</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">TOPOLOGY_CONFIGS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="n">MATERIAL_SNIPPET_FILES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">MaterialModel</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">MaterialModel</span><span class="o">.</span><span class="n">SIMPLE</span><span class="p">:</span> <span class="s2">"simple.sif.inc"</span><span class="p">,</span>
+    <span class="n">MaterialModel</span><span class="o">.</span><span class="n">TDEP</span><span class="p">:</span> <span class="s2">"Tdep.sif.inc"</span><span class="p">,</span>
+    <span class="n">MaterialModel</span><span class="o">.</span><span class="n">ANISOTROPY</span><span class="p">:</span> <span class="s2">"anisotropy.sif.inc"</span><span class="p">,</span>
+    <span class="n">MaterialModel</span><span class="o">.</span><span class="n">HYSTERESIS</span><span class="p">:</span> <span class="s2">"hysteresis.sif.inc"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">REQUIRED_SOLVER_BLOCKS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"thermoelectric"</span><span class="p">,</span>
+    <span class="s2">"seebeck_current"</span><span class="p">,</span>
+    <span class="s2">"current_density"</span><span class="p">,</span>
+    <span class="s2">"whitney_av"</span><span class="p">,</span>
+    <span class="s2">"magnetic_field"</span><span class="p">,</span>
+    <span class="s2">"result_output"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">_POST_WARM_NL_MAX</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">_POST_WARM_NEWTON_AFTER</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">_MAGNETIC_PRECURSOR_BLOCK</span> <span class="o">=</span> <span class="s2">"""</span><span class="se">\</span>
+<span class="s2">Solver 4</span>
+<span class="s2">  Exec Solver = After Timestep</span>
+<span class="s2">  Exec Intervals = 1</span>
+<span class="s2">  Equation = "MGDynamicsPrecursor"</span>
+<span class="s2">  Procedure = "MagnetoDynamics" "WhitneyAVSolver"</span>
+<span class="s2">  Variable = "P"</span>
+
+<span class="s2">  Use Magnetic Permeability = Logical True</span>
+
+<span class="s2">  Edge Basis = Logical True</span>
+<span class="s2">  Fix Input Current Density = Logical True</span>
+<span class="s2">  Automated Source Projection BCs = Logical True</span>
+<span class="s2">  JFix: Linear System Max Iterations = 2000</span>
+<span class="s2">  JFix: Linear System Convergence Tolerance = 1.0e-5</span>
+<span class="s2">  JFix: Linear System Abort Not Converged = Logical False</span>
+
+<span class="s2">  Use Tree Gauge = Logical True</span>
+
+<span class="s2">  Linear System Solver = Iterative</span>
+<span class="s2">  Linear System Iterative Method = GMRES</span>
+<span class="s2">  Linear System GMRES Restart = 100</span>
+<span class="s2">  Linear System Max Iterations = 2000</span>
+<span class="s2">  Linear System Convergence Tolerance = 1.0e-3</span>
+<span class="s2">  Linear System Preconditioning = ILU0</span>
+<span class="s2">  Linear System Residual Output = 50</span>
+<span class="s2">  Linear System Abort Not Converged = Logical False</span>
+<span class="s2">  Linear System Precondition Recompute = 1</span>
+
+<span class="s2">  Nonlinear System Max Iterations = 1</span>
+<span class="s2">  Steady State Convergence Tolerance = 1.0e-4</span>
+<span class="s2">End</span>
+<span class="s2">"""</span>
+
+
+<div class="viewcode-block" id="SifGenerator">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SifGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Compose complete Elmer SIF text from templates, drivers, and materials.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        base_dir: Optional simulations package root holding snippets [path].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SifGenerator: Assembler that can write SIF content to memory or disk.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Locate templates, drivers, materials, and solver-block directories.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            base_dir: Package root; defaults to this module's directory [path].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Constructs ``SifGenerator`` with resolved snippet paths.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">base_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">base_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span> <span class="o">=</span> <span class="n">base_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span> <span class="o">=</span> <span class="n">base_dir</span> <span class="o">/</span> <span class="s2">"templates"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drivers_dir</span> <span class="o">=</span> <span class="n">base_dir</span> <span class="o">/</span> <span class="s2">"drivers"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">materials_dir</span> <span class="o">=</span> <span class="n">base_dir</span> <span class="o">/</span> <span class="s2">"materials"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver_blocks_dir</span> <span class="o">=</span> <span class="n">base_dir</span> <span class="o">/</span> <span class="s2">"solver_blocks"</span>
+
+<div class="viewcode-block" id="SifGenerator.get_driver_params_defaults">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator.get_driver_params_defaults">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_driver_params_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span> <span class="n">DriverType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriverParams</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Build default driver temperatures and runtime from app defaults.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            driver: Driver kind selecting defaults subsection [dimensionless].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            DriverParams: Defaults including derived mean/amplitude and timesteps.</span>
+<span class="sd">        """</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="n">load_application_defaults</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">drv_defaults</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">drivers</span><span class="p">[</span><span class="n">driver</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing defaults for driver: </span><span class="si">{</span><span class="n">driver</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+        <span class="n">t_cold</span> <span class="o">=</span> <span class="n">drv_defaults</span><span class="o">.</span><span class="n">t_cold</span>
+        <span class="n">t_hot</span> <span class="o">=</span> <span class="n">drv_defaults</span><span class="o">.</span><span class="n">t_hot</span>
+        <span class="n">runtime</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">driver_runtime</span>
+        <span class="k">return</span> <span class="n">DriverParams</span><span class="p">(</span>
+            <span class="n">t_cold</span><span class="o">=</span><span class="n">t_cold</span><span class="p">,</span>
+            <span class="n">t_hot</span><span class="o">=</span><span class="n">t_hot</span><span class="p">,</span>
+            <span class="n">t_mean</span><span class="o">=</span><span class="p">(</span><span class="n">t_hot</span> <span class="o">+</span> <span class="n">t_cold</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span>
+            <span class="n">t_amplitude</span><span class="o">=</span><span class="p">(</span><span class="n">t_hot</span> <span class="o">-</span> <span class="n">t_cold</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span>
+            <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">t_min</span><span class="o">=</span><span class="n">t_cold</span><span class="p">,</span>
+            <span class="n">t_max</span><span class="o">=</span><span class="n">t_hot</span><span class="p">,</span>
+            <span class="n">period</span><span class="o">=</span><span class="n">drv_defaults</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
+            <span class="n">timestep_size</span><span class="o">=</span><span class="n">runtime</span><span class="o">.</span><span class="n">timestep_size</span><span class="p">,</span>
+            <span class="n">timestep_intervals</span><span class="o">=</span><span class="n">runtime</span><span class="o">.</span><span class="n">timestep_intervals</span><span class="p">,</span>
+            <span class="n">output_intervals</span><span class="o">=</span><span class="n">runtime</span><span class="o">.</span><span class="n">output_intervals</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator.runtime_defaults">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator.runtime_defaults">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">runtime_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return backend-enforced timestep/output defaults from config.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: loads ``application_defaults.json`` driver runtime section.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: ``timestep_size``, ``timestep_intervals``, ``output_intervals``.</span>
+<span class="sd">        """</span>
+        <span class="n">runtime</span> <span class="o">=</span> <span class="n">load_application_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">driver_runtime</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"timestep_size"</span><span class="p">:</span> <span class="n">runtime</span><span class="o">.</span><span class="n">timestep_size</span><span class="p">,</span>
+            <span class="s2">"timestep_intervals"</span><span class="p">:</span> <span class="n">runtime</span><span class="o">.</span><span class="n">timestep_intervals</span><span class="p">,</span>
+            <span class="s2">"output_intervals"</span><span class="p">:</span> <span class="n">runtime</span><span class="o">.</span><span class="n">output_intervals</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator.with_backend_runtime_defaults">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator.with_backend_runtime_defaults">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_backend_runtime_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">DriverParams</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriverParams</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Overlay backend runtime policy onto caller-supplied driver params.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            params: Caller driver params; may set ``physical_total_time`` [s].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            DriverParams: Copy with enforced timestep size/intervals/output intervals.</span>
+<span class="sd">        """</span>
+        <span class="n">runtime_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_defaults</span><span class="p">()</span>
+        <span class="n">timestep_size</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">runtime_defaults</span><span class="p">[</span><span class="s2">"timestep_size"</span><span class="p">])</span>
+        <span class="n">output_intervals</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">runtime_defaults</span><span class="p">[</span><span class="s2">"output_intervals"</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">physical_total_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">physical_total_time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">physical_total_time</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">physical_total_time</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"physical_total_time must be &gt; 0"</span><span class="p">)</span>
+            <span class="n">timestep_intervals</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">physical_total_time</span> <span class="o">/</span> <span class="n">timestep_size</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timestep_intervals</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">runtime_defaults</span><span class="p">[</span><span class="s2">"timestep_intervals"</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">DriverParams</span><span class="p">(</span>
+            <span class="n">t_cold</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">t_cold</span><span class="p">,</span>
+            <span class="n">t_hot</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">t_hot</span><span class="p">,</span>
+            <span class="n">t_mean</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">t_mean</span><span class="p">,</span>
+            <span class="n">t_amplitude</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">t_amplitude</span><span class="p">,</span>
+            <span class="n">frequency</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">frequency</span><span class="p">,</span>
+            <span class="n">t_min</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">t_min</span><span class="p">,</span>
+            <span class="n">t_max</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">t_max</span><span class="p">,</span>
+            <span class="n">period</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
+            <span class="n">timestep_size</span><span class="o">=</span><span class="n">timestep_size</span><span class="p">,</span>
+            <span class="n">timestep_intervals</span><span class="o">=</span><span class="n">timestep_intervals</span><span class="p">,</span>
+            <span class="n">output_intervals</span><span class="o">=</span><span class="n">output_intervals</span><span class="p">,</span>
+            <span class="n">physical_total_time</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">physical_total_time</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._format_sif_number">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._format_sif_number">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_format_sif_number</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Format a numeric value for Elmer Simulation-block assignment lines.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            value: Int/float-like value, or fallback string [mixed].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Compact SIF-friendly numeric literal.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">value_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value_f</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value_f</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value_f</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">10.0</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value_f</span><span class="p">))</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value_f</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._replace_or_insert_simulation_line">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._replace_or_insert_simulation_line">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_replace_or_insert_simulation_line</span><span class="p">(</span>
+        <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">insert_after_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Replace a Simulation key or insert it after an anchor line.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            text: Full or partial SIF text containing a Simulation block.</span>
+<span class="sd">            key: Simulation keyword such as ``Timestep Sizes`` [dimensionless].</span>
+<span class="sd">            value: Numeric value to assign [matches key units].</span>
+<span class="sd">            insert_after_key: Existing keyword after which to insert if missing.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Updated SIF text with the key present and set.</span>
+<span class="sd">        """</span>
+        <span class="n">value_text</span> <span class="o">=</span> <span class="n">SifGenerator</span><span class="o">.</span><span class="n">_format_sif_number</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">"(?mi)^(\s*</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s2">\s*=\s*).*$"</span>
+        <span class="n">replacement</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">"\g&lt;1&gt;</span><span class="si">{</span><span class="n">value_text</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">new_text</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">subn</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">count</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new_text</span>
+
+        <span class="n">after_pattern</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">"(?mi)^(\s*</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">insert_after_key</span><span class="p">)</span><span class="si">}</span><span class="s2">\s*=.*)$"</span>
+        <span class="n">new_text</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">subn</span><span class="p">(</span>
+            <span class="n">after_pattern</span><span class="p">,</span>
+            <span class="sa">rf</span><span class="s2">"\1\n  </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">value_text</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">text</span><span class="p">,</span>
+            <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">count</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new_text</span>
+
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Generated SIF is missing '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' and insertion anchor "</span>
+            <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">insert_after_key</span><span class="si">}</span><span class="s2">' was not found."</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._enforce_driver_runtime_policy">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._enforce_driver_runtime_policy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_enforce_driver_runtime_policy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sif_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">DriverParams</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Force timestep size/intervals/output intervals to backend policy.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            sif_content: Generated time-dependent SIF text.</span>
+<span class="sd">            params: Driver params providing expected timestep interval count.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: SIF text with runtime keywords rewritten and asserted.</span>
+<span class="sd">        """</span>
+        <span class="n">runtime_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_defaults</span><span class="p">()</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replace_or_insert_simulation_line</span><span class="p">(</span>
+            <span class="n">sif_content</span><span class="p">,</span>
+            <span class="s2">"Timestep Sizes"</span><span class="p">,</span>
+            <span class="n">runtime_defaults</span><span class="p">[</span><span class="s2">"timestep_size"</span><span class="p">],</span>
+            <span class="s2">"BDF Order"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replace_or_insert_simulation_line</span><span class="p">(</span>
+            <span class="n">sif_content</span><span class="p">,</span>
+            <span class="s2">"Timestep Intervals"</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">timestep_intervals</span><span class="p">,</span>
+            <span class="s2">"Timestep Sizes"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replace_or_insert_simulation_line</span><span class="p">(</span>
+            <span class="n">sif_content</span><span class="p">,</span>
+            <span class="s2">"Output Intervals"</span><span class="p">,</span>
+            <span class="n">runtime_defaults</span><span class="p">[</span><span class="s2">"output_intervals"</span><span class="p">],</span>
+            <span class="s2">"Timestep Intervals"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_driver_runtime_policy</span><span class="p">(</span><span class="n">sif_content</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">timestep_intervals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sif_content</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._assert_driver_runtime_policy">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._assert_driver_runtime_policy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assert_driver_runtime_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sif_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expected_intervals</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Verify generated SIF runtime keywords match application defaults.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            sif_content: Time-dependent SIF text to inspect.</span>
+<span class="sd">            expected_intervals: Required ``Timestep Intervals`` value.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Raises ``RuntimeError`` when policy is violated.</span>
+<span class="sd">        """</span>
+        <span class="n">runtime_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_defaults</span><span class="p">()</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"Timestep Sizes"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">runtime_defaults</span><span class="p">[</span><span class="s2">"timestep_size"</span><span class="p">]),</span>
+            <span class="s2">"Timestep Intervals"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">expected_intervals</span><span class="p">),</span>
+            <span class="s2">"Output Intervals"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">runtime_defaults</span><span class="p">[</span><span class="s2">"output_intervals"</span><span class="p">]),</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">expected_value</span> <span class="ow">in</span> <span class="n">expected</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">"(?mi)^\s*</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s2">\s*=\s*([^\s!]+)"</span><span class="p">,</span> <span class="n">sif_content</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generated time_dependent SIF is missing '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+
+            <span class="n">raw_value</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expected_value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="n">actual</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">raw_value</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">actual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Generated time_dependent SIF has non-numeric </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">raw_value</span><span class="si">!r}</span><span class="s2">"</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+            <span class="k">if</span> <span class="n">actual</span> <span class="o">!=</span> <span class="n">expected_value</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Generated time_dependent SIF has </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">actual</span><span class="si">}</span><span class="s2">, "</span>
+                    <span class="sa">f</span><span class="s2">"expected </span><span class="si">{</span><span class="n">expected_value</span><span class="si">}</span><span class="s2"> from application_defaults.json."</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator.generate">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator.generate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_type</span><span class="p">:</span> <span class="n">SifBaseType</span><span class="p">,</span>
+        <span class="n">driver</span><span class="p">:</span> <span class="n">DriverType</span><span class="p">,</span>
+        <span class="n">outer_material_model</span><span class="p">:</span> <span class="n">MaterialModel</span><span class="p">,</span>
+        <span class="n">outer_material_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">inner_material_model</span><span class="p">:</span> <span class="n">MaterialModel</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">inner_material_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">driver_params</span><span class="p">:</span> <span class="n">DriverParams</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">air_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">geometry_shape</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cylinder"</span><span class="p">,</span>
+        <span class="n">bc1_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">bc2_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Generate a complete coupled thermoelectric-magnetic Elmer SIF.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            base_type: Mesh topology selecting base template and BC/body IDs.</span>
+<span class="sd">            driver: Steady/harmonic/sawtooth driving schedule.</span>
+<span class="sd">            outer_material_model: Constitutive model for the outer conductor.</span>
+<span class="sd">            outer_material_params: Outer material property map.</span>
+<span class="sd">            inner_material_model: Inner conductor model for layered topologies.</span>
+<span class="sd">            inner_material_params: Inner material property map.</span>
+<span class="sd">            driver_params: Optional temperatures/runtime; defaults if omitted.</span>
+<span class="sd">            air_params: Required Air material property map.</span>
+<span class="sd">            output_path: Optional filesystem path to write the SIF.</span>
+<span class="sd">            geometry_shape: Shape used for anisotropic tensor orientation.</span>
+<span class="sd">            bc1_potential: Optional electrode electric potential if set [V].</span>
+<span class="sd">            bc2_potential: Cold electrode electric potential if set [V].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Fully substituted SIF source text.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">driver_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">driver_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_driver_params_defaults</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">driver_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_backend_runtime_defaults</span><span class="p">(</span><span class="n">driver_params</span><span class="p">)</span>
+
+        <span class="n">is_twolayer</span> <span class="o">=</span> <span class="n">base_type</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="n">SifBaseType</span><span class="o">.</span><span class="n">LAYER_OVER_HOLLOW</span><span class="p">,</span>
+            <span class="n">SifBaseType</span><span class="o">.</span><span class="n">LAYER_OVER_FULL</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_twolayer</span> <span class="ow">and</span> <span class="p">(</span><span class="n">inner_material_model</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">inner_material_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Two-layer geometries require inner_material_model and inner_material_params"</span><span class="p">)</span>
+
+        <span class="n">inner_seebeck</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">is_twolayer</span><span class="p">:</span>
+            <span class="n">inner_seebeck</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">inner_material_params</span><span class="p">[</span><span class="s2">"seebeck_coefficient"</span><span class="p">])</span>
+
+        <span class="n">base_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_base_template</span><span class="p">(</span><span class="n">base_type</span><span class="p">)</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">TOPOLOGY_CONFIGS</span><span class="p">[</span><span class="n">base_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_base_template</span><span class="p">(</span><span class="n">base_content</span><span class="p">,</span> <span class="n">base_type</span><span class="p">)</span>
+        <span class="n">bc_config</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">boundary_config</span>
+        <span class="n">outer_seebeck</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">outer_material_params</span><span class="p">[</span><span class="s2">"seebeck_coefficient"</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">outer_material_model</span> <span class="o">==</span> <span class="n">MaterialModel</span><span class="o">.</span><span class="n">ANISOTROPY</span><span class="p">:</span>
+            <span class="n">outer_body_force_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_tensor_current_body_force</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span>
+                <span class="n">geometry_shape</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">outer_material_params</span><span class="p">[</span><span class="s2">"s_par"</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">outer_material_params</span><span class="p">[</span><span class="s2">"s_perp"</span><span class="p">]),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">outer_body_force_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_scalar_current_body_force</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span>
+                <span class="n">outer_seebeck</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">inner_body_force_block</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="k">if</span> <span class="n">is_twolayer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">inner_material_model</span> <span class="o">==</span> <span class="n">MaterialModel</span><span class="o">.</span><span class="n">ANISOTROPY</span><span class="p">:</span>
+                <span class="n">inner_body_force_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_tensor_current_body_force</span><span class="p">(</span>
+                    <span class="mi">2</span><span class="p">,</span>
+                    <span class="n">geometry_shape</span><span class="p">,</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">inner_material_params</span><span class="p">[</span><span class="s2">"s_par"</span><span class="p">]),</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">inner_material_params</span><span class="p">[</span><span class="s2">"s_perp"</span><span class="p">]),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">inner_body_force_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_scalar_current_body_force</span><span class="p">(</span>
+                    <span class="mi">2</span><span class="p">,</span>
+                    <span class="n">inner_seebeck</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">air_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"air_params is required (Air material block is generated from properties)"</span>
+            <span class="p">)</span>
+
+        <span class="n">outer_material_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_material_block</span><span class="p">(</span><span class="n">outer_material_model</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">outer_material_params</span><span class="p">,</span> <span class="n">geometry_shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_twolayer</span><span class="p">:</span>
+            <span class="n">inner_material_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_material_block</span><span class="p">(</span><span class="n">inner_material_model</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">inner_material_params</span><span class="p">,</span> <span class="n">geometry_shape</span><span class="p">)</span>
+            <span class="n">air_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_material_block</span><span class="p">(</span>
+                <span class="n">MaterialModel</span><span class="o">.</span><span class="n">SIMPLE</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">air_params</span><span class="p">,</span> <span class="n">geometry_shape</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inner_material_block</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="n">air_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_material_block</span><span class="p">(</span>
+                <span class="n">MaterialModel</span><span class="o">.</span><span class="n">SIMPLE</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">air_params</span><span class="p">,</span> <span class="n">geometry_shape</span>
+            <span class="p">)</span>
+
+        <span class="n">sim_block</span><span class="p">,</span> <span class="n">bc_hot_block</span><span class="p">,</span> <span class="n">bc_cold_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_driver_blocks</span><span class="p">(</span>
+            <span class="n">driver</span><span class="p">,</span>
+            <span class="n">driver_params</span><span class="p">,</span>
+            <span class="n">bc_config</span><span class="p">,</span>
+            <span class="n">bc1_potential</span><span class="o">=</span><span class="n">bc1_potential</span><span class="p">,</span>
+            <span class="n">bc2_potential</span><span class="o">=</span><span class="n">bc2_potential</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">output_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_output_name</span><span class="p">()</span>
+
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">base_content</span>
+
+        <span class="n">solver_blocks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_solver_blocks</span><span class="p">(</span><span class="n">output_name</span><span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SOLVER1_BLOCK}}"</span><span class="p">,</span> <span class="n">solver_blocks</span><span class="p">[</span><span class="s2">"thermoelectric"</span><span class="p">])</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SOLVER2_BLOCK}}"</span><span class="p">,</span> <span class="n">solver_blocks</span><span class="p">[</span><span class="s2">"seebeck_current"</span><span class="p">])</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SOLVER3_BLOCK}}"</span><span class="p">,</span> <span class="n">solver_blocks</span><span class="p">[</span><span class="s2">"current_density"</span><span class="p">])</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SOLVER4_BLOCK}}"</span><span class="p">,</span> <span class="n">solver_blocks</span><span class="p">[</span><span class="s2">"whitney_av"</span><span class="p">])</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SOLVER5_BLOCK}}"</span><span class="p">,</span> <span class="n">solver_blocks</span><span class="p">[</span><span class="s2">"magnetic_field"</span><span class="p">])</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SOLVER6_BLOCK}}"</span><span class="p">,</span> <span class="n">solver_blocks</span><span class="p">[</span><span class="s2">"result_output"</span><span class="p">])</span>
+
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SIMULATION_BLOCK}}"</span><span class="p">,</span> <span class="n">sim_block</span><span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{OUTER_BODY_FORCE_BLOCK}}"</span><span class="p">,</span> <span class="n">outer_body_force_block</span><span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{INNER_BODY_FORCE_BLOCK}}"</span><span class="p">,</span> <span class="n">inner_body_force_block</span><span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{BC_HOT_BLOCK}}"</span><span class="p">,</span> <span class="n">bc_hot_block</span><span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{BC_COLD_BLOCK}}"</span><span class="p">,</span> <span class="n">bc_cold_block</span><span class="p">)</span>
+
+        <span class="n">t_ic</span> <span class="o">=</span> <span class="n">load_application_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">t_ic</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{T_IC}}"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">t_ic</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{OUTER_MATERIAL_BLOCK}}"</span><span class="p">,</span> <span class="n">outer_material_block</span><span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{INNER_MATERIAL_BLOCK}}"</span><span class="p">,</span> <span class="n">inner_material_block</span><span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{MATERIAL_AIR_BLOCK}}"</span><span class="p">,</span> <span class="n">air_block</span><span class="p">)</span>
+
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s2">"{{OUTER_MATERIAL_NAME}}"</span><span class="p">,</span> <span class="n">outer_material_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"OuterMaterial"</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">inner_material_params</span><span class="p">:</span>
+            <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                <span class="s2">"{{INNER_MATERIAL_NAME}}"</span><span class="p">,</span> <span class="n">inner_material_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"InnerMaterial"</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{BC_INFINITY_NUM}}"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bc_config</span><span class="o">.</span><span class="n">bc_infinity_num</span><span class="p">))</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s2">"{{BC_INFINITY_BOUNDARY}}"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bc_config</span><span class="o">.</span><span class="n">bc_infinity_boundary</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{BC_INFINITY_TEMPERATURE}}"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">sif_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{OUTPUT_FILE_NAME}}"</span><span class="p">,</span> <span class="n">output_name</span><span class="p">)</span>
+        <span class="n">permittivity</span> <span class="o">=</span> <span class="n">load_application_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">physics_constants</span><span class="p">[</span><span class="s2">"permittivity_of_vacuum"</span><span class="p">]</span>
+        <span class="n">sif_content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"(Permittivity of Vacuum\s*=\s*Real\s+)[0-9.eE+-]+"</span><span class="p">,</span>
+            <span class="sa">rf</span><span class="s2">"\g&lt;1&gt;</span><span class="si">{</span><span class="n">permittivity</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">sif_content</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">driver</span> <span class="o">!=</span> <span class="n">DriverType</span><span class="o">.</span><span class="n">STEADY</span><span class="p">:</span>
+            <span class="n">sif_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enforce_driver_runtime_policy</span><span class="p">(</span><span class="n">sif_content</span><span class="p">,</span> <span class="n">driver_params</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output_path</span><span class="p">:</span>
+            <span class="n">output_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sif_content</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sif_content</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator.build_magnetic_warm_start_sif">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator.build_magnetic_warm_start_sif">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_magnetic_warm_start_sif</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_sif</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Insert a linear WhitneyAV precursor before the nonlinear H-B solve.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            base_sif: SIF that already defines at least one ``H-B Curve`` material.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Modified SIF with precursor Solver 4 and renumbered trailing solvers.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?m)^\s*H-B Curve\s*="</span><span class="p">,</span> <span class="n">base_sif</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"In-memory warm-start requires at least one H-B Curve material"</span><span class="p">)</span>
+
+        <span class="n">sif</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"(?ms)^Equation\s+1\s*$\n.*?^End\s*$"</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">"Equation 1</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s1">'  Name = "CoupledPhysicsWarmStart"</span><span class="se">\n</span><span class="s1">'</span>
+                <span class="s2">"  Active Solvers(7) = 1 2 3 4 5 6 7</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"End"</span>
+            <span class="p">),</span>
+            <span class="n">base_sif</span><span class="p">,</span>
+            <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">solver_num</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+            <span class="n">sif</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_solver_comment_header</span><span class="p">(</span><span class="n">sif</span><span class="p">,</span> <span class="n">solver_num</span><span class="p">)</span>
+
+        <span class="n">solver4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_solver_block</span><span class="p">(</span><span class="n">sif</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">solver5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_solver_block</span><span class="p">(</span><span class="n">sif</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">solver6</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_solver_block</span><span class="p">(</span><span class="n">sif</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+
+        <span class="n">nonlinear_whitney</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_renumber_solver_header</span><span class="p">(</span><span class="n">solver4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">nonlinear_whitney</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">'(?m)^(\s*Equation\s*=\s*")[^"]*(")'</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s2">"\1MGDynamics\2"</span><span class="p">,</span>
+            <span class="n">nonlinear_whitney</span><span class="p">,</span>
+            <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">nonlinear_whitney</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tune_post_warm_whitney</span><span class="p">(</span><span class="n">nonlinear_whitney</span><span class="p">)</span>
+        <span class="n">calc_fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_renumber_solver_header</span><span class="p">(</span><span class="n">solver5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">result_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_renumber_solver_header</span><span class="p">(</span><span class="n">solver6</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+
+        <span class="n">replacement</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_solver_comment_header</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">"MagnetoDynamics AV Precursor"</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="o">+</span> <span class="n">_MAGNETIC_PRECURSOR_BLOCK</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="o">+</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solver_comment_header</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">"MagnetoDynamics AV"</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="o">+</span> <span class="n">nonlinear_whitney</span>
+            <span class="o">+</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solver_comment_header</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">"Magnetic Field Calculation"</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="o">+</span> <span class="n">calc_fields</span>
+            <span class="o">+</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solver_comment_header</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s2">"ResultOutput"</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="o">+</span> <span class="n">result_output</span>
+        <span class="p">)</span>
+        <span class="n">sif</span> <span class="o">=</span> <span class="n">sif</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">solver4</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sif</span> <span class="o">=</span> <span class="n">sif</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">solver5</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sif</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">solver6</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._solver_comment_header">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._solver_comment_header">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_solver_comment_header</span><span class="p">(</span><span class="n">solver_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Generate a comment header for a solver block.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            solver_num: Solver number [dimensionless].</span>
+<span class="sd">            comment: Comment text.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Comment header text.</span>
+<span class="sd">        """</span>
+        <span class="n">separator</span> <span class="o">=</span> <span class="s2">"!------------------------------------------------------"</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">separator</span><span class="si">}</span><span class="se">\n</span><span class="s2">! NAME: Solver </span><span class="si">{</span><span class="n">solver_num</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">separator</span><span class="si">}</span><span class="s2">)"</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._remove_solver_comment_header">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._remove_solver_comment_header">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remove_solver_comment_header</span><span class="p">(</span><span class="n">sif_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">solver_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Remove a comment header for a solver block.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            sif_content: Full SIF source.</span>
+<span class="sd">            solver_num: Solver header number to remove [dimensionless].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: SIF text with the solver header removed.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">rf</span><span class="s2">"(?m)^![-]+\s*$\n^!\s*NAME:\s*Solver\s+</span><span class="si">{</span><span class="n">solver_num</span><span class="si">}</span><span class="s2">\b.*$\n^![-]+\s*$\n?"</span><span class="p">,</span>
+            <span class="s2">""</span><span class="p">,</span>
+            <span class="n">sif_content</span><span class="p">,</span>
+            <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._extract_solver_block">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._extract_solver_block">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_solver_block</span><span class="p">(</span><span class="n">sif_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">solver_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Extract a numbered ``Solver N ... End`` block from SIF text.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            sif_content: Full SIF source.</span>
+<span class="sd">            solver_num: Solver header number to locate [dimensionless].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Exact solver block text including header and ``End``.</span>
+<span class="sd">        """</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="sa">rf</span><span class="s2">"(?ms)^Solver\s+</span><span class="si">{</span><span class="n">solver_num</span><span class="si">}</span><span class="s2">\s*$\n.*?^End\s*$"</span><span class="p">,</span>
+            <span class="n">sif_content</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Solver </span><span class="si">{</span><span class="n">solver_num</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._renumber_solver_header">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._renumber_solver_header">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_renumber_solver_header</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Rewrite the first ``Solver N`` header line to a new index.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            block: Solver block text beginning with ``Solver &lt;n&gt;``.</span>
+<span class="sd">            new_num: Replacement solver number [dimensionless].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Block with updated solver header.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"(?m)^Solver\s+\d+\s*$"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"Solver </span><span class="si">{</span><span class="n">new_num</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">block</span><span class="p">,</span>
+            <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._tune_post_warm_whitney">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._tune_post_warm_whitney">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_tune_post_warm_whitney</span><span class="p">(</span><span class="n">nonlinear_whitney</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Retune nonlinear WhitneyAV settings after a linear warm-start.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            nonlinear_whitney: Renumbered WhitneyAV solver block text.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Solver block with After-Timestep exec and relaxed Newton limits.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?m)^\s*Exec Solver\s*="</span><span class="p">,</span> <span class="n">nonlinear_whitney</span><span class="p">):</span>
+            <span class="n">nonlinear_whitney</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">"(?m)^(Solver\s+\d+\s*)$"</span><span class="p">,</span>
+                <span class="sa">r</span><span class="s2">"\1\n  Exec Solver = After Timestep"</span><span class="p">,</span>
+                <span class="n">nonlinear_whitney</span><span class="p">,</span>
+                <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nonlinear_whitney</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">"(?m)^(\s*Exec Solver\s*=\s*).*$"</span><span class="p">,</span>
+                <span class="sa">r</span><span class="s2">"\1After Timestep"</span><span class="p">,</span>
+                <span class="n">nonlinear_whitney</span><span class="p">,</span>
+                <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"(?m)^\s*Linear System Refactorize\s*="</span><span class="p">,</span>
+            <span class="n">nonlinear_whitney</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">nonlinear_whitney</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">"(?m)^(\s*Linear System Solver\s*=\s*.*)$"</span><span class="p">,</span>
+                <span class="sa">r</span><span class="s2">"  Linear System Refactorize = Logical True\n\1"</span><span class="p">,</span>
+                <span class="n">nonlinear_whitney</span><span class="p">,</span>
+                <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nonlinear_whitney</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">"(?m)^(\s*Linear System Refactorize\s*=\s*).*$"</span><span class="p">,</span>
+                <span class="sa">r</span><span class="s2">"\1Logical True"</span><span class="p">,</span>
+                <span class="n">nonlinear_whitney</span><span class="p">,</span>
+                <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">nonlinear_whitney</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"(?m)^(\s*Nonlinear System Max Iterations\s*=\s*).*$"</span><span class="p">,</span>
+            <span class="sa">rf</span><span class="s2">"\g&lt;1&gt;</span><span class="si">{</span><span class="n">_POST_WARM_NL_MAX</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">nonlinear_whitney</span><span class="p">,</span>
+            <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"(?m)^\s*Nonlinear System Newton After Iterations\s*="</span><span class="p">,</span>
+            <span class="n">nonlinear_whitney</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">"(?m)^(\s*Nonlinear System Newton After Iterations\s*=\s*).*$"</span><span class="p">,</span>
+                <span class="sa">rf</span><span class="s2">"\g&lt;1&gt;</span><span class="si">{</span><span class="n">_POST_WARM_NEWTON_AFTER</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="n">nonlinear_whitney</span><span class="p">,</span>
+                <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"(?m)^(\s*Newton-Raphson Iteration\s*=\s*.*)$"</span><span class="p">,</span>
+            <span class="sa">rf</span><span class="s2">"\1\n  Nonlinear System Newton After Iterations = </span><span class="si">{</span><span class="n">_POST_WARM_NEWTON_AFTER</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">nonlinear_whitney</span><span class="p">,</span>
+            <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._load_base_template">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._load_base_template">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_base_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_type</span><span class="p">:</span> <span class="n">SifBaseType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Read the base SIF template matching a topology variant.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            base_type: Topology selecting ``*_base.sif`` under ``templates/``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Raw base template text with placeholders intact.</span>
+<span class="sd">        """</span>
+        <span class="n">template_names</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">SifBaseType</span><span class="o">.</span><span class="n">FULL</span><span class="p">:</span> <span class="s2">"full_base.sif"</span><span class="p">,</span>
+            <span class="n">SifBaseType</span><span class="o">.</span><span class="n">HOLLOW</span><span class="p">:</span> <span class="s2">"hollow_base.sif"</span><span class="p">,</span>
+            <span class="n">SifBaseType</span><span class="o">.</span><span class="n">LAYER_OVER_FULL</span><span class="p">:</span> <span class="s2">"layer_over_full_base.sif"</span><span class="p">,</span>
+            <span class="n">SifBaseType</span><span class="o">.</span><span class="n">LAYER_OVER_HOLLOW</span><span class="p">:</span> <span class="s2">"layer_over_hollow_base.sif"</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">template_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span> <span class="o">/</span> <span class="n">template_names</span><span class="p">[</span><span class="n">base_type</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">template_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Base template not found: </span><span class="si">{</span><span class="n">template_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._validate_base_template">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._validate_base_template">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_base_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">base_type</span><span class="p">:</span> <span class="n">SifBaseType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Assert base template body IDs and infinity/IC placeholders.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            content: Loaded base SIF template text.</span>
+<span class="sd">            base_type: Topology whose expected outer-air body ID is checked.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Raises ``ValueError`` when the template contract is broken.</span>
+<span class="sd">        """</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">TOPOLOGY_CONFIGS</span><span class="p">[</span><span class="n">base_type</span><span class="p">]</span>
+
+        <span class="n">outer_air_pattern</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s2">"Body\s+\d+\s*\n"</span>
+            <span class="sa">r</span><span class="s2">"(?:(?:  .*)\n)*?"</span>
+            <span class="sa">r</span><span class="s1">'  Name = "Outer Air"\n'</span>
+            <span class="sa">r</span><span class="s2">"(?:(?:  .*)\n)*?"</span>
+            <span class="sa">rf</span><span class="s2">"  Target Bodies\(1\) = </span><span class="si">{</span><span class="n">topology</span><span class="o">.</span><span class="n">outer_air_body</span><span class="si">}</span><span class="s2">\b"</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">outer_air_pattern</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Base template </span><span class="si">{</span><span class="n">base_type</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> does not map the 'Outer Air' body "</span>
+                <span class="sa">f</span><span class="s2">"to Target Bodies(1) = </span><span class="si">{</span><span class="n">topology</span><span class="o">.</span><span class="n">outer_air_body</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">"{{BC_INFINITY_BOUNDARY}}"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Base template </span><span class="si">{</span><span class="n">base_type</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> is missing the infinity-boundary placeholder."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"{{BC_INFINITY_TEMPERATURE}}"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Base template </span><span class="si">{</span><span class="n">base_type</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> is missing </span><span class="se">{{</span><span class="s2">BC_INFINITY_TEMPERATURE</span><span class="se">}}</span><span class="s2">."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"{{T_IC}}"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Base template </span><span class="si">{</span><span class="n">base_type</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> is missing </span><span class="se">{{</span><span class="s2">T_IC</span><span class="se">}}</span><span class="s2">."</span>
+            <span class="p">)</span>
+
+        <span class="n">infinity_count</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"Infinity BC = Logical True"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">infinity_count</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Base template </span><span class="si">{</span><span class="n">base_type</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> must contain exactly one infinity boundary, "</span>
+                <span class="sa">f</span><span class="s2">"found </span><span class="si">{</span><span class="n">infinity_count</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._load_material_snippet">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._load_material_snippet">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_material_snippet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">MaterialModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Load a material constitutive snippet file for the given model.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            model: Material model selecting ``materials/*.sif.inc``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Raw material snippet with placeholders.</span>
+<span class="sd">        """</span>
+        <span class="n">snippet_name</span> <span class="o">=</span> <span class="n">MATERIAL_SNIPPET_FILES</span><span class="p">[</span><span class="n">model</span><span class="p">]</span>
+        <span class="n">snippet_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials_dir</span> <span class="o">/</span> <span class="n">snippet_name</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">snippet_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Material snippet not found: </span><span class="si">{</span><span class="n">snippet_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">snippet_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._load_driver_snippet">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._load_driver_snippet">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_driver_snippet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span> <span class="n">DriverType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Load a driver Simulation/BC snippet for the given driver type.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            driver: Driver type selecting ``drivers/&lt;name&gt;.sif.inc``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Raw driver snippet containing Simulation and BC sections.</span>
+<span class="sd">        """</span>
+        <span class="n">snippet_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivers_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">driver</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">.sif.inc"</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">snippet_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Driver snippet not found: </span><span class="si">{</span><span class="n">snippet_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">snippet_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._load_solver_block">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._load_solver_block">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_solver_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Load a named solver-block include from ``solver_blocks/``.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            block_key: Snippet stem such as ``thermoelectric`` [dimensionless].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Raw solver block text, possibly with placeholders.</span>
+<span class="sd">        """</span>
+        <span class="n">block_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_blocks_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">block_key</span><span class="si">}</span><span class="s2">.sif.inc"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">block_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Solver block snippet not found: </span><span class="si">{</span><span class="n">block_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">block_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._build_solver_blocks">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._build_solver_blocks">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_solver_blocks</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">output_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Load all required solver blocks and fill the result filename.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            output_name: Elmer result file stem substituted into output solvers.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, str]: Mapping of solver name to filled block text.</span>
+<span class="sd">        """</span>
+        <span class="n">blocks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">solver_name</span> <span class="ow">in</span> <span class="n">REQUIRED_SOLVER_BLOCKS</span><span class="p">:</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_solver_block</span><span class="p">(</span><span class="n">solver_name</span><span class="p">)</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{OUTPUT_FILE_NAME}}"</span><span class="p">,</span> <span class="n">output_name</span><span class="p">)</span>
+            <span class="n">blocks</span><span class="p">[</span><span class="n">solver_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">block</span>
+        <span class="k">return</span> <span class="n">blocks</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._generate_scalar_current_body_force">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._generate_scalar_current_body_force">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_scalar_current_body_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body_force_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seebeck</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Emit isotropic Seebeck body-force Current Density / SourceCurrent terms.</span>
+
+<span class="sd">        Combines ``Potential Flux`` from the OhmicCurrent FluxSolver with</span>
+<span class="sd">        ``Temperature Flux`` from the SeebeckCurrent FluxSolver scaled by a scalar</span>
+<span class="sd">        Seebeck coefficient.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">        body_force_num: Elmer Body Force index to write [dimensionless].</span>
+<span class="sd">        seebeck: Isotropic Seebeck coefficient [V/K].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">        str: Complete ``Body Force N ... End`` block for the SIF.</span>
+<span class="sd">        """</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_sif_number</span><span class="p">(</span><span class="n">seebeck</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"""Body Force </span><span class="si">{</span><span class="n">body_force_num</span><span class="si">}</span>
+<span class="s2">  Heat Source = Real 0.0</span>
+
+<span class="s2">  Current Density 1 = Variable "Potential Flux 1", "Temperature Flux 1"</span>
+<span class="s2">    Real MATC "tx(0) + (</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">)*tx(1)"</span>
+
+<span class="s2">  Current Density 2 = Variable "Potential Flux 2", "Temperature Flux 2"</span>
+<span class="s2">    Real MATC "tx(0) + (</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">)*tx(1)"</span>
+
+<span class="s2">  Current Density 3 = Variable "Potential Flux 3", "Temperature Flux 3"</span>
+<span class="s2">    Real MATC "tx(0) + (</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">)*tx(1)"</span>
+
+<span class="s2">  SourceCurrentX = Variable "Potential Flux 1", "Temperature Flux 1"</span>
+<span class="s2">    Real MATC "tx(0) + (</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">)*tx(1)"</span>
+
+<span class="s2">  SourceCurrentY = Variable "Potential Flux 2", "Temperature Flux 2"</span>
+<span class="s2">    Real MATC "tx(0) + (</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">)*tx(1)"</span>
+
+<span class="s2">  SourceCurrentZ = Variable "Potential Flux 3", "Temperature Flux 3"</span>
+<span class="s2">    Real MATC "tx(0) + (</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">)*tx(1)"</span>
+<span class="s2">End</span>
+<span class="s2">"""</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._generate_tensor_current_body_force">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._generate_tensor_current_body_force">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_tensor_current_body_force</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">body_force_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">geometry_shape</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">s_par</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">s_perp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Emit anisotropic Seebeck body-force terms via shape-aware MATC.</span>
+
+<span class="sd">        Uses ``generate_tensor_vector_product`` so ``J = PotentialFlux + S grad(T)`` with</span>
+<span class="sd">        the same cylinder/prism/sphere Seebeck tensor orientation as material blocks.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            body_force_num: Elmer Body Force index to write [dimensionless].</span>
+<span class="sd">            geometry_shape: ``cylinder``, ``prism``, or ``sphere`` [dimensionless].</span>
+<span class="sd">            s_par: Parallel/radial Seebeck principal value [V/K].</span>
+<span class="sd">            s_perp: Perpendicular/tangential Seebeck principal value [V/K].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Complete ``Body Force N ... End`` block for the SIF.</span>
+<span class="sd">        """</span>
+        <span class="n">j1</span><span class="p">,</span> <span class="n">j2</span><span class="p">,</span> <span class="n">j3</span> <span class="o">=</span> <span class="n">tensor_utils</span><span class="o">.</span><span class="n">generate_tensor_vector_product</span><span class="p">(</span>
+            <span class="n">geometry_shape</span><span class="p">,</span>
+            <span class="n">s_par</span><span class="p">,</span>
+            <span class="n">s_perp</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"""Body Force </span><span class="si">{</span><span class="n">body_force_num</span><span class="si">}</span>
+<span class="s2">  Heat Source = Real 0.0</span>
+
+<span class="s2">  Current Density 1 = Variable "Coordinate 1", "Coordinate 2", "Coordinate 3", "Temperature Flux 1", "Temperature Flux 2", "Temperature Flux 3", "Potential Flux 1"</span>
+<span class="s2">    Real MATC "tx(6) + (</span><span class="si">{</span><span class="n">j1</span><span class="si">}</span><span class="s2">)"</span>
+
+<span class="s2">  Current Density 2 = Variable "Coordinate 1", "Coordinate 2", "Coordinate 3", "Temperature Flux 1", "Temperature Flux 2", "Temperature Flux 3", "Potential Flux 2"</span>
+<span class="s2">    Real MATC "tx(6) + (</span><span class="si">{</span><span class="n">j2</span><span class="si">}</span><span class="s2">)"</span>
+
+<span class="s2">  Current Density 3 = Variable "Coordinate 1", "Coordinate 2", "Coordinate 3", "Temperature Flux 1", "Temperature Flux 2", "Temperature Flux 3", "Potential Flux 3"</span>
+<span class="s2">    Real MATC "tx(6) + (</span><span class="si">{</span><span class="n">j3</span><span class="si">}</span><span class="s2">)"</span>
+
+<span class="s2">  SourceCurrentX = Variable "Coordinate 1", "Coordinate 2", "Coordinate 3", "Temperature Flux 1", "Temperature Flux 2", "Temperature Flux 3", "Potential Flux 1"</span>
+<span class="s2">    Real MATC "tx(6) + (</span><span class="si">{</span><span class="n">j1</span><span class="si">}</span><span class="s2">)"</span>
+
+<span class="s2">  SourceCurrentY = Variable "Coordinate 1", "Coordinate 2", "Coordinate 3", "Temperature Flux 1", "Temperature Flux 2", "Temperature Flux 3", "Potential Flux 2"</span>
+<span class="s2">    Real MATC "tx(6) + (</span><span class="si">{</span><span class="n">j2</span><span class="si">}</span><span class="s2">)"</span>
+
+<span class="s2">  SourceCurrentZ = Variable "Coordinate 1", "Coordinate 2", "Coordinate 3", "Temperature Flux 1", "Temperature Flux 2", "Temperature Flux 3", "Potential Flux 3"</span>
+<span class="s2">    Real MATC "tx(6) + (</span><span class="si">{</span><span class="n">j3</span><span class="si">}</span><span class="s2">)"</span>
+<span class="s2">End</span>
+<span class="s2">"""</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._generate_material_block">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._generate_material_block">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_material_block</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">MaterialModel</span><span class="p">,</span>
+        <span class="n">mat_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">geometry_shape</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cylinder"</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Fill a material snippet with properties and optional anisotropy tensors.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            model: Constitutive model selecting the material snippet.</span>
+<span class="sd">            mat_num: Elmer Material number to assign.</span>
+<span class="sd">            params: Property map including scalars, tables, and tensor principals.</span>
+<span class="sd">            geometry_shape: Shape controlling anisotropic tensor orientation.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Complete Material block ready for SIF insertion.</span>
+<span class="sd">        """</span>
+        <span class="n">snippet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_material_snippet</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">snippet</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{MATERIAL_NUM}}"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">mat_num</span><span class="p">))</span>
+        <span class="n">mat_name</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Material</span><span class="si">{</span><span class="n">mat_num</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{MATERIAL_NAME}}"</span><span class="p">,</span> <span class="n">mat_name</span><span class="p">)</span>
+
+        <span class="n">hc_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_property_def</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"heat_conductivity"</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{HEAT_CONDUCTIVITY_DEF}}"</span><span class="p">,</span> <span class="n">hc_def</span><span class="p">)</span>
+
+        <span class="n">ec_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_property_def</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"electric_conductivity"</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{ELECTRIC_CONDUCTIVITY_DEF}}"</span><span class="p">,</span> <span class="n">ec_def</span><span class="p">)</span>
+
+        <span class="n">sc_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_property_def</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"seebeck_coefficient"</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SEEBECK_COEFFICIENT_DEF}}"</span><span class="p">,</span> <span class="n">sc_def</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">placeholder</span> <span class="o">=</span> <span class="s2">"{{"</span> <span class="o">+</span> <span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"}}"</span>
+            <span class="k">if</span> <span class="n">placeholder</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">model</span> <span class="o">==</span> <span class="n">MaterialModel</span><span class="o">.</span><span class="n">ANISOTROPY</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">k_par</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"k_par"</span><span class="p">]</span>
+                <span class="n">k_perp</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"k_perp"</span><span class="p">]</span>
+                <span class="n">sigma_par</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"sigma_par"</span><span class="p">]</span>
+                <span class="n">sigma_perp</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"sigma_perp"</span><span class="p">]</span>
+                <span class="n">s_par</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"s_par"</span><span class="p">]</span>
+                <span class="n">s_perp</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">"s_perp"</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Missing anisotropy parameter </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&lt;material&gt;'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+            <span class="n">heat_block</span> <span class="o">=</span> <span class="n">tensor_utils</span><span class="o">.</span><span class="n">generate_tensor_block</span><span class="p">(</span>
+                <span class="n">geometry_shape</span><span class="p">,</span> <span class="s2">"Heat Conductivity"</span><span class="p">,</span> <span class="n">k_par</span><span class="p">,</span> <span class="n">k_perp</span>
+            <span class="p">)</span>
+            <span class="n">electric_block</span> <span class="o">=</span> <span class="n">tensor_utils</span><span class="o">.</span><span class="n">generate_tensor_block</span><span class="p">(</span>
+                <span class="n">geometry_shape</span><span class="p">,</span> <span class="s2">"Electric Conductivity"</span><span class="p">,</span> <span class="n">sigma_par</span><span class="p">,</span> <span class="n">sigma_perp</span>
+            <span class="p">)</span>
+            <span class="n">seebeck_block</span> <span class="o">=</span> <span class="n">tensor_utils</span><span class="o">.</span><span class="n">generate_tensor_block</span><span class="p">(</span>
+                <span class="n">geometry_shape</span><span class="p">,</span> <span class="s2">"Seebeck Coefficient"</span><span class="p">,</span> <span class="n">s_par</span><span class="p">,</span> <span class="n">s_perp</span>
+            <span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{HEAT_CONDUCTIVITY_BLOCK}}"</span><span class="p">,</span> <span class="n">heat_block</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{ELECTRIC_CONDUCTIVITY_BLOCK}}"</span><span class="p">,</span> <span class="n">electric_block</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{SEEBECK_COEFFICIENT_BLOCK}}"</span><span class="p">,</span> <span class="n">seebeck_block</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._generate_property_def">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._generate_property_def">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_property_def</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Emit a Real scalar or Temperature-table property definition.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            params: Material parameter map that may include ``*_table`` data.</span>
+<span class="sd">            key_prefix: Base property key such as ``heat_conductivity``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Elmer property RHS (``Real ...`` or ``Variable Temperature`` table).</span>
+<span class="sd">        """</span>
+
+        <span class="n">table_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key_prefix</span><span class="si">}</span><span class="s2">_table"</span>
+        <span class="k">if</span> <span class="n">table_key</span> <span class="ow">in</span> <span class="n">params</span> <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="n">table_key</span><span class="p">]:</span>
+            <span class="n">table_data</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">table_key</span><span class="p">]</span>
+
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Variable Temperature"</span><span class="p">,</span> <span class="s2">"    Real"</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">table_data</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"      </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"    End"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key_prefix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Missing required property '</span><span class="si">{</span><span class="n">key_prefix</span><span class="si">}</span><span class="s2">' (and no '</span><span class="si">{</span><span class="n">table_key</span><span class="si">}</span><span class="s2">' table) for </span><span class="si">{</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&lt;material&gt;'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Real </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="n">key_prefix</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._generate_driver_blocks">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._generate_driver_blocks">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_driver_blocks</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">driver</span><span class="p">:</span> <span class="n">DriverType</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">DriverParams</span><span class="p">,</span>
+        <span class="n">bc_config</span><span class="p">:</span> <span class="n">BoundaryConfig</span><span class="p">,</span>
+        <span class="n">bc1_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">bc2_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Split a driver snippet into Simulation and hot/cold BC blocks.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            driver: Driver selecting the snippet file.</span>
+<span class="sd">            params: Temperatures and timestep values for placeholder substitution.</span>
+<span class="sd">            bc_config: Boundary numbering for hot/cold target surfaces.</span>
+<span class="sd">            bc1_potential: Optional hot-end Potential line value [V].</span>
+<span class="sd">            bc2_potential: Optional cold-end Potential line value [V].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple: ``(sim_block, bc_hot_block, bc_cold_block)`` filled SIF sections.</span>
+<span class="sd">        """</span>
+        <span class="n">snippet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_driver_snippet</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="n">snippet</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"!---------------------------------------------------------"</span><span class="p">)</span>
+
+        <span class="n">sim_block</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="n">bc_hot_block</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="n">bc_cold_block</span> <span class="o">=</span> <span class="s2">""</span>
+
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"Simulation"</span> <span class="ow">in</span> <span class="n">section</span> <span class="ow">and</span> <span class="s2">"Simulation Type"</span> <span class="ow">in</span> <span class="n">section</span><span class="p">:</span>
+                <span class="n">sim_block</span> <span class="o">=</span> <span class="s2">"!---------------------------------------------------------"</span> <span class="o">+</span> <span class="n">section</span>
+            <span class="k">elif</span> <span class="s2">"BC Hot End"</span> <span class="ow">in</span> <span class="n">section</span> <span class="ow">or</span> <span class="s2">"hot_end"</span> <span class="ow">in</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">bc_hot_block</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">"!---------------------------------------------------------"</span> <span class="o">+</span> <span class="n">section</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">"BC Cold End"</span> <span class="ow">in</span> <span class="n">section</span> <span class="ow">or</span> <span class="s2">"cold_end"</span> <span class="ow">in</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">bc_cold_block</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">"!---------------------------------------------------------"</span> <span class="o">+</span> <span class="n">section</span>
+                <span class="p">)</span>
+
+        <span class="n">bc_hot_block</span> <span class="o">=</span> <span class="n">bc_hot_block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{BC_HOT_NUM}}"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bc_config</span><span class="o">.</span><span class="n">bc_hot_num</span><span class="p">))</span>
+        <span class="n">bc_hot_block</span> <span class="o">=</span> <span class="n">bc_hot_block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{BC_HOT_BOUNDARY}}"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bc_config</span><span class="o">.</span><span class="n">bc_hot_boundary</span><span class="p">))</span>
+        <span class="n">bc_cold_block</span> <span class="o">=</span> <span class="n">bc_cold_block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"{{BC_COLD_NUM}}"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bc_config</span><span class="o">.</span><span class="n">bc_cold_num</span><span class="p">))</span>
+        <span class="n">bc_cold_block</span> <span class="o">=</span> <span class="n">bc_cold_block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s2">"{{BC_COLD_BOUNDARY}}"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bc_config</span><span class="o">.</span><span class="n">bc_cold_boundary</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">bc_hot_potential_line</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Potential = </span><span class="si">{</span><span class="n">bc1_potential</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">bc1_potential</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="p">)</span>
+        <span class="n">bc_cold_potential_line</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Potential = </span><span class="si">{</span><span class="n">bc2_potential</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">bc2_potential</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="p">)</span>
+
+        <span class="n">param_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"T_HOT"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">t_hot</span><span class="p">,</span>
+            <span class="s2">"T_COLD"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">t_cold</span><span class="p">,</span>
+            <span class="s2">"T_MEAN"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">t_mean</span><span class="p">,</span>
+            <span class="s2">"T_AMPLITUDE"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">t_amplitude</span><span class="p">,</span>
+            <span class="s2">"FREQUENCY"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">frequency</span><span class="p">,</span>
+            <span class="s2">"T_MIN"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">t_min</span><span class="p">,</span>
+            <span class="s2">"T_MAX"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">t_max</span><span class="p">,</span>
+            <span class="s2">"PERIOD"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
+            <span class="s2">"TIMESTEP_SIZE"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">timestep_size</span><span class="p">,</span>
+            <span class="s2">"TIMESTEP_INTERVALS"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">timestep_intervals</span><span class="p">,</span>
+            <span class="s2">"OUTPUT_INTERVALS"</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">output_intervals</span><span class="p">,</span>
+            <span class="s2">"BC_HOT_POTENTIAL_LINE"</span><span class="p">:</span> <span class="n">bc_hot_potential_line</span><span class="p">,</span>
+            <span class="s2">"BC_COLD_POTENTIAL_LINE"</span><span class="p">:</span> <span class="n">bc_cold_potential_line</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">param_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">placeholder</span> <span class="o">=</span> <span class="s2">"{{"</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">"}}"</span>
+            <span class="n">sim_block</span> <span class="o">=</span> <span class="n">sim_block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">bc_hot_block</span> <span class="o">=</span> <span class="n">bc_hot_block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">bc_cold_block</span> <span class="o">=</span> <span class="n">bc_cold_block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">sim_block</span><span class="p">,</span> <span class="n">bc_hot_block</span><span class="p">,</span> <span class="n">bc_cold_block</span></div>
+
+
+<div class="viewcode-block" id="SifGenerator._generate_output_name">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.SifGenerator._generate_output_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_output_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Provide the Elmer result file stem used in output solvers.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: fixed naming policy for generated SIFs.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Output file stem (currently ``result``).</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s2">"result"</span></div>
+</div>
+
+
+
+<span class="n">_generator</span><span class="p">:</span> <span class="n">SifGenerator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="get_sif_generator">
+<a class="viewcode-back" href="../../api/simulations.generator.html#simulations.generator.get_sif_generator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_sif_generator</span><span class="p">(</span><span class="n">base_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SifGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Return the process-wide ``SifGenerator`` singleton.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        base_dir: Optional package root used on first construction [path].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SifGenerator: Shared generator instance.</span>
+<span class="sd">    """</span>
+    <span class="k">global</span> <span class="n">_generator</span>
+    <span class="k">if</span> <span class="n">_generator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_generator</span> <span class="o">=</span> <span class="n">SifGenerator</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_generator</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.generator</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

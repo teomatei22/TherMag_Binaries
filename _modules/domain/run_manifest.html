@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>domain.run_manifest &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.run_manifest</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for domain.run_manifest</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Run workspace paths, status, and project manifest for a single FEM case."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeometrySpec</span><span class="p">,</span> <span class="n">ProbePoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.simulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimulationConfig</span>
+
+
+<div class="viewcode-block" id="RunStatus">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.RunStatus">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunStatus</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Lifecycle status of a FEM run from creation through post-processing.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: Enum members ``CREATED``, ``GENERATED``, ``MESHED``, ``SOLVED``,</span>
+<span class="sd">            ``POST_PROCESSED``, ``FAILED``, ``CANCELLED``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        RunStatus: String enum value describing the current run lifecycle stage.</span>
+<span class="sd">    """</span>
+
+    <span class="n">CREATED</span> <span class="o">=</span> <span class="s2">"created"</span>
+    <span class="n">GENERATED</span> <span class="o">=</span> <span class="s2">"generated"</span>
+    <span class="n">MESHED</span> <span class="o">=</span> <span class="s2">"meshed"</span>
+    <span class="n">SOLVED</span> <span class="o">=</span> <span class="s2">"solved"</span>
+    <span class="n">POST_PROCESSED</span> <span class="o">=</span> <span class="s2">"post_processed"</span>
+    <span class="n">FAILED</span> <span class="o">=</span> <span class="s2">"failed"</span>
+    <span class="n">CANCELLED</span> <span class="o">=</span> <span class="s2">"cancelled"</span></div>
+
+
+
+<div class="viewcode-block" id="ScriptSelection">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.ScriptSelection">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScriptSelection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Named post-processing script selection with optional parameters.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        name: Post-processing script identifier.</span>
+<span class="sd">        file: Optional script filename or path relative to the scripts tree.</span>
+<span class="sd">        parameters: Optional script-specific parameter mapping.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ScriptSelection: Immutable named script choice for a run's results config.</span>
+<span class="sd">    """</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ScriptSelection.from_dict">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.ScriptSelection.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ScriptSelection"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize a script selection from a mapping.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with ``name``, optional ``file`` and ``parameters``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            ScriptSelection: Immutable script selection.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="n">file</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parameters"</span><span class="p">,</span> <span class="p">{})),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ScriptSelection.to_dict">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.ScriptSelection.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize the script selection.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: JSON-serializable script mapping.</span>
+<span class="sd">        """</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"parameters"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ResultsConfig">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.ResultsConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResultsConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Post-processing scripts and Bext/Jint probe locations for a run.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        scripts: Ordered post-processing script selections.</span>
+<span class="sd">        bext_probes: Probe points for exterior magnetic field (Bext) [m].</span>
+<span class="sd">        jint_probes: Probe points for interior current density (Jint) [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ResultsConfig: Immutable post-processing scripts and probe configuration.</span>
+<span class="sd">    """</span>
+
+    <span class="n">scripts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ScriptSelection</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">bext_probes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProbePoint</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">jint_probes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProbePoint</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ResultsConfig.from_dict">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.ResultsConfig.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"ResultsConfig"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize results configuration from a mapping.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Mapping with ``scripts``, ``bext_probes``, and ``jint_probes``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            ResultsConfig: Immutable results configuration.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">scripts</span><span class="o">=</span><span class="p">[</span><span class="n">ScriptSelection</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"scripts"</span><span class="p">,</span> <span class="p">[])],</span>
+            <span class="n">bext_probes</span><span class="o">=</span><span class="p">[</span><span class="n">ProbePoint</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"bext_probes"</span><span class="p">,</span> <span class="p">[])],</span>
+            <span class="n">jint_probes</span><span class="o">=</span><span class="p">[</span><span class="n">ProbePoint</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"jint_probes"</span><span class="p">,</span> <span class="p">[])],</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResultsConfig.to_dict">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.ResultsConfig.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize results configuration for manifest persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: JSON-serializable results mapping.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"scripts"</span><span class="p">:</span> <span class="p">[</span><span class="n">script</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scripts</span><span class="p">],</span>
+            <span class="s2">"bext_probes"</span><span class="p">:</span> <span class="p">[</span><span class="n">point</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bext_probes</span><span class="p">],</span>
+            <span class="s2">"jint_probes"</span><span class="p">:</span> <span class="p">[</span><span class="n">point</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jint_probes</span><span class="p">],</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ResultsConfig.processing_config">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.ResultsConfig.processing_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">processing_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Shape results settings into the post-processing config schema.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses scripts and probe lists on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: Mapping with ``scripts`` and nested ``probe_points``.</span>
+<span class="sd">        """</span>
+        <span class="n">scripts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scripts</span><span class="p">:</span>
+            <span class="n">entry</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">script</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">script</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s2">"parameters"</span><span class="p">]</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">parameters</span>
+            <span class="n">scripts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"scripts"</span><span class="p">:</span> <span class="n">scripts</span><span class="p">,</span>
+            <span class="s2">"probe_points"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"bext"</span><span class="p">:</span> <span class="p">[</span><span class="n">point</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bext_probes</span><span class="p">],</span>
+                <span class="s2">"jint"</span><span class="p">:</span> <span class="p">[</span><span class="n">point</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jint_probes</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RunWorkspace">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.RunWorkspace">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunWorkspace</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Canonical on-disk paths for a FEM run or sweep project root.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        root: Absolute or relative path to the run/sweep project directory.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        RunWorkspace: Derived paths for geometry, SIF, results, and sweep artifacts.</span>
+<span class="sd">    """</span>
+
+    <span class="n">root</span><span class="p">:</span> <span class="n">Path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">geometry_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Directory holding generated geometry artifacts.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/geometry``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"geometry"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">results_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Directory holding solver and post-processing results.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/results``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"results"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">geometry_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Path to the Gmsh ``.geo`` case geometry file.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/geometry.geo``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"geometry.geo"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">case_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Path to the Elmer Solver Input File (``case.sif``).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/case.sif``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"case.sif"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">manifest_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Path to the project manifest JSON (``project.json``).</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/project.json``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"project.json"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">startinfo_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Path to Elmer's ``ELMERSOLVER_STARTINFO`` launcher file.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/ELMERSOLVER_STARTINFO``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"ELMERSOLVER_STARTINFO"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">processing_config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Path to the post-processing configuration JSON under results.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.results_dir``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``results/processing_config.json``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_dir</span> <span class="o">/</span> <span class="s2">"processing_config.json"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sweep_manifest_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Path to the sweep manifest JSON when this root is a sweep project.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/sweep_manifest.json``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"sweep_manifest.json"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sweep_results_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Directory for aggregated sweep result artifacts.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/sweep_results``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"sweep_results"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sweep_runs_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Directory containing per-coefficient sweep run folders.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Derived from ``self.root``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: ``root/results`` (shared layout with single-run results).</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"results"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_sweep_project</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Whether this workspace root contains a sweep manifest file.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Checks ``self.sweep_manifest_file``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            bool: ``True`` if ``sweep_manifest.json`` exists on disk.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep_manifest_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="RunManifest">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.RunManifest">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunManifest</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Persisted project.json contents describing a FEM run's full configuration.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        name: Human-readable run/project name.</span>
+<span class="sd">        run_path: Filesystem path string for the run directory.</span>
+<span class="sd">        geometry: Geometry specification for the case.</span>
+<span class="sd">        simulation: Full simulation configuration (materials, BCs, solver).</span>
+<span class="sd">        results: Post-processing scripts and probe configuration.</span>
+<span class="sd">        materials: Material definition mapping keyed by role/name.</span>
+<span class="sd">        material_roles: Optional mapping of geometry roles to material names.</span>
+<span class="sd">        created: Timestamp when the manifest was first created.</span>
+<span class="sd">        last_modified: Timestamp of the latest manifest update.</span>
+<span class="sd">        status: Current ``RunStatus`` lifecycle value.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        RunManifest: Immutable ``project.json`` representation of a FEM run.</span>
+<span class="sd">    """</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">run_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">geometry</span><span class="p">:</span> <span class="n">GeometrySpec</span>
+    <span class="n">simulation</span><span class="p">:</span> <span class="n">SimulationConfig</span>
+    <span class="n">results</span><span class="p">:</span> <span class="n">ResultsConfig</span>
+    <span class="n">materials</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">material_roles</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">created</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+    <span class="n">last_modified</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">RunStatus</span> <span class="o">=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">CREATED</span>
+
+<div class="viewcode-block" id="RunManifest.from_dict">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.RunManifest.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"RunManifest"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Deserialize a run manifest from a ``project.json`` mapping.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            data: Nested mapping of name, paths, geometry, simulation, materials, results,</span>
+<span class="sd">                and status.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            RunManifest: Immutable run manifest.</span>
+<span class="sd">        """</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">CREATED</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="n">created</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"created"</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()),</span>
+            <span class="n">last_modified</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"last_modified"</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()),</span>
+            <span class="n">run_path</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"run_path"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">GeometrySpec</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"geometry"</span><span class="p">,</span> <span class="p">{})),</span>
+            <span class="n">simulation</span><span class="o">=</span><span class="n">SimulationConfig</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"simulation"</span><span class="p">,</span> <span class="p">{})),</span>
+            <span class="n">materials</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"materials"</span><span class="p">,</span> <span class="p">{})),</span>
+            <span class="n">material_roles</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"material_roles"</span><span class="p">,</span> <span class="p">{})),</span>
+            <span class="n">results</span><span class="o">=</span><span class="n">ResultsConfig</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"results"</span><span class="p">,</span> <span class="p">{})),</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">RunStatus</span><span class="p">(</span><span class="n">status</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RunManifest.to_dict">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.RunManifest.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Serialize the run manifest for ``project.json`` persistence.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, Any]: JSON-serializable project manifest mapping.</span>
+<span class="sd">        """</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">"created"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">created</span><span class="p">,</span>
+            <span class="s2">"last_modified"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_modified</span><span class="p">,</span>
+            <span class="s2">"run_path"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_path</span><span class="p">,</span>
+            <span class="s2">"status"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">"geometry"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="s2">"simulation"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="s2">"materials"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="p">,</span>
+            <span class="s2">"results"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">material_roles</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"material_roles"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">material_roles</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="RunManifest.updated">
+<a class="viewcode-back" href="../../api/domain.run_manifest.html#domain.run_manifest.RunManifest.updated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updated</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">RunStatus</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">ResultsConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"RunManifest"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return a copy with optional status/results updates and fresh timestamp.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            status: Optional new ``RunStatus``; keeps current status when omitted.</span>
+<span class="sd">            results: Optional new ``ResultsConfig``; keeps current results when omitted.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            RunManifest: New immutable manifest with ``last_modified`` set to now.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">RunManifest</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">created</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">created</span><span class="p">,</span>
+            <span class="n">last_modified</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="n">run_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_path</span><span class="p">,</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span>
+            <span class="n">simulation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="p">,</span>
+            <span class="n">materials</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="p">,</span>
+            <span class="n">material_roles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">material_roles</span><span class="p">,</span>
+            <span class="n">results</span><span class="o">=</span><span class="n">results</span> <span class="k">if</span> <span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">status</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.run_manifest</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

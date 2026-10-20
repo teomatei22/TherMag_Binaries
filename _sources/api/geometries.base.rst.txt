@@ -1,0 +1,7 @@
+geometries.base module
+======================
+
+.. automodule:: geometries.base
+   :members:
+   :show-inheritance:
+   :undoc-members:

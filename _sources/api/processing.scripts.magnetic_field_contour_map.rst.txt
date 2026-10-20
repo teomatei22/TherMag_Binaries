@@ -1,0 +1,7 @@
+processing.scripts.magnetic\_field\_contour\_map module
+=======================================================
+
+.. automodule:: processing.scripts.magnetic_field_contour_map
+   :members:
+   :show-inheritance:
+   :undoc-members:

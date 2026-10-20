@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.geometry_params &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.geometry_params</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.geometry_params</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Geometry and model configuration for FEM post-processing from ``geometry.geo``."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">processing.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_processing_defaults</span><span class="p">,</span> <span class="n">load_post_processing_settings</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_processing_defaults</span><span class="p">,</span> <span class="n">load_post_processing_settings</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">processing.scripts.geometry_contract</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">contract_from_text</span><span class="p">,</span>
+        <span class="n">domain_radius_m</span><span class="p">,</span>
+        <span class="n">first_value</span><span class="p">,</span>
+        <span class="n">load_mesh_name_ids</span><span class="p">,</span>
+        <span class="n">parse_geo_assignments</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">geometry_contract</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">contract_from_text</span><span class="p">,</span>
+        <span class="n">domain_radius_m</span><span class="p">,</span>
+        <span class="n">first_value</span><span class="p">,</span>
+        <span class="n">load_mesh_name_ids</span><span class="p">,</span>
+        <span class="n">parse_geo_assignments</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">_PROCESSING_DEFAULTS</span> <span class="o">=</span> <span class="n">load_processing_defaults</span><span class="p">()</span>
+<span class="n">_BUNDLED_PP_SETTINGS</span> <span class="o">=</span> <span class="n">load_post_processing_settings</span><span class="p">()</span>
+<span class="n">_LAYER_OVER_MODEL_TYPES</span> <span class="o">=</span> <span class="n">_PROCESSING_DEFAULTS</span><span class="o">.</span><span class="n">layer_over_model_types</span>
+
+
+<div class="viewcode-block" id="GeometryParams">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.GeometryParams">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GeometryParams</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Conductor dimensions and hollow/layer variant parsed from ``geometry.geo``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_type: Family ``cylinder``, ``prism``, or ``sphere``.</span>
+<span class="sd">        variant: Topology ``full``, ``hollow``, or ``layer_over_*``.</span>
+<span class="sd">        is_two_layer: Whether an inner material layer is present.</span>
+<span class="sd">        T_inner: Inner-layer wall thickness [m].</span>
+<span class="sd">        T_outer: Outer-layer / hollow wall thickness [m].</span>
+<span class="sd">        L: Axial length (cylinder/prism) [m].</span>
+<span class="sd">        R: Cylinder radius [m].</span>
+<span class="sd">        W: Prism half-width [m].</span>
+<span class="sd">        H: Prism half-height [m].</span>
+<span class="sd">        R_sphere: Metal sphere radius [m].</span>
+<span class="sd">        R_cap: Sphere contact-cap radius [m].</span>
+<span class="sd">        R_sph: Optional far-field air-sphere radius [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryParams: Dimension container for glyph scale and probe band layout.</span>
+<span class="sd">    """</span>
+
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span>
+    <span class="n">is_two_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">T_inner</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">T_outer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">L</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">R</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">W</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">H</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">R_sphere</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">R_cap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">R_sph</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="GeometryParams.cavity_thickness_m">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.GeometryParams.cavity_thickness_m">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cavity_thickness_m</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Total cavity wall thickness for hollow or layered-hollow variants.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.variant``, ``self.T_inner``, ``self.T_outer``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float: Cavity wall thickness [m]; ``0.0`` for solid full bodies.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="o">==</span> <span class="s2">"hollow"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T_outer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="o">==</span> <span class="s2">"layer_over_hollow"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T_inner</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">T_outer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="GeometryParams.characteristic_extent">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.GeometryParams.characteristic_extent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">characteristic_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Characteristic conductor extent used for camera and glyph span scaling.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses family dimensions on ``self`` (L/R, L/W/H, or R_sphere/R_cap).</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float: Positive characteristic length [m] (floor ``1e-9``).</span>
+<span class="sd">        """</span>
+        <span class="n">gtype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry_type</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+            <span class="n">span</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R_sphere</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R_cap</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+            <span class="n">span</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">span</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="mf">1.0e-9</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GeometryParams.probe_scaling_params">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.GeometryParams.probe_scaling_params">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">probe_scaling_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Export the subset of dimensions required by probe-band / Jint scaling.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses family-required fields on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, float]: Geometry keys (e.g. ``L``/``R``, ``L``/``W``/``H``, ``R_sphere``/``R_cap``) [m].</span>
+<span class="sd">        """</span>
+        <span class="n">gtype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry_type</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_sphere</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_cap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Sphere geometry requires R_sphere and R_cap"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"R_sphere"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R_sphere</span><span class="p">),</span> <span class="s2">"R_cap"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R_cap</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Prism geometry requires L, W, and H"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">"L"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">),</span>
+                <span class="s2">"W"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">),</span>
+                <span class="s2">"H"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Cylinder geometry requires L and R"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"L"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">),</span> <span class="s2">"R"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="GeometryParams.from_geo_file">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.GeometryParams.from_geo_file">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_geo_file</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">geo_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pp_settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeometryParams</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Parse conductor dimensions and variant from a Gmsh ``geometry.geo`` file.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            geo_path: Path to ``geometry.geo`` in the FEM run directory.</span>
+<span class="sd">            pp_settings: Optional post-processing settings; loaded from the run root if omitted.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            GeometryParams: Populated geometry for the detected family and variant.</span>
+<span class="sd">            A sphere stores metal radius ``R_sphere`` and air-domain radius ``R_sph``.</span>
+<span class="sd">        """</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">geo_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="n">pp</span> <span class="o">=</span> <span class="n">pp_settings</span> <span class="k">if</span> <span class="n">pp_settings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">load_post_processing_settings</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="n">detection</span> <span class="o">=</span> <span class="n">pp</span><span class="p">[</span><span class="s2">"geometry_detection"</span><span class="p">]</span>
+        <span class="n">geo_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">geo_path</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">geo_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">parse_geo_assignments</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">contract</span> <span class="o">=</span> <span class="n">contract_from_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">family</span> <span class="o">=</span> <span class="n">contract</span><span class="o">.</span><span class="n">family</span>
+        <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"unknown"</span><span class="p">:</span>
+            <span class="n">name_lower</span> <span class="o">=</span> <span class="n">geo_file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name_lower</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">detection</span><span class="p">[</span><span class="s2">"sphere_path_substrings"</span><span class="p">])</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">marker</span> <span class="ow">in</span> <span class="n">text</span> <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">detection</span><span class="p">[</span><span class="s2">"sphere_content_markers"</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="n">family</span> <span class="o">=</span> <span class="s2">"sphere"</span>
+            <span class="k">elif</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"W"</span><span class="p">,))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"H"</span><span class="p">,))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">family</span> <span class="o">=</span> <span class="s2">"prism"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">family</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">detection</span><span class="p">[</span><span class="s2">"default_geometry_type"</span><span class="p">])</span>
+
+        <span class="n">r_sph</span> <span class="o">=</span> <span class="n">domain_radius_m</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+        <span class="n">variant</span> <span class="o">=</span> <span class="n">contract</span><span class="o">.</span><span class="n">variant</span> <span class="k">if</span> <span class="n">contract</span><span class="o">.</span><span class="n">variant</span> <span class="o">!=</span> <span class="s2">"unknown"</span> <span class="k">else</span> <span class="s2">"full"</span>
+        <span class="n">is_two_layer</span> <span class="o">=</span> <span class="n">variant</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"layer_over_full"</span><span class="p">,</span> <span class="s2">"layer_over_hollow"</span><span class="p">)</span>
+        <span class="n">thicknesses</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"T_inner"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"T_inner"</span><span class="p">,))</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="s2">"T_outer"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"T_outer"</span><span class="p">,))</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+            <span class="n">radius</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R_sphere"</span><span class="p">,))</span>
+            <span class="n">r_cap</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R_cap"</span><span class="p">,))</span>
+            <span class="k">if</span> <span class="n">radius</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">r_cap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">geo_file</span><span class="si">}</span><span class="s2"> must define R_sphere and R_cap for sphere geometry"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+                <span class="n">geometry_type</span><span class="o">=</span><span class="s2">"sphere"</span><span class="p">,</span>
+                <span class="n">R_sphere</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">radius</span><span class="p">),</span>
+                <span class="n">R_cap</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r_cap</span><span class="p">),</span>
+                <span class="n">R_sph</span><span class="o">=</span><span class="n">r_sph</span><span class="p">,</span>
+                <span class="n">is_two_layer</span><span class="o">=</span><span class="n">is_two_layer</span><span class="p">,</span>
+                <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">thicknesses</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"L"</span><span class="p">,))</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"W"</span><span class="p">,))</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"H"</span><span class="p">,))</span>
+            <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">width</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">height</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">geo_file</span><span class="si">}</span><span class="s2"> must define L, W, and H for prism geometry"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+                <span class="n">geometry_type</span><span class="o">=</span><span class="s2">"prism"</span><span class="p">,</span>
+                <span class="n">L</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">length</span><span class="p">),</span>
+                <span class="n">W</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">width</span><span class="p">),</span>
+                <span class="n">H</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">height</span><span class="p">),</span>
+                <span class="n">R_sph</span><span class="o">=</span><span class="n">r_sph</span><span class="p">,</span>
+                <span class="n">is_two_layer</span><span class="o">=</span><span class="n">is_two_layer</span><span class="p">,</span>
+                <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">thicknesses</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">length</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"L"</span><span class="p">,))</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">first_value</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="s2">"R"</span><span class="p">,))</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">geo_file</span><span class="si">}</span><span class="s2"> must define L and R for cylinder geometry"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">geometry_type</span><span class="o">=</span><span class="s2">"cylinder"</span><span class="p">,</span>
+            <span class="n">L</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">length</span><span class="p">),</span>
+            <span class="n">R</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">radius</span><span class="p">),</span>
+            <span class="n">R_sph</span><span class="o">=</span><span class="n">r_sph</span><span class="p">,</span>
+            <span class="n">is_two_layer</span><span class="o">=</span><span class="n">is_two_layer</span><span class="p">,</span>
+            <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">thicknesses</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ModelConfig">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.ModelConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Mesh body IDs and model layout for conductive vs air thresholding.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        model_type: Layout key (e.g. ``full_cylinder``, ``layer_over_hollow_prism``).</span>
+<span class="sd">        geometry_type: Family ``cylinder``, ``prism``, or ``sphere``.</span>
+<span class="sd">        outer_material_id: Conductive outer body GeometryIds value.</span>
+<span class="sd">        outer_air_id: Exterior air body GeometryIds value.</span>
+<span class="sd">        inner_air_id: Optional cavity air body id.</span>
+<span class="sd">        inner_material_id: Optional inner conductive layer body id.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ModelConfig: Body-id configuration for ParaView thresholds and coloring.</span>
+<span class="sd">    """</span>
+
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full_cylinder"</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cylinder"</span>
+    <span class="n">outer_material_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">_BUNDLED_PP_SETTINGS</span><span class="p">[</span><span class="s2">"model_config_defaults"</span><span class="p">][</span><span class="s2">"outer_material_id"</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">outer_air_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">_BUNDLED_PP_SETTINGS</span><span class="p">[</span><span class="s2">"model_config_defaults"</span><span class="p">][</span><span class="s2">"outer_air_id"</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">inner_air_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">inner_material_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ModelConfig.conductive_analysis_range">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.ModelConfig.conductive_analysis_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conductive_analysis_range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: GeometryIds threshold range selecting conductive material bodies.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.inner_material_id``, ``self.outer_material_id``, ``self.model_type``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple[float, float]: Inclusive lower/upper GeometryIds for conductive volumes.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_material_id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="n">_LAYER_OVER_MODEL_TYPES</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_material_id</span><span class="p">)</span>
+        <span class="n">outer_material_id</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_material_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outer_material_id</span><span class="p">,</span> <span class="n">outer_material_id</span></div>
+
+
+<div class="viewcode-block" id="ModelConfig.validate_outer_air_sampling">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.ModelConfig.validate_outer_air_sampling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_outer_air_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Ensure exterior B-field sampling targets outer air, not metal or cavity.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.outer_air_id``, ``self.outer_material_id``, ``self.inner_air_id``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Raises ``RuntimeError`` when outer air id collides with metal or cavity.</span>
+<span class="sd">        """</span>
+        <span class="n">outer_air_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_air_id</span><span class="p">)</span>
+        <span class="n">outer_material_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_material_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outer_air_id</span> <span class="o">==</span> <span class="n">outer_material_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"outer_air_id (</span><span class="si">{</span><span class="n">outer_air_id</span><span class="si">}</span><span class="s2">) equals outer_material_id for model "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type</span><span class="si">!r}</span><span class="s2">; B-field sampling must use the exterior air body."</span>
+            <span class="p">)</span>
+        <span class="n">inner_air_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_air_id</span>
+        <span class="k">if</span> <span class="n">inner_air_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">outer_air_id</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">inner_air_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"outer_air_id (</span><span class="si">{</span><span class="n">outer_air_id</span><span class="si">}</span><span class="s2">) equals inner_air_id for model "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type</span><span class="si">!r}</span><span class="s2">; hollow meshes require outer_air_id "</span>
+                <span class="sa">f</span><span class="s2">"for the surrounding air body, not the cavity."</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelConfig.detect">
+<a class="viewcode-back" href="../../api/processing.geometry_params.html#processing.geometry_params.ModelConfig.detect">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">pp_settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Detect model layout and body IDs from geometry, mesh names, and defaults.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            cwd: FEM run working directory containing ``geometry.geo`` and mesh metadata.</span>
+<span class="sd">            pp_settings: Optional post-processing settings; loaded from ``cwd`` if omitted.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            ModelConfig: Resolved ``model_type`` and conductive/air GeometryIds.</span>
+<span class="sd">        """</span>
+        <span class="n">pp</span> <span class="o">=</span> <span class="n">pp_settings</span> <span class="k">if</span> <span class="n">pp_settings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">load_post_processing_settings</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
+        <span class="n">mc_def</span> <span class="o">=</span> <span class="n">pp</span><span class="p">[</span><span class="s2">"model_config_defaults"</span><span class="p">]</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">outer_material_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">mc_def</span><span class="p">[</span><span class="s2">"outer_material_id"</span><span class="p">]),</span>
+            <span class="n">outer_air_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">mc_def</span><span class="p">[</span><span class="s2">"outer_air_id"</span><span class="p">]),</span>
+            <span class="n">inner_air_id</span><span class="o">=</span><span class="n">mc_def</span><span class="p">[</span><span class="s2">"inner_air_id"</span><span class="p">],</span>
+            <span class="n">inner_material_id</span><span class="o">=</span><span class="n">mc_def</span><span class="p">[</span><span class="s2">"inner_material_id"</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">geo_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s2">"geometry.geo"</span><span class="p">)</span>
+        <span class="n">geo_params</span> <span class="o">=</span> <span class="n">GeometryParams</span><span class="o">.</span><span class="n">from_geo_file</span><span class="p">(</span><span class="n">geo_file</span><span class="p">,</span> <span class="n">pp</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">geo_file</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+        <span class="n">contract</span> <span class="o">=</span> <span class="n">contract_from_text</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">geometry_type</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">contract</span><span class="o">.</span><span class="n">family</span> <span class="k">if</span> <span class="n">contract</span><span class="o">.</span><span class="n">family</span> <span class="o">!=</span> <span class="s2">"unknown"</span> <span class="k">else</span> <span class="n">geo_params</span><span class="o">.</span><span class="n">geometry_type</span>
+        <span class="p">)</span>
+
+        <span class="n">variant</span> <span class="o">=</span> <span class="n">contract</span><span class="o">.</span><span class="n">variant</span> <span class="k">if</span> <span class="n">contract</span><span class="o">.</span><span class="n">variant</span> <span class="o">!=</span> <span class="s2">"unknown"</span> <span class="k">else</span> <span class="n">geo_params</span><span class="o">.</span><span class="n">variant</span>
+        <span class="n">is_hollow</span> <span class="o">=</span> <span class="n">variant</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"hollow"</span><span class="p">,</span> <span class="s2">"layer_over_hollow"</span><span class="p">)</span>
+        <span class="n">is_two_layer</span> <span class="o">=</span> <span class="n">variant</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"layer_over_full"</span><span class="p">,</span> <span class="s2">"layer_over_hollow"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">geo_params</span><span class="o">.</span><span class="n">is_two_layer</span>
+
+        <span class="n">mesh_name_ids</span> <span class="o">=</span> <span class="n">load_mesh_name_ids</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">cwd</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s2">"outer_material"</span> <span class="ow">in</span> <span class="n">mesh_name_ids</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">outer_material_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mesh_name_ids</span><span class="p">[</span><span class="s2">"outer_material"</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">"outer_air"</span> <span class="ow">in</span> <span class="n">mesh_name_ids</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">outer_air_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mesh_name_ids</span><span class="p">[</span><span class="s2">"outer_air"</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">"inner_air"</span> <span class="ow">in</span> <span class="n">mesh_name_ids</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">inner_air_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mesh_name_ids</span><span class="p">[</span><span class="s2">"inner_air"</span><span class="p">])</span>
+            <span class="n">is_hollow</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="s2">"inner_material"</span> <span class="ow">in</span> <span class="n">mesh_name_ids</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">inner_material_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mesh_name_ids</span><span class="p">[</span><span class="s2">"inner_material"</span><span class="p">])</span>
+            <span class="n">is_two_layer</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">layouts</span> <span class="o">=</span> <span class="n">pp</span><span class="p">[</span><span class="s2">"model_layouts"</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">geometry_type</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_two_layer</span> <span class="ow">or</span> <span class="n">geo_params</span><span class="o">.</span><span class="n">is_two_layer</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">"layer_over_hollow_prism"</span> <span class="k">if</span> <span class="n">is_hollow</span> <span class="k">else</span> <span class="s2">"layer_over_full_prism"</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">is_hollow</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">"hollow_prism"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">"full_prism"</span>
+        <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">geometry_type</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_two_layer</span> <span class="ow">or</span> <span class="n">geo_params</span><span class="o">.</span><span class="n">is_two_layer</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">"layer_over_hollow_sphere"</span> <span class="k">if</span> <span class="n">is_hollow</span> <span class="k">else</span> <span class="s2">"layer_over_full_sphere"</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">is_hollow</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">"hollow_sphere"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">"full_sphere"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_two_layer</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">"layer_over_hollow_cylinder"</span> <span class="k">if</span> <span class="n">is_hollow</span> <span class="k">else</span> <span class="s2">"layer_over_full_cylinder"</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">is_hollow</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">"hollow_cylinder"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">"full_cylinder"</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">layouts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">layout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown post-processing model_type </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">model_type</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="n">config</span><span class="o">.</span><span class="n">outer_material_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">layout</span><span class="p">[</span><span class="s2">"outer_material_id"</span><span class="p">])</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">outer_air_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">layout</span><span class="p">[</span><span class="s2">"outer_air_id"</span><span class="p">])</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">inner_air_id</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inner_air_id"</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">inner_material_id</span> <span class="o">=</span> <span class="n">mesh_name_ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inner_material"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inner_material_id"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"outer_material"</span> <span class="ow">in</span> <span class="n">mesh_name_ids</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">outer_material_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mesh_name_ids</span><span class="p">[</span><span class="s2">"outer_material"</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">"outer_air"</span> <span class="ow">in</span> <span class="n">mesh_name_ids</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">outer_air_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mesh_name_ids</span><span class="p">[</span><span class="s2">"outer_air"</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">"inner_air"</span> <span class="ow">in</span> <span class="n">mesh_name_ids</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">inner_air_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mesh_name_ids</span><span class="p">[</span><span class="s2">"inner_air"</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">config</span></div>
+</div>
+
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"GeometryParams"</span><span class="p">,</span> <span class="s2">"ModelConfig"</span><span class="p">]</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.geometry_params</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

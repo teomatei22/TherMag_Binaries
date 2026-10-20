@@ -1,0 +1,7 @@
+geometries.registry module
+==========================
+
+.. automodule:: geometries.registry
+   :members:
+   :show-inheritance:
+   :undoc-members:

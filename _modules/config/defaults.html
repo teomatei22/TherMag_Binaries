@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>config.defaults &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">config.defaults</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for config.defaults</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Validated access to user-editable application defaults."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MappingProxyType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="n">DEFAULTS_FILENAME</span> <span class="o">=</span> <span class="s2">"application_defaults.json"</span>
+
+
+<div class="viewcode-block" id="_object">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults._object">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_object</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a nested mapping value at ``key``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping to read.</span>
+<span class="sd">        key: Field name expected to hold an object.</span>
+<span class="sd">        path: Dot-path used in validation error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        Mapping[str, Any]: The nested object at ``key``.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be an object"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span></div>
+
+
+
+<div class="viewcode-block" id="_number">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults._number">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_number</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a numeric (non-bool) value at ``key``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping to read.</span>
+<span class="sd">        key: Field name expected to hold a number.</span>
+<span class="sd">        path: Dot-path used in validation error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Parsed numeric value.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be a number"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_integer">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults._integer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_integer</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require an integer-valued number at ``key``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping to read.</span>
+<span class="sd">        key: Field name expected to hold an integer.</span>
+<span class="sd">        path: Dot-path used in validation error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        int: Parsed integer value.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be an integer"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_boolean">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults._boolean">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_boolean</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a boolean value at ``key``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping to read.</span>
+<span class="sd">        key: Field name expected to hold a boolean.</span>
+<span class="sd">        path: Dot-path used in validation error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        bool: Parsed boolean value.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be a boolean"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span></div>
+
+
+
+<div class="viewcode-block" id="_optional_number">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults._optional_number">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_optional_number</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Read an optional numeric field, allowing ``None``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Parent mapping to read.</span>
+<span class="sd">        key: Field name that may be absent, null, or numeric.</span>
+<span class="sd">        path: Dot-path used in validation error messages.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float | None: Parsed number, or ``None`` when the field is null.</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">_number</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TemperatureDefaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.TemperatureDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TemperatureDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Default thermal boundary and initial temperatures for FEM runs [K].</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        min_k: Minimum allowed temperature [K].</span>
+<span class="sd">        max_k: Maximum allowed temperature [K].</span>
+<span class="sd">        t_hot: Default hot-side boundary temperature [K].</span>
+<span class="sd">        t_cold: Default cold-side boundary temperature [K].</span>
+<span class="sd">        t_ic: Default initial-condition temperature [K].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        TemperatureDefaults: Validated thermal temperature defaults for FEM runs.</span>
+<span class="sd">    """</span>
+
+    <span class="n">min_k</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">max_k</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">t_hot</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">t_cold</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">t_ic</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="DriverDefaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.DriverDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DriverDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Default hot/cold driver temperatures and optional period.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        t_hot: Hot-side driver temperature [K].</span>
+<span class="sd">        t_cold: Cold-side driver temperature [K].</span>
+<span class="sd">        period: Optional thermal-driver period [s]; ``None`` for steady drivers.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        DriverDefaults: Per-driver temperature and period defaults.</span>
+<span class="sd">    """</span>
+
+    <span class="n">t_hot</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">t_cold</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="DriverRuntimeDefaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.DriverRuntimeDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DriverRuntimeDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Default timestepping and output cadence for transient drivers.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        timestep_size: Integration timestep size [s].</span>
+<span class="sd">        timestep_intervals: Number of timesteps per driver interval.</span>
+<span class="sd">        output_intervals: Number of timesteps between result writes.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        DriverRuntimeDefaults: Transient driver timestep and output cadence defaults.</span>
+<span class="sd">    """</span>
+
+    <span class="n">timestep_size</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">timestep_intervals</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">output_intervals</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
+<div class="viewcode-block" id="TimeDependentDefaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.TimeDependentDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TimeDependentDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Default total simulation time and thermal-driver period.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        total_time: Default simulated physical duration [s].</span>
+<span class="sd">        driver_period: Default thermal-driver period [s].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        TimeDependentDefaults: Time-dependent simulation duration defaults.</span>
+<span class="sd">    """</span>
+
+    <span class="n">total_time</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">driver_period</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="ElectricBCDefaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.ElectricBCDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ElectricBCDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Default Dirichlet electric potentials on named boundaries [V].</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        bc1_enabled: Whether the first electric BC is active.</span>
+<span class="sd">        bc1_potential: First boundary potential [V], or ``None`` when free.</span>
+<span class="sd">        bc2_enabled: Whether the second electric BC is active.</span>
+<span class="sd">        bc2_potential: Second boundary potential [V], or ``None`` when free.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ElectricBCDefaults: Default electric Dirichlet BC enable flags and potentials.</span>
+<span class="sd">    """</span>
+
+    <span class="n">bc1_enabled</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">bc1_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">bc2_enabled</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">bc2_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="SolverDefaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.SolverDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SolverDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Default MPI process counts and stage timeouts for the FEM pipeline.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        requested_processes: Default number of MPI processes to request.</span>
+<span class="sd">        max_partitions: Maximum mesh partitions allowed.</span>
+<span class="sd">        mesh_timeout: Mesh-generation stage timeout [s].</span>
+<span class="sd">        solve_timeout: Solver stage timeout [s].</span>
+<span class="sd">        post_timeout: Post-processing stage timeout [s].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SolverDefaults: Default process counts and stage timeouts for the FEM pipeline.</span>
+<span class="sd">    """</span>
+
+    <span class="n">requested_processes</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_partitions</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">mesh_timeout</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">solve_timeout</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">post_timeout</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
+<div class="viewcode-block" id="SweepBounds">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.SweepBounds">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SweepBounds</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Per-geometry limits for sweep coefficient spinboxes.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        default_lower_min: Default lower bound for swept length scales [m].</span>
+<span class="sd">        default_upper_max: Default upper bound for swept length scales [m].</span>
+<span class="sd">        cylinder_length_lower_min: Cylinder length lower bound [m].</span>
+<span class="sd">        cylinder_length_upper_max: Cylinder length upper bound [m].</span>
+<span class="sd">        cylinder_radius_lower_min: Cylinder radius lower bound [m].</span>
+<span class="sd">        cylinder_radius_upper_max: Cylinder radius upper bound [m].</span>
+<span class="sd">        prism_length_lower_min: Prism length lower bound [m].</span>
+<span class="sd">        prism_length_upper_max: Prism length upper bound [m].</span>
+<span class="sd">        prism_width_lower_min: Prism width lower bound [m].</span>
+<span class="sd">        prism_width_upper_max: Prism width upper bound [m].</span>
+<span class="sd">        sphere_lower_min: Sphere radius-coefficient lower bound.</span>
+<span class="sd">        sphere_upper_max: Sphere radius-coefficient upper bound.</span>
+<span class="sd">        sphere_shell_margin_m: Extra shell clearance for sphere thickness floor [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SweepBounds: Geometric limits applied when scaling sweep coefficients.</span>
+<span class="sd">    """</span>
+
+    <span class="n">default_lower_min</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">default_upper_max</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">cylinder_length_lower_min</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">cylinder_length_upper_max</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">cylinder_radius_lower_min</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">cylinder_radius_upper_max</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">prism_length_lower_min</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">prism_length_upper_max</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">prism_width_lower_min</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">prism_width_upper_max</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">sphere_lower_min</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">sphere_upper_max</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">sphere_shell_margin_m</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="SweepDefaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.SweepDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SweepDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Default parameter-sweep coefficient range, step, and geometric bounds.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        lower_coefficient: Default lower multiplicative coefficient for sweeps.</span>
+<span class="sd">        upper_coefficient: Default upper multiplicative coefficient for sweeps.</span>
+<span class="sd">        coefficient_step: Default step between consecutive coefficients.</span>
+<span class="sd">        length_period_coefficient: Coefficient used when period scales with length.</span>
+<span class="sd">        bounds: Absolute geometric bounds for coefficient scaling [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SweepDefaults: Default sweep coefficient range, step, and geometric bounds.</span>
+<span class="sd">    """</span>
+
+    <span class="n">lower_coefficient</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">upper_coefficient</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">coefficient_step</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">length_period_coefficient</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="n">SweepBounds</span></div>
+
+
+
+<div class="viewcode-block" id="ApplicationDefaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.ApplicationDefaults">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApplicationDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Application defaults loaded from JSON.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        default_threads: Default worker/thread count for application runtime.</span>
+<span class="sd">        temperature: Thermal temperature defaults [K].</span>
+<span class="sd">        drivers: Mapping of driver name to ``DriverDefaults``.</span>
+<span class="sd">        driver_runtime: Transient timestepping and output intervals defaults.</span>
+<span class="sd">        time_dependent: Time-dependent duration and period defaults.</span>
+<span class="sd">        electric_bc: Electric Dirichlet BC defaults [V].</span>
+<span class="sd">        solver: MPI process and stage timeouts defaults.</span>
+<span class="sd">        sweep: Parameter-sweep coefficient and bounds defaults.</span>
+<span class="sd">        bc_defaults: SIF boundary-condition default mapping.</span>
+<span class="sd">        physics_constants: Named physics constants (e.g. vacuum permittivity).</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ApplicationDefaults: Immutable validated defaults tree from JSON.</span>
+<span class="sd">    """</span>
+
+    <span class="n">default_threads</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="n">TemperatureDefaults</span>
+    <span class="n">drivers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DriverDefaults</span><span class="p">]</span>
+    <span class="n">driver_runtime</span><span class="p">:</span> <span class="n">DriverRuntimeDefaults</span>
+    <span class="n">time_dependent</span><span class="p">:</span> <span class="n">TimeDependentDefaults</span>
+    <span class="n">electric_bc</span><span class="p">:</span> <span class="n">ElectricBCDefaults</span>
+    <span class="n">solver</span><span class="p">:</span> <span class="n">SolverDefaults</span>
+    <span class="n">sweep</span><span class="p">:</span> <span class="n">SweepDefaults</span>
+    <span class="n">bc_defaults</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">physics_constants</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="_validate_positive">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults._validate_positive">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_positive</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Ensure a numeric setting is strictly positive.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        value: Candidate numeric value.</span>
+<span class="sd">        path: Dot-path used in the validation error message.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: The same ``value`` when it is greater than zero.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> must be greater than zero"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span></div>
+
+
+
+<div class="viewcode-block" id="_parse_defaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults._parse_defaults">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_defaults</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ApplicationDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Parse and validate raw JSON defaults into typed dataclasses.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        data: Root object from ``application_defaults.json``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ApplicationDefaults: Immutable, validated defaults tree.</span>
+<span class="sd">    """</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"simulation"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">)</span>
+    <span class="n">limits</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"temperature_limits"</span><span class="p">,</span> <span class="s2">"simulation"</span><span class="p">)</span>
+    <span class="n">drivers_data</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"driver_defaults"</span><span class="p">,</span> <span class="s2">"simulation"</span><span class="p">)</span>
+    <span class="n">drivers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DriverDefaults</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"steady"</span><span class="p">,</span> <span class="s2">"harmonic"</span><span class="p">,</span> <span class="s2">"sawtooth"</span><span class="p">):</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">drivers_data</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"simulation.driver_defaults"</span><span class="p">)</span>
+        <span class="n">period</span> <span class="o">=</span> <span class="n">_optional_number</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="s2">"period"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"simulation.driver_defaults.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">drivers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">DriverDefaults</span><span class="p">(</span>
+            <span class="n">t_hot</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="s2">"t_hot"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"simulation.driver_defaults.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">),</span>
+            <span class="n">t_cold</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="s2">"t_cold"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"simulation.driver_defaults.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">),</span>
+            <span class="n">period</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">_validate_positive</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"simulation.driver_defaults.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.period"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="n">runtime</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"driver_runtime"</span><span class="p">,</span> <span class="s2">"simulation"</span><span class="p">)</span>
+    <span class="n">time_dependent</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"time_dependent"</span><span class="p">,</span> <span class="s2">"simulation"</span><span class="p">)</span>
+    <span class="n">electric_bc</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"electric_bc"</span><span class="p">,</span> <span class="s2">"simulation"</span><span class="p">)</span>
+    <span class="n">solver</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"solver"</span><span class="p">,</span> <span class="s2">"simulation"</span><span class="p">)</span>
+    <span class="n">sweep</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"sweep"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">)</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="s2">"bounds"</span><span class="p">,</span> <span class="s2">"sweep"</span><span class="p">)</span>
+    <span class="n">default_bounds</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">,</span> <span class="s2">"sweep.bounds"</span><span class="p">)</span>
+    <span class="n">length_bounds</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="s2">"cylinder_length"</span><span class="p">,</span> <span class="s2">"sweep.bounds"</span><span class="p">)</span>
+    <span class="n">radius_bounds</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="s2">"cylinder_radius"</span><span class="p">,</span> <span class="s2">"sweep.bounds"</span><span class="p">)</span>
+    <span class="n">prism_length_bounds</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="s2">"prism_length"</span><span class="p">,</span> <span class="s2">"sweep.bounds"</span><span class="p">)</span>
+    <span class="n">prism_width_bounds</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="s2">"prism_width"</span><span class="p">,</span> <span class="s2">"sweep.bounds"</span><span class="p">)</span>
+    <span class="n">sphere_bounds</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="s2">"sphere"</span><span class="p">,</span> <span class="s2">"sweep.bounds"</span><span class="p">)</span>
+    <span class="n">sif</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"sif"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">)</span>
+    <span class="n">application_runtime</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"runtime"</span><span class="p">,</span> <span class="s2">"defaults"</span><span class="p">)</span>
+    <span class="n">physics</span> <span class="o">=</span> <span class="n">_object</span><span class="p">(</span><span class="n">sif</span><span class="p">,</span> <span class="s2">"physics_constants"</span><span class="p">,</span> <span class="s2">"sif"</span><span class="p">)</span>
+
+    <span class="n">temperature</span> <span class="o">=</span> <span class="n">TemperatureDefaults</span><span class="p">(</span>
+        <span class="n">min_k</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">limits</span><span class="p">,</span> <span class="s2">"min_k"</span><span class="p">,</span> <span class="s2">"simulation.temperature_limits"</span><span class="p">),</span>
+        <span class="n">max_k</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">limits</span><span class="p">,</span> <span class="s2">"max_k"</span><span class="p">,</span> <span class="s2">"simulation.temperature_limits"</span><span class="p">),</span>
+        <span class="n">t_hot</span><span class="o">=</span><span class="n">drivers</span><span class="p">[</span><span class="s2">"steady"</span><span class="p">]</span><span class="o">.</span><span class="n">t_hot</span><span class="p">,</span>
+        <span class="n">t_cold</span><span class="o">=</span><span class="n">drivers</span><span class="p">[</span><span class="s2">"steady"</span><span class="p">]</span><span class="o">.</span><span class="n">t_cold</span><span class="p">,</span>
+        <span class="n">t_ic</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="s2">"temperature_ic"</span><span class="p">,</span> <span class="s2">"simulation"</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">temperature</span><span class="o">.</span><span class="n">min_k</span> <span class="o">&gt;=</span> <span class="n">temperature</span><span class="o">.</span><span class="n">max_k</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"simulation.temperature_limits.min_k must be below max_k"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+        <span class="n">temperature</span><span class="o">.</span><span class="n">min_k</span> <span class="o">&lt;=</span> <span class="n">temperature</span><span class="o">.</span><span class="n">t_cold</span> <span class="o">&lt;=</span> <span class="n">temperature</span><span class="o">.</span><span class="n">max_k</span>
+        <span class="ow">and</span> <span class="n">temperature</span><span class="o">.</span><span class="n">min_k</span> <span class="o">&lt;=</span> <span class="n">temperature</span><span class="o">.</span><span class="n">t_hot</span> <span class="o">&lt;=</span> <span class="n">temperature</span><span class="o">.</span><span class="n">max_k</span>
+        <span class="ow">and</span> <span class="n">temperature</span><span class="o">.</span><span class="n">min_k</span> <span class="o">&lt;=</span> <span class="n">temperature</span><span class="o">.</span><span class="n">t_ic</span> <span class="o">&lt;=</span> <span class="n">temperature</span><span class="o">.</span><span class="n">max_k</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"default temperatures must be within configured limits"</span><span class="p">)</span>
+
+    <span class="n">parsed_sweep</span> <span class="o">=</span> <span class="n">SweepDefaults</span><span class="p">(</span>
+        <span class="n">lower_coefficient</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="s2">"lower_coefficient"</span><span class="p">,</span> <span class="s2">"sweep"</span><span class="p">),</span>
+        <span class="n">upper_coefficient</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="s2">"upper_coefficient"</span><span class="p">,</span> <span class="s2">"sweep"</span><span class="p">),</span>
+        <span class="n">coefficient_step</span><span class="o">=</span><span class="n">_validate_positive</span><span class="p">(</span>
+            <span class="n">_number</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="s2">"coefficient_step"</span><span class="p">,</span> <span class="s2">"sweep"</span><span class="p">),</span>
+            <span class="s2">"sweep.coefficient_step"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">length_period_coefficient</span><span class="o">=</span><span class="n">_validate_positive</span><span class="p">(</span>
+            <span class="n">_number</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="s2">"length_period_coefficient"</span><span class="p">,</span> <span class="s2">"sweep"</span><span class="p">),</span>
+            <span class="s2">"sweep.length_period_coefficient"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">bounds</span><span class="o">=</span><span class="n">SweepBounds</span><span class="p">(</span>
+            <span class="n">default_lower_min</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">default_bounds</span><span class="p">,</span> <span class="s2">"lower_min"</span><span class="p">,</span> <span class="s2">"sweep.bounds.default"</span><span class="p">),</span>
+            <span class="n">default_upper_max</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">default_bounds</span><span class="p">,</span> <span class="s2">"upper_max"</span><span class="p">,</span> <span class="s2">"sweep.bounds.default"</span><span class="p">),</span>
+            <span class="n">cylinder_length_lower_min</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">length_bounds</span><span class="p">,</span>
+                <span class="s2">"lower_min"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds.cylinder_length"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">cylinder_length_upper_max</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">length_bounds</span><span class="p">,</span>
+                <span class="s2">"upper_max"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds.cylinder_length"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">cylinder_radius_lower_min</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">radius_bounds</span><span class="p">,</span>
+                <span class="s2">"lower_min"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds.cylinder_radius"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">cylinder_radius_upper_max</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">radius_bounds</span><span class="p">,</span>
+                <span class="s2">"upper_max"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds.cylinder_radius"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">prism_length_lower_min</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">prism_length_bounds</span><span class="p">,</span>
+                <span class="s2">"lower_min"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds.prism_length"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">prism_length_upper_max</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">prism_length_bounds</span><span class="p">,</span>
+                <span class="s2">"upper_max"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds.prism_length"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">prism_width_lower_min</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">prism_width_bounds</span><span class="p">,</span>
+                <span class="s2">"lower_min"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds.prism_width"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">prism_width_upper_max</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">prism_width_bounds</span><span class="p">,</span>
+                <span class="s2">"upper_max"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds.prism_width"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">sphere_lower_min</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">sphere_bounds</span><span class="p">,</span> <span class="s2">"lower_min"</span><span class="p">,</span> <span class="s2">"sweep.bounds.sphere"</span><span class="p">),</span>
+            <span class="n">sphere_upper_max</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span><span class="n">sphere_bounds</span><span class="p">,</span> <span class="s2">"upper_max"</span><span class="p">,</span> <span class="s2">"sweep.bounds.sphere"</span><span class="p">),</span>
+            <span class="n">sphere_shell_margin_m</span><span class="o">=</span><span class="n">_number</span><span class="p">(</span>
+                <span class="n">bounds</span><span class="p">,</span>
+                <span class="s2">"sphere_shell_margin_m"</span><span class="p">,</span>
+                <span class="s2">"sweep.bounds"</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">parsed_sweep</span><span class="o">.</span><span class="n">lower_coefficient</span> <span class="o">&gt;</span> <span class="n">parsed_sweep</span><span class="o">.</span><span class="n">upper_coefficient</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"sweep.lower_coefficient must not exceed upper_coefficient"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ApplicationDefaults</span><span class="p">(</span>
+        <span class="n">default_threads</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">application_runtime</span><span class="p">,</span> <span class="s2">"default_threads"</span><span class="p">,</span> <span class="s2">"runtime"</span><span class="p">),</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">drivers</span><span class="o">=</span><span class="n">MappingProxyType</span><span class="p">(</span><span class="n">drivers</span><span class="p">),</span>
+        <span class="n">driver_runtime</span><span class="o">=</span><span class="n">DriverRuntimeDefaults</span><span class="p">(</span>
+            <span class="n">timestep_size</span><span class="o">=</span><span class="n">_validate_positive</span><span class="p">(</span>
+                <span class="n">_number</span><span class="p">(</span><span class="n">runtime</span><span class="p">,</span> <span class="s2">"timestep_size"</span><span class="p">,</span> <span class="s2">"simulation.driver_runtime"</span><span class="p">),</span>
+                <span class="s2">"simulation.driver_runtime.timestep_size"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">timestep_intervals</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span>
+                <span class="n">runtime</span><span class="p">,</span>
+                <span class="s2">"timestep_intervals"</span><span class="p">,</span>
+                <span class="s2">"simulation.driver_runtime"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">output_intervals</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span>
+                <span class="n">runtime</span><span class="p">,</span>
+                <span class="s2">"output_intervals"</span><span class="p">,</span>
+                <span class="s2">"simulation.driver_runtime"</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">time_dependent</span><span class="o">=</span><span class="n">TimeDependentDefaults</span><span class="p">(</span>
+            <span class="n">total_time</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">time_dependent</span><span class="p">,</span> <span class="s2">"total_time"</span><span class="p">,</span> <span class="s2">"simulation.time_dependent"</span><span class="p">),</span>
+            <span class="n">driver_period</span><span class="o">=</span><span class="n">_validate_positive</span><span class="p">(</span>
+                <span class="n">_number</span><span class="p">(</span><span class="n">time_dependent</span><span class="p">,</span> <span class="s2">"driver_period"</span><span class="p">,</span> <span class="s2">"simulation.time_dependent"</span><span class="p">),</span>
+                <span class="s2">"simulation.time_dependent.driver_period"</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">electric_bc</span><span class="o">=</span><span class="n">ElectricBCDefaults</span><span class="p">(</span>
+            <span class="n">bc1_enabled</span><span class="o">=</span><span class="n">_boolean</span><span class="p">(</span><span class="n">electric_bc</span><span class="p">,</span> <span class="s2">"bc1_enabled"</span><span class="p">,</span> <span class="s2">"simulation.electric_bc"</span><span class="p">),</span>
+            <span class="n">bc1_potential</span><span class="o">=</span><span class="n">_optional_number</span><span class="p">(</span>
+                <span class="n">electric_bc</span><span class="p">,</span>
+                <span class="s2">"bc1_potential"</span><span class="p">,</span>
+                <span class="s2">"simulation.electric_bc"</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">bc2_enabled</span><span class="o">=</span><span class="n">_boolean</span><span class="p">(</span><span class="n">electric_bc</span><span class="p">,</span> <span class="s2">"bc2_enabled"</span><span class="p">,</span> <span class="s2">"simulation.electric_bc"</span><span class="p">),</span>
+            <span class="n">bc2_potential</span><span class="o">=</span><span class="n">_optional_number</span><span class="p">(</span>
+                <span class="n">electric_bc</span><span class="p">,</span>
+                <span class="s2">"bc2_potential"</span><span class="p">,</span>
+                <span class="s2">"simulation.electric_bc"</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">solver</span><span class="o">=</span><span class="n">SolverDefaults</span><span class="p">(</span>
+            <span class="n">requested_processes</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="s2">"requested_processes"</span><span class="p">,</span> <span class="s2">"simulation.solver"</span><span class="p">),</span>
+            <span class="n">max_partitions</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="s2">"max_partitions"</span><span class="p">,</span> <span class="s2">"simulation.solver"</span><span class="p">),</span>
+            <span class="n">mesh_timeout</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="s2">"mesh_timeout"</span><span class="p">,</span> <span class="s2">"simulation.solver"</span><span class="p">),</span>
+            <span class="n">solve_timeout</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="s2">"solve_timeout"</span><span class="p">,</span> <span class="s2">"simulation.solver"</span><span class="p">),</span>
+            <span class="n">post_timeout</span><span class="o">=</span><span class="n">_integer</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="s2">"post_timeout"</span><span class="p">,</span> <span class="s2">"simulation.solver"</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">sweep</span><span class="o">=</span><span class="n">parsed_sweep</span><span class="p">,</span>
+        <span class="n">bc_defaults</span><span class="o">=</span><span class="n">MappingProxyType</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">_object</span><span class="p">(</span><span class="n">sif</span><span class="p">,</span> <span class="s2">"bc_defaults"</span><span class="p">,</span> <span class="s2">"sif"</span><span class="p">))),</span>
+        <span class="n">physics_constants</span><span class="o">=</span><span class="n">MappingProxyType</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"permittivity_of_vacuum"</span><span class="p">:</span> <span class="n">_number</span><span class="p">(</span>
+                    <span class="n">physics</span><span class="p">,</span>
+                    <span class="s2">"permittivity_of_vacuum"</span><span class="p">,</span>
+                    <span class="s2">"sif.physics_constants"</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_load_defaults_file">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults._load_defaults_file">[docs]</a>
+<span class="nd">@cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_defaults_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApplicationDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load, parse, and cache defaults from a resolved JSON path.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        path: Absolute path to the defaults JSON file.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ApplicationDefaults: Cached validated defaults for ``path``.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing defaults JSON: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Defaults JSON must contain an object: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_parse_defaults</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_application_defaults">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.load_application_defaults">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_application_defaults</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApplicationDefaults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Load and validate defaults, caching each resolved file path.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        path: Optional overrides path; defaults to packaged ``application_defaults.json``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ApplicationDefaults: Validated application defaults.</span>
+<span class="sd">    """</span>
+    <span class="n">defaults_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">DEFAULTS_FILENAME</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_load_defaults_file</span><span class="p">(</span><span class="n">defaults_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="clear_defaults_cache">
+<a class="viewcode-back" href="../../api/config.defaults.html#config.defaults.clear_defaults_cache">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_defaults_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">_load_defaults_file</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">config.defaults</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

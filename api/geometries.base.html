@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>geometries.base module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="geometries.cylinder module" href="geometries.cylinder.html" />
+    <link rel="prev" title="geometries package" href="geometries.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geometries.cylinder.html" title="geometries.cylinder module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="geometries.html" title="geometries package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="geometries.html" accesskey="U">geometries package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.base module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-geometries.base">
+<span id="geometries-base-module"></span><h1>geometries.base module<a class="headerlink" href="#module-geometries.base" title="Link to this heading">¶</a></h1>
+<p>Abstract geometry contract, parameter specs, and domain size helpers.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometries.base.</span></span><span class="sig-name descname"><span class="pre">BaseGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#BaseGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.BaseGeometry" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract Gmsh geometry: parameters, template fill, and physical IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – subclass sets <code class="docutils literal notranslate"><span class="pre">geometry_type</span></code>, template path, and parameter specs.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>BaseGeometry</strong> – Instance ready to validate params and emit <code class="docutils literal notranslate"><span class="pre">.geo</span></code> text.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>template_file</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#geometries.base.BaseGeometry._abc_impl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry._init_parameters">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_init_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#BaseGeometry._init_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.BaseGeometry._init_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>Populate <code class="docutils literal notranslate"><span class="pre">_parameters</span></code> from defaults for this shape/variant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – uses subclass variant and defaults JSON.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Mutates <code class="docutils literal notranslate"><span class="pre">self._parameters</span></code> in place.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.air_sphere_radius_m">
+<span class="sig-name descname"><span class="pre">air_sphere_radius_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#BaseGeometry.air_sphere_radius_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.BaseGeometry.air_sphere_radius_m" title="Link to this definition">¶</a></dt>
+<dd><p>Parse outer air radius from generated <code class="docutils literal notranslate"><span class="pre">.geo</span></code> domain text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – Partial or full parameter overrides [m / deg as applicable].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Spherical air domain radius implied by the template [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.description">
+<span class="sig-name descname"><span class="pre">description</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#geometries.base.BaseGeometry.description" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.generate_geo_content">
+<span class="sig-name descname"><span class="pre">generate_geo_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#BaseGeometry.generate_geo_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.BaseGeometry.generate_geo_content" title="Link to this definition">¶</a></dt>
+<dd><p>Substitute numeric parameters into the Gmsh template.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – Parameter name/value pairs to rewrite in assignments [m/deg].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Filled <code class="docutils literal notranslate"><span class="pre">.geo</span></code> content ready for meshing.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.geometry_type">
+<span class="sig-name descname"><span class="pre">geometry_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unknown'</span></span><a class="headerlink" href="#geometries.base.BaseGeometry.geometry_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.get_physical_surfaces">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_physical_surfaces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#BaseGeometry.get_physical_surfaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.BaseGeometry.get_physical_surfaces" title="Link to this definition">¶</a></dt>
+<dd><p>Map logical surface roles to Gmsh physical surface tags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – uses subclass variant configuration.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, int]</strong> – Role name (hot/cold/infinity) to physical surface ID.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.get_physical_volumes">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_physical_volumes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#BaseGeometry.get_physical_volumes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.BaseGeometry.get_physical_volumes" title="Link to this definition">¶</a></dt>
+<dd><p>Map logical volume roles to Gmsh physical volume tags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – uses subclass variant configuration.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, int]</strong> – Role name to physical volume ID for SIF body mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.load_template">
+<span class="sig-name descname"><span class="pre">load_template</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#BaseGeometry.load_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.BaseGeometry.load_template" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Gmsh <code class="docutils literal notranslate"><span class="pre">.geo</span></code> template file from disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – uses <code class="docutils literal notranslate"><span class="pre">self.template_file</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Raw template source text.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Unknown</span> <span class="pre">Geometry'</span></span><a class="headerlink" href="#geometries.base.BaseGeometry.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.parameters">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">parameters</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#geometries.base.ParameterSpec" title="geometries.base.ParameterSpec"><span class="pre">ParameterSpec</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#geometries.base.BaseGeometry.parameters" title="Link to this definition">¶</a></dt>
+<dd><p>Expose the live parameter-spec dictionary for this geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – reads <code class="docutils literal notranslate"><span class="pre">self._parameters</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, ParameterSpec]</strong> – Name-to-spec mapping for GUI and validation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.validate_parameters">
+<span class="sig-name descname"><span class="pre">validate_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#BaseGeometry.validate_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.BaseGeometry.validate_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>Validate all declared parameters against their specs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – Candidate parameter values keyed by name [matches units].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[bool, list[str]]</strong> – Validity flag and list of error messages.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[bool, list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="geometries.base.BaseGeometry.variant_key">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">variant_key</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#geometries.base.BaseGeometry.variant_key" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize the topology variant to a lowercase registry key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – reads optional <code class="docutils literal notranslate"><span class="pre">self.variant</span></code> enum or string.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Variant key such as <code class="docutils literal notranslate"><span class="pre">full</span></code> or <code class="docutils literal notranslate"><span class="pre">hollow</span></code> [dimensionless].</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometries.base.</span></span><span class="sig-name descname"><span class="pre">ParameterSpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#ParameterSpec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.ParameterSpec" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Declares a named geometry parameter with bounds and UI metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Parameter identifier used in <code class="docutils literal notranslate"><span class="pre">.geo</span></code> templates [dimensionless].</p></li>
+<li><p><strong>description</strong> – Human-readable meaning of the parameter [dimensionless].</p></li>
+<li><p><strong>default_value</strong> – Numeric value when unset [matches <code class="docutils literal notranslate"><span class="pre">unit</span></code>].</p></li>
+<li><p><strong>min_value</strong> – Inclusive lower bound, if any [matches <code class="docutils literal notranslate"><span class="pre">unit</span></code>].</p></li>
+<li><p><strong>max_value</strong> – Inclusive upper bound, if any [matches <code class="docutils literal notranslate"><span class="pre">unit</span></code>].</p></li>
+<li><p><strong>unit</strong> – Physical unit label such as <code class="docutils literal notranslate"><span class="pre">m</span></code> or <code class="docutils literal notranslate"><span class="pre">deg</span></code> [dimensionless].</p></li>
+<li><p><strong>step</strong> – Suggested UI increment [matches <code class="docutils literal notranslate"><span class="pre">unit</span></code>].</p></li>
+<li><p><strong>decimals</strong> – Digits retained when writing template values [dimensionless].</p></li>
+<li><p><strong>read_only</strong> – Whether the GUI should forbid edits [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ParameterSpec</strong> – Frozen-style dataclass instance describing one parameter.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>description</strong> (<em>str</em>)</p></li>
+<li><p><strong>default_value</strong> (<em>float</em>)</p></li>
+<li><p><strong>min_value</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>max_value</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>unit</strong> (<em>str</em>)</p></li>
+<li><p><strong>step</strong> (<em>float</em>)</p></li>
+<li><p><strong>decimals</strong> (<em>int</em>)</p></li>
+<li><p><strong>read_only</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.decimals">
+<span class="sig-name descname"><span class="pre">decimals</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.decimals" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.default_value">
+<span class="sig-name descname"><span class="pre">default_value</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.default_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.description">
+<span class="sig-name descname"><span class="pre">description</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.description" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.max_value">
+<span class="sig-name descname"><span class="pre">max_value</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.max_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.min_value">
+<span class="sig-name descname"><span class="pre">min_value</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.min_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.read_only">
+<span class="sig-name descname"><span class="pre">read_only</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.read_only" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a class="headerlink" href="#geometries.base.ParameterSpec.unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.base.ParameterSpec.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#ParameterSpec.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.ParameterSpec.validate" title="Link to this definition">¶</a></dt>
+<dd><p>Check that a candidate value lies within configured bounds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Proposed parameter value [matches <code class="docutils literal notranslate"><span class="pre">unit</span></code>].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[bool, str]</strong> – <code class="docutils literal notranslate"><span class="pre">(True,</span> <span class="pre">&quot;&quot;)</span></code> if valid, else <code class="docutils literal notranslate"><span class="pre">(False,</span> <span class="pre">message)</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[bool, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="geometries.base.air_sphere_radius_m">
+<span class="sig-prename descclassname"><span class="pre">geometries.base.</span></span><span class="sig-name descname"><span class="pre">air_sphere_radius_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#air_sphere_radius_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.air_sphere_radius_m" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve surrounding air-sphere radius via the geometry registry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_type</strong> – Shape family key such as <code class="docutils literal notranslate"><span class="pre">cylinder</span></code> [dimensionless].</p></li>
+<li><p><strong>params</strong> – Geometry parameter map used by the <code class="docutils literal notranslate"><span class="pre">.geo</span></code> template [m].</p></li>
+<li><p><strong>variant</strong> – Topology variant; defaults to <code class="docutils literal notranslate"><span class="pre">full</span></code> when omitted [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Outer air domain radius taken from generated geometry [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>params</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="geometries.base.l_metal_max_m">
+<span class="sig-prename descclassname"><span class="pre">geometries.base.</span></span><span class="sig-name descname"><span class="pre">l_metal_max_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/base.html#l_metal_max_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.base.l_metal_max_m" title="Link to this definition">¶</a></dt>
+<dd><p>Characteristic metal extent used for mesh/domain scaling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_type</strong> – Shape family <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code> [dimensionless].</p></li>
+<li><p><strong>params</strong> – Geometry parameter map (lengths and radii) [m].</p></li>
+<li><p><strong>variant</strong> – Topology variant such as <code class="docutils literal notranslate"><span class="pre">full</span></code> or <code class="docutils literal notranslate"><span class="pre">hollow</span></code> [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Maximum metal length scale for the shape [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>params</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">geometries.base module</a><ul>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry"><code class="docutils literal notranslate"><span class="pre">BaseGeometry</span></code></a><ul>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry._abc_impl"><code class="docutils literal notranslate"><span class="pre">BaseGeometry._abc_impl</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry._init_parameters"><code class="docutils literal notranslate"><span class="pre">BaseGeometry._init_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.air_sphere_radius_m"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.air_sphere_radius_m()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.description"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.description</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.generate_geo_content"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.generate_geo_content()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.geometry_type"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.geometry_type</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.get_physical_surfaces"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.get_physical_surfaces()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.get_physical_volumes"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.get_physical_volumes()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.load_template"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.load_template()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.name"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.name</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.parameters"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.parameters</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.validate_parameters"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.validate_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.BaseGeometry.variant_key"><code class="docutils literal notranslate"><span class="pre">BaseGeometry.variant_key</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec"><code class="docutils literal notranslate"><span class="pre">ParameterSpec</span></code></a><ul>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.decimals"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.decimals</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.default_value"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.default_value</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.description"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.description</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.max_value"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.max_value</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.min_value"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.min_value</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.name"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.name</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.read_only"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.read_only</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.step"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.step</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.unit"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.unit</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.ParameterSpec.validate"><code class="docutils literal notranslate"><span class="pre">ParameterSpec.validate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geometries.base.air_sphere_radius_m"><code class="docutils literal notranslate"><span class="pre">air_sphere_radius_m()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.base.l_metal_max_m"><code class="docutils literal notranslate"><span class="pre">l_metal_max_m()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="geometries.html"
+                          title="previous chapter">geometries package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="geometries.cylinder.html"
+                          title="next chapter">geometries.cylinder module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/geometries.base.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geometries.cylinder.html" title="geometries.cylinder module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="geometries.html" title="geometries package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="geometries.html" >geometries package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.base module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

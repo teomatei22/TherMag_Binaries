@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>geometries.registry module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="geometries.sphere module" href="geometries.sphere.html" />
+    <link rel="prev" title="geometries.prism module" href="geometries.prism.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geometries.sphere.html" title="geometries.sphere module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="geometries.prism.html" title="geometries.prism module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="geometries.html" accesskey="U">geometries package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.registry module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-geometries.registry">
+<span id="geometries-registry-module"></span><h1>geometries.registry module<a class="headerlink" href="#module-geometries.registry" title="Link to this heading">¶</a></h1>
+<p>Discover and resolve Gmsh geometry templates by name or variant.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometries.registry.</span></span><span class="sig-name descname"><span class="pre">GeometryRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">templates_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Catalog of available geometry variants keyed by template stem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>templates_dir</strong> – Optional directory of <code class="docutils literal notranslate"><span class="pre">.geo</span></code> templates [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryRegistry</strong> – Instance with discovered geometries and lookup APIs.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>templates_dir</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry._discover_geometries">
+<span class="sig-name descname"><span class="pre">_discover_geometries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry._discover_geometries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry._discover_geometries" title="Link to this definition">¶</a></dt>
+<dd><p>Register all cylinder, prism, and sphere variants if files exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – reads <code class="docutils literal notranslate"><span class="pre">self.templates_dir</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Mutates <code class="docutils literal notranslate"><span class="pre">self._geometries</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry._register_cylinder_variants">
+<span class="sig-name descname"><span class="pre">_register_cylinder_variants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry._register_cylinder_variants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry._register_cylinder_variants" title="Link to this definition">¶</a></dt>
+<dd><p>Add cylinder variants whose template files are present on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – iterates <code class="docutils literal notranslate"><span class="pre">CylinderVariant</span></code> against <code class="docutils literal notranslate"><span class="pre">templates_dir</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Inserts matching entries into <code class="docutils literal notranslate"><span class="pre">self._geometries</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry._register_prism_variants">
+<span class="sig-name descname"><span class="pre">_register_prism_variants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry._register_prism_variants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry._register_prism_variants" title="Link to this definition">¶</a></dt>
+<dd><p>Add prism variants whose template files are present on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – iterates <code class="docutils literal notranslate"><span class="pre">PrismVariant</span></code> against <code class="docutils literal notranslate"><span class="pre">templates_dir</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Inserts matching entries into <code class="docutils literal notranslate"><span class="pre">self._geometries</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry._register_sphere_variants">
+<span class="sig-name descname"><span class="pre">_register_sphere_variants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry._register_sphere_variants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry._register_sphere_variants" title="Link to this definition">¶</a></dt>
+<dd><p>Add sphere variants whose template files are present on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – iterates <code class="docutils literal notranslate"><span class="pre">SphereVariant</span></code> against <code class="docutils literal notranslate"><span class="pre">templates_dir</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Inserts matching entries into <code class="docutils literal notranslate"><span class="pre">self._geometries</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry.air_sphere_radius_m">
+<span class="sig-name descname"><span class="pre">air_sphere_radius_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry.air_sphere_radius_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry.air_sphere_radius_m" title="Link to this definition">¶</a></dt>
+<dd><p>Compute air-sphere radius for a named registered geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_name</strong> – Registry key for the geometry [dimensionless].</p></li>
+<li><p><strong>params</strong> – Geometry parameter values [m / deg as applicable].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Surrounding air domain radius [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>params</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry.get_geometry">
+<span class="sig-name descname"><span class="pre">get_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry.get_geometry" title="Link to this definition">¶</a></dt>
+<dd><p>Look up a registered geometry by template-stem key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Registry key such as <code class="docutils literal notranslate"><span class="pre">full_cylinder</span></code> [dimensionless].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>BaseGeometry | None</strong> – Matching geometry or <code class="docutils literal notranslate"><span class="pre">None</span></code> if unknown.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="geometries.base.html#geometries.base.BaseGeometry" title="geometries.base.BaseGeometry"><em>BaseGeometry</em></a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry.get_geometry_names">
+<span class="sig-name descname"><span class="pre">get_geometry_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry.get_geometry_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry.get_geometry_names" title="Link to this definition">¶</a></dt>
+<dd><p>List all registered geometry template-stem keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – reads <code class="docutils literal notranslate"><span class="pre">self._geometries</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[str]</strong> – Sorted-order-independent list of registry keys.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="geometries.registry.GeometryRegistry.resolve_key">
+<span class="sig-name descname"><span class="pre">resolve_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#GeometryRegistry.resolve_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.GeometryRegistry.resolve_key" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize user-facing names to a concrete registry key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Requested geometry name or stem [dimensionless].</p></li>
+<li><p><strong>template_file</strong> – Optional <code class="docutils literal notranslate"><span class="pre">.geo</span></code> path whose stem may match [path].</p></li>
+<li><p><strong>geometry_type</strong> – Shape family hint such as <code class="docutils literal notranslate"><span class="pre">prism</span></code> [dimensionless].</p></li>
+<li><p><strong>variant</strong> – Topology hint such as <code class="docutils literal notranslate"><span class="pre">hollow</span></code> [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Resolved registry key, or original <code class="docutils literal notranslate"><span class="pre">name</span></code> if unresolved.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>template_file</strong> (<em>str</em><em> | </em><em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="geometries.registry.get_geometry_registry">
+<span class="sig-prename descclassname"><span class="pre">geometries.registry.</span></span><span class="sig-name descname"><span class="pre">get_geometry_registry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">templates_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#get_geometry_registry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.get_geometry_registry" title="Link to this definition">¶</a></dt>
+<dd><p>Return the process-wide geometry registry singleton.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>templates_dir</strong> – If set, rebuilds the registry from that directory [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryRegistry</strong> – Shared or freshly constructed registry instance.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>templates_dir</strong> (<em>Path</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#geometries.registry.GeometryRegistry" title="geometries.registry.GeometryRegistry"><em>GeometryRegistry</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="geometries.registry.resolve_geometry_registry_key">
+<span class="sig-prename descclassname"><span class="pre">geometries.registry.</span></span><span class="sig-name descname"><span class="pre">resolve_geometry_registry_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geometries/registry.html#resolve_geometry_registry_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geometries.registry.resolve_geometry_registry_key" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve ambiguous geometry identifiers onto a registry key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Direct key, display name, or slug [dimensionless].</p></li>
+<li><p><strong>geometries</strong> – Mapping of known registry keys to geometry objects.</p></li>
+<li><p><strong>template_file</strong> – Optional template path for stem matching [path].</p></li>
+<li><p><strong>geometry_type</strong> – Optional shape family filter [dimensionless].</p></li>
+<li><p><strong>variant</strong> – Optional topology filter [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Matching registry key, or <code class="docutils literal notranslate"><span class="pre">name</span></code> when no better match exists.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>geometries</strong> (<em>Mapping</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="geometries.base.html#geometries.base.BaseGeometry" title="geometries.base.BaseGeometry"><em>BaseGeometry</em></a><em>]</em>)</p></li>
+<li><p><strong>template_file</strong> (<em>str</em><em> | </em><em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>geometry_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">geometries.registry module</a><ul>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry</span></code></a><ul>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry._discover_geometries"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry._discover_geometries()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry._register_cylinder_variants"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry._register_cylinder_variants()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry._register_prism_variants"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry._register_prism_variants()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry._register_sphere_variants"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry._register_sphere_variants()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry.air_sphere_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry.air_sphere_radius_m()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry.get_geometry"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry.get_geometry()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry.get_geometry_names"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry.get_geometry_names()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.registry.GeometryRegistry.resolve_key"><code class="docutils literal notranslate"><span class="pre">GeometryRegistry.resolve_key()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geometries.registry.get_geometry_registry"><code class="docutils literal notranslate"><span class="pre">get_geometry_registry()</span></code></a></li>
+<li><a class="reference internal" href="#geometries.registry.resolve_geometry_registry_key"><code class="docutils literal notranslate"><span class="pre">resolve_geometry_registry_key()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="geometries.prism.html"
+                          title="previous chapter">geometries.prism module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="geometries.sphere.html"
+                          title="next chapter">geometries.sphere module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/geometries.registry.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geometries.sphere.html" title="geometries.sphere module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="geometries.prism.html" title="geometries.prism module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="geometries.html" >geometries package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.registry module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

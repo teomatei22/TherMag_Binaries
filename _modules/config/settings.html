@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>config.settings &#8212; TherMag 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=43b6f3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=7cd586de" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">config.settings</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for config.settings</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Runtime settings, tool discovery, and dependency checks for TherMag."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_application_defaults</span>
+
+
+<div class="viewcode-block" id="ToolPaths">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.ToolPaths">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolPaths</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Resolved filesystem paths to external FEM and post-processing tools.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        gmsh: Path to the Gmsh executable, or ``None`` if not found.</span>
+<span class="sd">        elmergrid: Path to ElmerGrid, or ``None`` if not found.</span>
+<span class="sd">        elmersolver: Path to serial ElmerSolver, or ``None`` if not found.</span>
+<span class="sd">        elmersolver_mpi: Path to MPI ElmerSolver, or ``None`` if not found.</span>
+<span class="sd">        mpiexec: Path to ``mpiexec``/``mpirun``, or ``None`` if not found.</span>
+<span class="sd">        pvpython: Path to ParaView ``pvpython``, or ``None`` if not found.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        ToolPaths: Container of discovered external tool executable paths.</span>
+<span class="sd">    """</span>
+
+    <span class="n">gmsh</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">elmergrid</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">elmersolver</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">elmersolver_mpi</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">mpiexec</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">pvpython</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="Settings">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Process-wide settings including tool paths, runs directory, and timeouts.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        platform: OS platform string (e.g. ``linux``, ``win32``).</span>
+<span class="sd">        tools: Resolved paths to Gmsh, Elmer, MPI, and ParaView tools.</span>
+<span class="sd">        default_runs_dir: Default directory for simulation run outputs.</span>
+<span class="sd">        default_threads: Default worker/thread count from application defaults.</span>
+<span class="sd">        post_processing_timeout: Post-processing stage timeout [s].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        Settings: Process-wide runtime settings with detected tool paths.</span>
+<span class="sd">    """</span>
+
+    <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+
+    <span class="n">tools</span><span class="p">:</span> <span class="n">ToolPaths</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ToolPaths</span><span class="p">)</span>
+
+    <span class="n">default_runs_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">Settings</span><span class="o">.</span><span class="n">_get_default_runs_dir</span><span class="p">())</span>
+
+    <span class="n">default_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">load_application_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">default_threads</span>
+    <span class="p">)</span>
+    <span class="n">post_processing_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">load_application_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">post_timeout</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="Settings._get_default_runs_dir">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings._get_default_runs_dir">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_default_runs_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Choose the default directory for simulation run outputs.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses platform and optional Windows ``config.ini``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path: Default runs directory for the current platform.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">"win32"</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">configparser</span>
+
+            <span class="n">config_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"config.ini"</span>
+
+            <span class="k">if</span> <span class="n">config_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">"Paths"</span> <span class="ow">in</span> <span class="n">config</span> <span class="ow">and</span> <span class="s2">"runs_dir"</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">"Paths"</span><span class="p">]:</span>
+                        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">"Paths"</span><span class="p">][</span><span class="s2">"runs_dir"</span><span class="p">])</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">configparser</span><span class="o">.</span><span class="n">Error</span><span class="p">):</span>
+                    <span class="k">pass</span>
+
+            <span class="n">docs</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expandvars</span><span class="p">(</span><span class="s2">"%USERPROFILE%</span><span class="se">\\</span><span class="s2">Documents"</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">docs</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">docs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"Documents"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"runs"</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Detect external tools after dataclass field initialization.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Operates on ``self``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Populates ``self.tools`` via ``_detect_tools``.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_detect_tools</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Settings._detect_tools">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings._detect_tools">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_detect_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Resolve paths for Gmsh, Elmer, MPI, and ParaView executables.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Operates on ``self`` and the environment.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Assigns discovered paths onto ``self.tools``.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">gmsh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span><span class="s2">"gmsh"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">elmergrid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span><span class="s2">"ElmerGrid"</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span><span class="s2">"elmergrid"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">elmersolver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span><span class="s2">"ElmerSolver"</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span><span class="s2">"elmersolver"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">elmersolver_mpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span><span class="s2">"ElmerSolver_mpi"</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span>
+            <span class="s2">"elmersolver_mpi"</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">mpiexec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span><span class="s2">"mpiexec"</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_tool</span><span class="p">(</span><span class="s2">"mpirun"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">pvpython</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_pvpython</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Settings._find_tool">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings._find_tool">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_tool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Locate a named executable via env override, bundle, PATH, or platform paths.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: Tool base name (e.g. ``gmsh``, ``ElmerSolver``).</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path | None: Absolute path to the executable, or ``None`` if not found.</span>
+<span class="sd">        """</span>
+        <span class="n">env_var</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">_PATH"</span>
+        <span class="n">override</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">env_var</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">override</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">override</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">override</span><span class="p">)</span>
+
+        <span class="n">bundled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bundled_candidates</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">bundled</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bundled</span>
+
+        <span class="k">for</span> <span class="n">executable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_names</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">found</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_platform_candidates</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Settings._executable_names">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings._executable_names">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_executable_names</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Build candidate executable names including Windows ``.exe`` variants.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: Tool base name or already-suffixed executable name.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple[str, ...]: Ordered candidate executable names.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".exe"</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.exe"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Settings._first_file">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings._first_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_first_file</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return the first existing file among candidate paths.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            candidates: Iterable of ``Path`` candidates to test with ``is_file()``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path | None: First existing file path, or ``None``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">path</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">candidates</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()),</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Settings._bundled_candidates">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings._bundled_candidates">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_bundled_candidates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: List bundled ``bin/`` locations for a tool under the package tree.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: Tool base name used to form executable filenames.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[Path]: Candidate paths under the application ``bin`` directory.</span>
+<span class="sd">        """</span>
+        <span class="n">bin_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"bin"</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_names</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">subdirs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Path</span><span class="p">(),</span>
+            <span class="n">Path</span><span class="p">(</span><span class="s2">"gmsh"</span><span class="p">),</span>
+            <span class="n">Path</span><span class="p">(</span><span class="s2">"elmerfem"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"bin"</span><span class="p">,</span>
+            <span class="n">Path</span><span class="p">(</span><span class="s2">"elmer"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"bin"</span><span class="p">,</span>
+            <span class="n">Path</span><span class="p">(</span><span class="s2">"paraview"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"bin"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">bin_dir</span> <span class="o">/</span> <span class="n">subdir</span> <span class="o">/</span> <span class="n">executable</span> <span class="k">for</span> <span class="n">subdir</span> <span class="ow">in</span> <span class="n">subdirs</span> <span class="k">for</span> <span class="n">executable</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Settings._platform_candidates">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings._platform_candidates">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_platform_candidates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: List OS-specific fallback install locations for a tool.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: Tool base name (uses Windows MPI and ``ELMER_HOME`` when applicable).</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[Path]: Platform-specific candidate executable paths.</span>
+<span class="sd">        """</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_names</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">"win32"</span><span class="p">:</span>
+            <span class="n">bases</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">"/usr/bin"</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"/usr/local/bin"</span><span class="p">),</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"bin"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">base</span> <span class="o">/</span> <span class="n">executable</span> <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">bases</span> <span class="k">for</span> <span class="n">executable</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+
+        <span class="n">candidates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"mpiexec"</span><span class="p">,</span> <span class="s2">"mpirun"</span><span class="p">}:</span>
+            <span class="n">candidates</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="sa">r</span><span class="s2">"C:\Program Files\Microsoft MPI\Bin\mpiexec.exe"</span><span class="p">),</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="sa">r</span><span class="s2">"C:\Program Files (x86)\Microsoft MPI\Bin\mpiexec.exe"</span><span class="p">),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="n">elmer_home</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ELMER_HOME"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">elmer_home</span><span class="p">:</span>
+            <span class="n">candidates</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">elmer_home</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="n">executable</span> <span class="k">for</span> <span class="n">executable</span> <span class="ow">in</span> <span class="n">names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidates</span></div>
+
+
+<div class="viewcode-block" id="Settings._find_pvpython">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings._find_pvpython">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_pvpython</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Locate ParaView's ``pvpython`` for post-processing scripts.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses env vars, bundled bin, PATH, and platform install paths.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            Path | None: Absolute path to ``pvpython``, or ``None`` if not found.</span>
+<span class="sd">        """</span>
+        <span class="n">pvpython_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PVPYTHON_PATH"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PARAVIEW_PVPYTHON"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pvpython_env</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pvpython_env</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">p</span>
+
+        <span class="n">bundled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bundled_candidates</span><span class="p">(</span><span class="s2">"pvpython"</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">bundled</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bundled</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_names</span><span class="p">(</span><span class="s2">"pvpython"</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">"win32"</span><span class="p">:</span>
+            <span class="n">pf86</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ProgramFiles(x86)"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"C:\Program Files (x86)"</span><span class="p">))</span>
+            <span class="n">pf</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ProgramFiles"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"C:\Program Files"</span><span class="p">))</span>
+            <span class="n">fixed_candidates</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">pf86</span> <span class="o">/</span> <span class="s2">"emc-theatre"</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="s2">"paraview"</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="s2">"pvpython.exe"</span><span class="p">,</span>
+                <span class="n">pf</span> <span class="o">/</span> <span class="s2">"emc-theatre"</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="s2">"paraview"</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="s2">"pvpython.exe"</span><span class="p">,</span>
+                <span class="n">pf86</span> <span class="o">/</span> <span class="s2">"EMC-Theatre"</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="s2">"paraview"</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="s2">"pvpython.exe"</span><span class="p">,</span>
+                <span class="n">pf</span> <span class="o">/</span> <span class="s2">"EMC-Theatre"</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="s2">"paraview"</span> <span class="o">/</span> <span class="s2">"bin"</span> <span class="o">/</span> <span class="s2">"pvpython.exe"</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">exe</span> <span class="ow">in</span> <span class="n">fixed_candidates</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">exe</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">exe</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_file</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">Path</span><span class="p">(</span><span class="s2">"/usr/bin/pvpython"</span><span class="p">),</span>
+                <span class="n">Path</span><span class="p">(</span><span class="s2">"/usr/local/bin/pvpython"</span><span class="p">),</span>
+                <span class="n">Path</span><span class="p">(</span><span class="s2">"/opt/ParaView/bin/pvpython"</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Settings.get_file_manager_command">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings.get_file_manager_command">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_file_manager_command</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return the platform command used to open a folder in a file manager.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``self.platform``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[str]: Command argv (e.g. ``explorer`` or ``xdg-open``).</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">"win32"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">"explorer"</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">"xdg-open"</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Settings.check_dependencies">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings.check_dependencies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Report whether required external FEM tools were discovered.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Reads ``self.tools``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, bool]: Availability flags keyed by tool group name.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"gmsh"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">gmsh</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"elmergrid"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">elmergrid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"elmersolver"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">elmersolver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">elmersolver_mpi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"mpi"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">mpiexec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"pvpython"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">pvpython</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="Settings.get_missing_tools">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.Settings.get_missing_tools">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_missing_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: List tool groups that are unavailable on this machine.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            N/A: Uses ``check_dependencies``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[str]: Names of missing dependency groups.</span>
+<span class="sd">        """</span>
+        <span class="n">deps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_dependencies</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">available</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">available</span><span class="p">]</span></div>
+</div>
+
+
+
+<span class="n">_settings</span><span class="p">:</span> <span class="n">Settings</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="get_settings">
+<a class="viewcode-back" href="../../api/config.settings.html#config.settings.get_settings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_settings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Settings</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Return the process-wide singleton ``Settings`` instance.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        N/A: Initializes global ``_settings`` on first call.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        Settings: Shared settings object with detected tool paths.</span>
+<span class="sd">    """</span>
+    <span class="k">global</span> <span class="n">_settings</span>
+    <span class="k">if</span> <span class="n">_settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_settings</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">config.settings</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geometries.sphere &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.sphere</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for geometries.sphere</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Spherical conductor geometries with hot/cold caps and air domain."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_parameter_specs</span><span class="p">,</span> <span class="n">parameter_value</span>
+
+
+<div class="viewcode-block" id="sphere_metal_radius_m">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.sphere_metal_radius_m">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sphere_metal_radius_m</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Metal sphere radius from stored parameter.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        params: Sphere parameter map containing ``R_sphere`` [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Outer metal radius [m].</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">parameter_value</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"sphere"</span><span class="p">,</span> <span class="s2">"R_sphere"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="sphere_cap_radius_m">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.sphere_cap_radius_m">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sphere_cap_radius_m</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Hot/cold contact-cap radius from parameter ``R_cap``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        params: Sphere parameter map containing ``R_cap`` [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Cap patch radius used for electrode footprints [m].</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">parameter_value</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">"sphere"</span><span class="p">,</span> <span class="s2">"R_cap"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="swept_geometry_key">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.swept_geometry_key">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">swept_geometry_key</span><span class="p">(</span><span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">swept_param</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Map a sweep axis choice onto the primary geometry parameter name.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_type: Shape family ``sphere``, ``prism``, or ``cylinder`` [dimensionless].</span>
+<span class="sd">        swept_param: Requested sweep parameter hint such as ``L`` or ``R`` [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Canonical parameter key to sweep (``L``, ``W``, or ``R``).</span>
+<span class="sd">    """</span>
+    <span class="n">gtype</span> <span class="o">=</span> <span class="p">(</span><span class="n">geometry_type</span> <span class="ow">or</span> <span class="s2">"cylinder"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"R_sphere"</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"L"</span> <span class="k">if</span> <span class="n">swept_param</span> <span class="o">==</span> <span class="s2">"L"</span> <span class="k">else</span> <span class="s2">"W"</span>
+    <span class="k">return</span> <span class="s2">"L"</span> <span class="k">if</span> <span class="n">swept_param</span> <span class="o">==</span> <span class="s2">"L"</span> <span class="k">else</span> <span class="s2">"R"</span></div>
+
+
+
+<div class="viewcode-block" id="SphereVariant">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.SphereVariant">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SphereVariant</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Topology variants for spherical geometries.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: enumeration of solid, hollow, and layered sphere layouts.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SphereVariant: Enum member whose ``value`` is the registry variant key.</span>
+<span class="sd">    """</span>
+
+    <span class="n">FULL</span> <span class="o">=</span> <span class="s2">"full"</span>
+    <span class="n">HOLLOW</span> <span class="o">=</span> <span class="s2">"hollow"</span>
+    <span class="n">LAYER_OVER_HOLLOW</span> <span class="o">=</span> <span class="s2">"layer_over_hollow"</span>
+    <span class="n">LAYER_OVER_FULL</span> <span class="o">=</span> <span class="s2">"layer_over_full"</span></div>
+
+
+
+<div class="viewcode-block" id="SphereGeometry">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.SphereGeometry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SphereGeometry</span><span class="p">(</span><span class="n">BaseGeometry</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Brief: Gmsh sphere geometry with caps, layers, and surrounding air.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        variant: Topology selecting solid/hollow/layered templates.</span>
+<span class="sd">        template_dir: Optional directory containing ``.geo`` templates [path].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        SphereGeometry: Configured geometry with physical volume/surface IDs.</span>
+<span class="sd">    """</span>
+
+    <span class="n">geometry_type</span> <span class="o">=</span> <span class="s2">"sphere"</span>
+
+    <span class="n">VARIANT_CONFIGS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">SphereVariant</span><span class="o">.</span><span class="n">FULL</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Full Sphere"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Solid sphere with hot/cold cap patches and surrounding spherical air"</span><span class="p">,</span>
+            <span class="s2">"template_name"</span><span class="p">:</span> <span class="s2">"full_sphere.geo"</span><span class="p">,</span>
+            <span class="s2">"volumes"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"outer_material"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"outer_air"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+            <span class="s2">"surfaces"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"hot"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"cold"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"infinity"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="n">SphereVariant</span><span class="o">.</span><span class="n">HOLLOW</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Hollow Sphere"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Hollow sphere shell with inner air cavity and surrounding spherical air"</span><span class="p">,</span>
+            <span class="s2">"template_name"</span><span class="p">:</span> <span class="s2">"hollow_sphere.geo"</span><span class="p">,</span>
+            <span class="s2">"volumes"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"outer_material"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"inner_air"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"outer_air"</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+            <span class="s2">"surfaces"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"hot"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"cold"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"infinity"</span><span class="p">:</span> <span class="mi">6</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="n">SphereVariant</span><span class="o">.</span><span class="n">LAYER_OVER_HOLLOW</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Layer Over Hollow Shape"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Outer shell wrapping a hollow inner sphere"</span><span class="p">,</span>
+            <span class="s2">"template_name"</span><span class="p">:</span> <span class="s2">"layer_over_hollow_sphere.geo"</span><span class="p">,</span>
+            <span class="s2">"volumes"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"outer_material"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"inner_material"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"inner_air"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"outer_air"</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+            <span class="s2">"surfaces"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"hot"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"cold"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"infinity"</span><span class="p">:</span> <span class="mi">7</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="n">SphereVariant</span><span class="o">.</span><span class="n">LAYER_OVER_FULL</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Layer Over Full Shape"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Outer shell wrapping a solid inner sphere"</span><span class="p">,</span>
+            <span class="s2">"template_name"</span><span class="p">:</span> <span class="s2">"layer_over_full_sphere.geo"</span><span class="p">,</span>
+            <span class="s2">"volumes"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"outer_material"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"inner_material"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"outer_air"</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+            <span class="s2">"surfaces"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"hot"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"cold"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"infinity"</span><span class="p">:</span> <span class="mi">6</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variant</span><span class="p">:</span> <span class="n">SphereVariant</span><span class="p">,</span> <span class="n">template_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Bind variant config and resolve the matching ``.geo`` template.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            variant: Sphere topology enum member.</span>
+<span class="sd">            template_dir: Directory of sphere templates; package default if omitted [path].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Constructs ``SphereGeometry`` with name, description, and specs.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="o">=</span> <span class="n">variant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VARIANT_CONFIGS</span><span class="p">[</span><span class="n">variant</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"description"</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">template_dir</span><span class="p">:</span>
+            <span class="n">template_file</span> <span class="o">=</span> <span class="n">template_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"template_name"</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">template_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"templates"</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"template_name"</span><span class="p">]</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">template_file</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SphereGeometry._init_parameters">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.SphereGeometry._init_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Load sphere parameter specs for the selected variant.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: uses ``self.variant.value`` against geometry defaults.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Assigns ``self._parameters``.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="n">build_parameter_specs</span><span class="p">(</span><span class="s2">"sphere"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SphereGeometry.get_physical_volumes">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.SphereGeometry.get_physical_volumes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_physical_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return physical volume IDs for material and air regions.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: reads ``self.config['volumes']``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, int]: Copy of role-to-Gmsh physical volume mapping.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"volumes"</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SphereGeometry.get_physical_surfaces">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.SphereGeometry.get_physical_surfaces">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_physical_surfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: Return physical surface IDs for hot, cold, and infinity BCs.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: reads ``self.config['surfaces']``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            dict[str, int]: Copy of role-to-Gmsh physical surface mapping.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"surfaces"</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SphereGeometry.validate_parameters">
+<a class="viewcode-back" href="../../api/geometries.sphere.html#geometries.sphere.SphereGeometry.validate_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Enforce sphere cap, air, thickness, and non-overlap constraints.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            params: Candidate sphere parameters including ``R_sphere``, ``R_cap``, angles [m/deg].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            tuple: ``(valid, errors)`` where errors lists geometric violations.</span>
+<span class="sd">        """</span>
+        <span class="n">valid</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="n">outer_radius</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"R_sphere"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s2">"R_sphere"</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span>
+        <span class="n">cap_radius</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"R_cap"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s2">"R_cap"</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span>
+        <span class="n">patch_angle_deg</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">"patch_angle_deg"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s2">"patch_angle_deg"</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span>
+        <span class="p">)</span>
+        <span class="n">air_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">air_sphere_radius_m</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cap_radius</span> <span class="o">&gt;=</span> <span class="n">outer_radius</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Cap radius (</span><span class="si">{</span><span class="n">cap_radius</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">m) must be smaller than sphere radius (</span><span class="si">{</span><span class="n">outer_radius</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">m)"</span>
+            <span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">air_radius</span> <span class="o">&lt;=</span> <span class="n">outer_radius</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Computed air sphere radius (</span><span class="si">{</span><span class="n">air_radius</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">m) must be larger than sphere radius (</span><span class="si">{</span><span class="n">outer_radius</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">m)"</span>
+            <span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">outer_radius</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">cap_radius</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">patch_half_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">asin</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">cap_radius</span> <span class="o">/</span> <span class="n">outer_radius</span><span class="p">))</span>
+            <span class="n">patch_angle_rad</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">patch_angle_deg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">patch_half_angle</span> <span class="o">&gt;=</span> <span class="n">patch_angle_rad</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">"Cap patches overlap or touch; increase patch_angle_deg or reduce R_cap"</span>
+                <span class="p">)</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="n">patch_center_chord</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">outer_radius</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">patch_angle_rad</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">patch_center_chord</span> <span class="o">&lt;=</span> <span class="mf">2.2</span> <span class="o">*</span> <span class="n">cap_radius</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">"Hot/cold contact centres are too close; increase patch_angle_deg or reduce R_cap"</span>
+                <span class="p">)</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">interface_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cavity_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="o">==</span> <span class="n">SphereVariant</span><span class="o">.</span><span class="n">HOLLOW</span><span class="p">:</span>
+            <span class="n">thickness</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"T_outer"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span>
+            <span class="n">cavity_radius</span> <span class="o">=</span> <span class="n">outer_radius</span> <span class="o">-</span> <span class="n">thickness</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="o">==</span> <span class="n">SphereVariant</span><span class="o">.</span><span class="n">LAYER_OVER_FULL</span><span class="p">:</span>
+            <span class="n">thickness</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"T_outer"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span>
+            <span class="n">interface_radius</span> <span class="o">=</span> <span class="n">outer_radius</span> <span class="o">-</span> <span class="n">thickness</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="o">==</span> <span class="n">SphereVariant</span><span class="o">.</span><span class="n">LAYER_OVER_HOLLOW</span><span class="p">:</span>
+            <span class="n">outer_thickness</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">"T_outer"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span>
+            <span class="p">)</span>
+            <span class="n">inner_thickness</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">"T_inner"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s2">"T_inner"</span><span class="p">]</span><span class="o">.</span><span class="n">default_value</span>
+            <span class="p">)</span>
+            <span class="n">interface_radius</span> <span class="o">=</span> <span class="n">outer_radius</span> <span class="o">-</span> <span class="n">outer_thickness</span>
+            <span class="n">cavity_radius</span> <span class="o">=</span> <span class="n">interface_radius</span> <span class="o">-</span> <span class="n">inner_thickness</span>
+
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">radius</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s2">"layer-interface"</span><span class="p">,</span> <span class="n">interface_radius</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">"cavity"</span><span class="p">,</span> <span class="n">cavity_radius</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">radius</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">radius</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Derived </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> radius (</span><span class="si">{</span><span class="n">radius</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">m) must be positive"</span>
+                <span class="p">)</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">contact_limit</span> <span class="o">=</span> <span class="n">cavity_radius</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="o">==</span> <span class="n">SphereVariant</span><span class="o">.</span><span class="n">HOLLOW</span> <span class="k">else</span> <span class="n">interface_radius</span>
+        <span class="n">contact_limit_label</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">"cavity"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variant</span> <span class="o">==</span> <span class="n">SphereVariant</span><span class="o">.</span><span class="n">HOLLOW</span> <span class="k">else</span> <span class="s2">"layer-interface"</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">contact_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cap_radius</span> <span class="o">&gt;=</span> <span class="n">contact_limit</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Cap radius (</span><span class="si">{</span><span class="n">cap_radius</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">m) must be smaller than the "</span>
+                <span class="sa">f</span><span class="s2">"derived </span><span class="si">{</span><span class="n">contact_limit_label</span><span class="si">}</span><span class="s2"> radius (</span><span class="si">{</span><span class="n">contact_limit</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">m)"</span>
+            <span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">valid</span><span class="p">,</span> <span class="n">errors</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.sphere</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

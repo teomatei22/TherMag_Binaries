@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.scripts.geometry_contract module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.scripts.interior_probe_common module" href="processing.scripts.interior_probe_common.html" />
+    <link rel="prev" title="processing.scripts.generate_plots module" href="processing.scripts.generate_plots.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.interior_probe_common.html" title="processing.scripts.interior_probe_common module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.generate_plots.html" title="processing.scripts.generate_plots module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" accesskey="U">processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.geometry_contract module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.scripts.geometry_contract">
+<span id="processing-scripts-geometry-contract-module"></span><h1>processing.scripts.geometry_contract module<a class="headerlink" href="#module-processing.scripts.geometry_contract" title="Link to this heading">¶</a></h1>
+<p>Canonical geometry metadata (family/variant/radii) shared by sphere-family post-processing.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">GeometryContract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">family</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_radius_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_outer_radius_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_interface_radius_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_radius_m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#GeometryContract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Frozen dataclass of geometry family, variant, and characteristic radii [m].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>family</strong> – Geometry family string (<code class="docutils literal notranslate"><span class="pre">sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, …).</p></li>
+<li><p><strong>variant</strong> – Topology variant (<code class="docutils literal notranslate"><span class="pre">full</span></code>, <code class="docutils literal notranslate"><span class="pre">hollow</span></code>, <code class="docutils literal notranslate"><span class="pre">layer_over_*</span></code>).</p></li>
+<li><p><strong>domain_radius_m</strong> – Outer simulation-domain radius [m].</p></li>
+<li><p><strong>body_outer_radius_m</strong> – Conductor outer radius for spheres [m].</p></li>
+<li><p><strong>layer_interface_radius_m</strong> – Optional layer interface radius [m].</p></li>
+<li><p><strong>cavity_radius_m</strong> – Inner cavity radius for hollow variants [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryContract</strong> – Immutable geometry metadata for probe/map scripts.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>family</strong> (<em>str</em>)</p></li>
+<li><p><strong>variant</strong> (<em>str</em>)</p></li>
+<li><p><strong>domain_radius_m</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>body_outer_radius_m</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>layer_interface_radius_m</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>cavity_radius_m</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract.body_outer_radius_m">
+<span class="sig-name descname"><span class="pre">body_outer_radius_m</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract.body_outer_radius_m" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract.cavity_radius_m">
+<span class="sig-name descname"><span class="pre">cavity_radius_m</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract.cavity_radius_m" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract.domain_radius_m">
+<span class="sig-name descname"><span class="pre">domain_radius_m</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract.domain_radius_m" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract.family">
+<span class="sig-name descname"><span class="pre">family</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract.family" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract.is_hollow">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_hollow</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract.is_hollow" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the variant includes an inner cavity (hollow / layer_over_hollow).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – GeometryContract instance.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> for hollow-bearing variants.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract.is_sphere">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_sphere</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract.is_sphere" title="Link to this definition">¶</a></dt>
+<dd><p>Whether this contract describes a sphere-family geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> – GeometryContract instance.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bool</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> when <code class="docutils literal notranslate"><span class="pre">family</span> <span class="pre">==</span> <span class="pre">&quot;sphere&quot;</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract.layer_interface_radius_m">
+<span class="sig-name descname"><span class="pre">layer_interface_radius_m</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract.layer_interface_radius_m" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.GeometryContract.variant">
+<span class="sig-name descname"><span class="pre">variant</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#processing.scripts.geometry_contract.GeometryContract.variant" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract._infer_contract">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">_infer_contract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#_infer_contract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract._infer_contract" title="Link to this definition">¶</a></dt>
+<dd><p>Infer family/variant and radii from geo assignments and Physical names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – Full <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> source.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryContract</strong> – Parsed contract.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract" title="processing.scripts.geometry_contract.GeometryContract"><em>GeometryContract</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.contract_from_text">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">contract_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#contract_from_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.contract_from_text" title="Link to this definition">¶</a></dt>
+<dd><p>Build a <code class="docutils literal notranslate"><span class="pre">GeometryContract</span></code> directly from in-memory geo source text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – <code class="docutils literal notranslate"><span class="pre">.geo</span></code> source string.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryContract</strong> – Result of <code class="docutils literal notranslate"><span class="pre">_infer_contract</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract" title="processing.scripts.geometry_contract.GeometryContract"><em>GeometryContract</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.domain_radius_from_geo_text">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">domain_radius_from_geo_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#domain_radius_from_geo_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.domain_radius_from_geo_text" title="Link to this definition">¶</a></dt>
+<dd><p>Require a positive air-domain radius <code class="docutils literal notranslate"><span class="pre">R_sph</span></code> from geo text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – <code class="docutils literal notranslate"><span class="pre">.geo</span></code> source defining the simulation domain.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Domain radius [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.domain_radius_m">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">domain_radius_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#domain_radius_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.domain_radius_m" title="Link to this definition">¶</a></dt>
+<dd><p>Air-domain radius from <code class="docutils literal notranslate"><span class="pre">R_sph</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> – Symbol map from <code class="docutils literal notranslate"><span class="pre">parse_geo_assignments</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float | None</strong> – Positive outer air radius [m], else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.first_value">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">first_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#first_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.first_value" title="Link to this definition">¶</a></dt>
+<dd><p>Return the first finite float among named keys in a geo assignment map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> – Symbol float map from <code class="docutils literal notranslate"><span class="pre">parse_geo_assignments</span></code>.</p></li>
+<li><p><strong>names</strong> – Preferred key names in priority order.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float | None</strong> – First finite value found, else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>names</strong> (<em>Iterable</em><em>[</em><em>str</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.geo_code_text">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">geo_code_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#geo_code_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.geo_code_text" title="Link to this definition">¶</a></dt>
+<dd><p>Join non-empty, comment-stripped lines of a <code class="docutils literal notranslate"><span class="pre">.geo</span></code> text into clean code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – Full <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> source.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Comment-free code with blank lines removed.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.load_geometry_contract">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">load_geometry_contract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#load_geometry_contract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.load_geometry_contract" title="Link to this definition">¶</a></dt>
+<dd><p>Load <code class="docutils literal notranslate"><span class="pre">GeometryContract</span></code> from <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> under a FEM run directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>run_dir</strong> – Run root containing <code class="docutils literal notranslate"><span class="pre">geometry.geo</span></code> (case-insensitive) [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GeometryContract</strong> – Inferred contract, or empty-text fallback if geo missing.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>run_dir</strong> (<em>Path</em><em> | </em><em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract" title="processing.scripts.geometry_contract.GeometryContract"><em>GeometryContract</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.load_mesh_name_ids">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">load_mesh_name_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#load_mesh_name_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.load_mesh_name_ids" title="Link to this definition">¶</a></dt>
+<dd><p>Parse Elmer/Gmsh <code class="docutils literal notranslate"><span class="pre">mesh.names</span></code> <code class="docutils literal notranslate"><span class="pre">$name</span> <span class="pre">=</span> <span class="pre">id</span></code> entries into a name-id map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>run_dir</strong> – Run root; looks under <code class="docutils literal notranslate"><span class="pre">geometry/mesh.names</span></code> or <code class="docutils literal notranslate"><span class="pre">mesh.names</span></code> [path].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – Lowercased region name integer GeometryId; empty if file missing.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>run_dir</strong> (<em>Path</em><em> | </em><em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Dict</em>[str, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.metal_sphere_radius_m">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">metal_sphere_radius_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#metal_sphere_radius_m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.metal_sphere_radius_m" title="Link to this definition">¶</a></dt>
+<dd><p>Metal sphere radius from <code class="docutils literal notranslate"><span class="pre">R_sphere</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> – Symbol map from <code class="docutils literal notranslate"><span class="pre">parse_geo_assignments</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float | None</strong> – Positive metal radius [m], else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.parse_geo_assignments">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">parse_geo_assignments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#parse_geo_assignments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.parse_geo_assignments" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate successive <code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">expr;</span></code> assignments from Gmsh geo text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – <code class="docutils literal notranslate"><span class="pre">.geo</span></code> source with numeric assignments.</p></li>
+<li><p><strong>passes</strong> – Max multi-pass resolution iterations for dependency order.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – Mapping of symbol name - finite float value.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>)</p></li>
+<li><p><strong>passes</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Dict</em>[str, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.physical_names">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">physical_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Volume'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#physical_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.physical_names" title="Link to this definition">¶</a></dt>
+<dd><p>Collect Physical Volume/Surface/Line names declared in geo text (lowercased).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – <code class="docutils literal notranslate"><span class="pre">.geo</span></code> source.</p></li>
+<li><p><strong>dimension</strong> – Gmsh physical entity kind (default <code class="docutils literal notranslate"><span class="pre">Volume</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>set</strong> – Lowercased physical region names.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>)</p></li>
+<li><p><strong>dimension</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>set[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.scripts.geometry_contract.strip_geo_comment">
+<span class="sig-prename descclassname"><span class="pre">processing.scripts.geometry_contract.</span></span><span class="sig-name descname"><span class="pre">strip_geo_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/scripts/geometry_contract.html#strip_geo_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.scripts.geometry_contract.strip_geo_comment" title="Link to this definition">¶</a></dt>
+<dd><p>Strip a Gmsh <code class="docutils literal notranslate"><span class="pre">//</span></code> line comment and surrounding whitespace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>line</strong> – Raw <code class="docutils literal notranslate"><span class="pre">.geo</span></code> source line.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Code portion before <code class="docutils literal notranslate"><span class="pre">//</span></code>, stripped.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>line</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.scripts.geometry_contract module</a><ul>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract"><code class="docutils literal notranslate"><span class="pre">GeometryContract</span></code></a><ul>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract.body_outer_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryContract.body_outer_radius_m</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract.cavity_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryContract.cavity_radius_m</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract.domain_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryContract.domain_radius_m</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract.family"><code class="docutils literal notranslate"><span class="pre">GeometryContract.family</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract.is_hollow"><code class="docutils literal notranslate"><span class="pre">GeometryContract.is_hollow</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract.is_sphere"><code class="docutils literal notranslate"><span class="pre">GeometryContract.is_sphere</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract.layer_interface_radius_m"><code class="docutils literal notranslate"><span class="pre">GeometryContract.layer_interface_radius_m</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.GeometryContract.variant"><code class="docutils literal notranslate"><span class="pre">GeometryContract.variant</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract._infer_contract"><code class="docutils literal notranslate"><span class="pre">_infer_contract()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.contract_from_text"><code class="docutils literal notranslate"><span class="pre">contract_from_text()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.domain_radius_from_geo_text"><code class="docutils literal notranslate"><span class="pre">domain_radius_from_geo_text()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.domain_radius_m"><code class="docutils literal notranslate"><span class="pre">domain_radius_m()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.first_value"><code class="docutils literal notranslate"><span class="pre">first_value()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.geo_code_text"><code class="docutils literal notranslate"><span class="pre">geo_code_text()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.load_geometry_contract"><code class="docutils literal notranslate"><span class="pre">load_geometry_contract()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.load_mesh_name_ids"><code class="docutils literal notranslate"><span class="pre">load_mesh_name_ids()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.metal_sphere_radius_m"><code class="docutils literal notranslate"><span class="pre">metal_sphere_radius_m()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.parse_geo_assignments"><code class="docutils literal notranslate"><span class="pre">parse_geo_assignments()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.physical_names"><code class="docutils literal notranslate"><span class="pre">physical_names()</span></code></a></li>
+<li><a class="reference internal" href="#processing.scripts.geometry_contract.strip_geo_comment"><code class="docutils literal notranslate"><span class="pre">strip_geo_comment()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.generate_plots.html"
+                          title="previous chapter">processing.scripts.generate_plots module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.scripts.interior_probe_common.html"
+                          title="next chapter">processing.scripts.interior_probe_common module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.scripts.geometry_contract.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.interior_probe_common.html" title="processing.scripts.interior_probe_common module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.generate_plots.html" title="processing.scripts.generate_plots module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="processing.scripts.html" >processing.scripts package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.geometry_contract module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

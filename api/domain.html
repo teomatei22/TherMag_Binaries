@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>domain package &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="domain.geometry module" href="domain.geometry.html" />
+    <link rel="prev" title="config.settings module" href="config.settings.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.geometry.html" title="domain.geometry module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="config.settings.html" title="config.settings module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">API reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-domain">
+<span id="domain-package"></span><h1>domain package<a class="headerlink" href="#module-domain" title="Link to this heading">¶</a></h1>
+<p>Domain models for TherMag simulation, geometry, sweeps, and run manifests.</p>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="domain.geometry.html">domain.geometry module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="domain.geometry.html#domain.geometry.GeometrySpec"><code class="docutils literal notranslate"><span class="pre">GeometrySpec</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.GeometrySpec.from_dict"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.GeometrySpec.geometry_type"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.geometry_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.GeometrySpec.name"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.GeometrySpec.parameters"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.parameters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.GeometrySpec.template_file"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.template_file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.GeometrySpec.to_dict"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.GeometrySpec.variant"><code class="docutils literal notranslate"><span class="pre">GeometrySpec.variant</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.geometry.html#domain.geometry.ProbePoint"><code class="docutils literal notranslate"><span class="pre">ProbePoint</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.ProbePoint.from_value"><code class="docutils literal notranslate"><span class="pre">ProbePoint.from_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.ProbePoint.to_dict"><code class="docutils literal notranslate"><span class="pre">ProbePoint.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.ProbePoint.x"><code class="docutils literal notranslate"><span class="pre">ProbePoint.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.ProbePoint.y"><code class="docutils literal notranslate"><span class="pre">ProbePoint.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.geometry.html#domain.geometry.ProbePoint.z"><code class="docutils literal notranslate"><span class="pre">ProbePoint.z</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="domain.run_manifest.html">domain.run_manifest module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ResultsConfig"><code class="docutils literal notranslate"><span class="pre">ResultsConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ResultsConfig.bext_probes"><code class="docutils literal notranslate"><span class="pre">ResultsConfig.bext_probes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ResultsConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">ResultsConfig.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ResultsConfig.jint_probes"><code class="docutils literal notranslate"><span class="pre">ResultsConfig.jint_probes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ResultsConfig.processing_config"><code class="docutils literal notranslate"><span class="pre">ResultsConfig.processing_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ResultsConfig.scripts"><code class="docutils literal notranslate"><span class="pre">ResultsConfig.scripts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ResultsConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">ResultsConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest"><code class="docutils literal notranslate"><span class="pre">RunManifest</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.created"><code class="docutils literal notranslate"><span class="pre">RunManifest.created</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.from_dict"><code class="docutils literal notranslate"><span class="pre">RunManifest.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.geometry"><code class="docutils literal notranslate"><span class="pre">RunManifest.geometry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.last_modified"><code class="docutils literal notranslate"><span class="pre">RunManifest.last_modified</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.material_roles"><code class="docutils literal notranslate"><span class="pre">RunManifest.material_roles</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.materials"><code class="docutils literal notranslate"><span class="pre">RunManifest.materials</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.name"><code class="docutils literal notranslate"><span class="pre">RunManifest.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.results"><code class="docutils literal notranslate"><span class="pre">RunManifest.results</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.run_path"><code class="docutils literal notranslate"><span class="pre">RunManifest.run_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.simulation"><code class="docutils literal notranslate"><span class="pre">RunManifest.simulation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.status"><code class="docutils literal notranslate"><span class="pre">RunManifest.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.to_dict"><code class="docutils literal notranslate"><span class="pre">RunManifest.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunManifest.updated"><code class="docutils literal notranslate"><span class="pre">RunManifest.updated()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus"><code class="docutils literal notranslate"><span class="pre">RunStatus</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus.CANCELLED"><code class="docutils literal notranslate"><span class="pre">RunStatus.CANCELLED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus.CREATED"><code class="docutils literal notranslate"><span class="pre">RunStatus.CREATED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus.FAILED"><code class="docutils literal notranslate"><span class="pre">RunStatus.FAILED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus.GENERATED"><code class="docutils literal notranslate"><span class="pre">RunStatus.GENERATED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus.MESHED"><code class="docutils literal notranslate"><span class="pre">RunStatus.MESHED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus.POST_PROCESSED"><code class="docutils literal notranslate"><span class="pre">RunStatus.POST_PROCESSED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus.SOLVED"><code class="docutils literal notranslate"><span class="pre">RunStatus.SOLVED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunStatus._generate_next_value_"><code class="docutils literal notranslate"><span class="pre">RunStatus._generate_next_value_()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace"><code class="docutils literal notranslate"><span class="pre">RunWorkspace</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.case_file"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.case_file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.geometry_dir"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.geometry_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.geometry_file"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.geometry_file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.is_sweep_project"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.is_sweep_project</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.manifest_file"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.manifest_file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.processing_config_file"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.processing_config_file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.results_dir"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.results_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.root"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.root</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.startinfo_file"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.startinfo_file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.sweep_manifest_file"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.sweep_manifest_file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.sweep_results_dir"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.sweep_results_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.RunWorkspace.sweep_runs_dir"><code class="docutils literal notranslate"><span class="pre">RunWorkspace.sweep_runs_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ScriptSelection"><code class="docutils literal notranslate"><span class="pre">ScriptSelection</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ScriptSelection.file"><code class="docutils literal notranslate"><span class="pre">ScriptSelection.file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ScriptSelection.from_dict"><code class="docutils literal notranslate"><span class="pre">ScriptSelection.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ScriptSelection.name"><code class="docutils literal notranslate"><span class="pre">ScriptSelection.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ScriptSelection.parameters"><code class="docutils literal notranslate"><span class="pre">ScriptSelection.parameters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.run_manifest.html#domain.run_manifest.ScriptSelection.to_dict"><code class="docutils literal notranslate"><span class="pre">ScriptSelection.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="domain.simulation.html">domain.simulation module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig._parse_potential"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig._parse_potential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig._serialize_potential"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig._serialize_potential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig.bc1_enabled"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc1_enabled</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig.bc1_potential"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc1_potential</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig.bc1_value"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc1_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig.bc2_enabled"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc2_enabled</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig.bc2_potential"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc2_potential</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig.bc2_value"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.bc2_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.ElectricBCConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">ElectricBCConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig"><code class="docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.base_type"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.base_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.driver_type"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.driver_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.electric_bc"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.electric_bc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.inner_material_model"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.inner_material_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.inner_material_name"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.inner_material_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.is_twolayer"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.is_twolayer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.outer_material_model"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.outer_material_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.outer_material_name"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.outer_material_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.simulation_type"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.simulation_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.solver"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.solver</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.temperature"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.temperature</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.time_dependent"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.time_dependent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SimulationConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.simulation.html#domain.simulation.SolverOptions"><code class="docutils literal notranslate"><span class="pre">SolverOptions</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SolverOptions.from_dict"><code class="docutils literal notranslate"><span class="pre">SolverOptions.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SolverOptions.max_partitions"><code class="docutils literal notranslate"><span class="pre">SolverOptions.max_partitions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SolverOptions.mesh_timeout"><code class="docutils literal notranslate"><span class="pre">SolverOptions.mesh_timeout</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SolverOptions.post_timeout"><code class="docutils literal notranslate"><span class="pre">SolverOptions.post_timeout</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SolverOptions.requested_processes"><code class="docutils literal notranslate"><span class="pre">SolverOptions.requested_processes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SolverOptions.solve_timeout"><code class="docutils literal notranslate"><span class="pre">SolverOptions.solve_timeout</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.SolverOptions.to_dict"><code class="docutils literal notranslate"><span class="pre">SolverOptions.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.simulation.html#domain.simulation.TemperatureConfig"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TemperatureConfig.frequency"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.frequency</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TemperatureConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TemperatureConfig.t_cold"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.t_cold</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TemperatureConfig.t_hot"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.t_hot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TemperatureConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">TemperatureConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.simulation.html#domain.simulation.TimeDependentConfig"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TimeDependentConfig.driver_period"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.driver_period</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TimeDependentConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TimeDependentConfig.integration_steps"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.integration_steps</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TimeDependentConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.simulation.html#domain.simulation.TimeDependentConfig.total_time"><code class="docutils literal notranslate"><span class="pre">TimeDependentConfig.total_time</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.simulation.html#domain.simulation._default_integration_steps"><code class="docutils literal notranslate"><span class="pre">_default_integration_steps()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain.simulation.html#domain.simulation._defaults"><code class="docutils literal notranslate"><span class="pre">_defaults()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain.simulation.html#domain.simulation._integration_steps"><code class="docutils literal notranslate"><span class="pre">_integration_steps()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="domain.sweep.html">domain.sweep module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="domain.sweep.html#domain.sweep.SweepConfig"><code class="docutils literal notranslate"><span class="pre">SweepConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep.html#domain.sweep.SweepConfig.coefficient_step"><code class="docutils literal notranslate"><span class="pre">SweepConfig.coefficient_step</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep.html#domain.sweep.SweepConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">SweepConfig.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep.html#domain.sweep.SweepConfig.lower_coefficient"><code class="docutils literal notranslate"><span class="pre">SweepConfig.lower_coefficient</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep.html#domain.sweep.SweepConfig.observables"><code class="docutils literal notranslate"><span class="pre">SweepConfig.observables</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep.html#domain.sweep.SweepConfig.swept_parameter"><code class="docutils literal notranslate"><span class="pre">SweepConfig.swept_parameter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep.html#domain.sweep.SweepConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">SweepConfig.to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep.html#domain.sweep.SweepConfig.upper_coefficient"><code class="docutils literal notranslate"><span class="pre">SweepConfig.upper_coefficient</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="domain.sweep_manifest.html">domain.sweep_manifest module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest"><code class="docutils literal notranslate"><span class="pre">SweepManifest</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.L0"><code class="docutils literal notranslate"><span class="pre">SweepManifest.L0</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.R0"><code class="docutils literal notranslate"><span class="pre">SweepManifest.R0</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.base_val"><code class="docutils literal notranslate"><span class="pre">SweepManifest.base_val</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.from_dict"><code class="docutils literal notranslate"><span class="pre">SweepManifest.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.observables"><code class="docutils literal notranslate"><span class="pre">SweepManifest.observables</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.runs"><code class="docutils literal notranslate"><span class="pre">SweepManifest.runs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.swept_param"><code class="docutils literal notranslate"><span class="pre">SweepManifest.swept_param</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepManifest.to_dict"><code class="docutils literal notranslate"><span class="pre">SweepManifest.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.coeff"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.coeff</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.param_val"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.param_val</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.resolve_run_dir"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.resolve_run_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.run_dir"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.run_dir</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.swept_param"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.swept_param</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.sweep_manifest.html#domain.sweep_manifest.SweepRunEntry.to_dict"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">domain package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="config.settings.html"
+                          title="previous chapter">config.settings module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="domain.geometry.html"
+                          title="next chapter">domain.geometry module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/domain.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.geometry.html" title="domain.geometry module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="config.settings.html" title="config.settings module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

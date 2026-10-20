@@ -1,0 +1,28 @@
+processing package
+==================
+
+.. automodule:: processing
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   processing.scripts
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   processing.base
+   processing.defaults
+   processing.geometry_params
+   processing.probe_scaling
+   processing.run_integrity
+   processing.sampling

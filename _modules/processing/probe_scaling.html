@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.probe_scaling &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.probe_scaling</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.probe_scaling</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Magnetic trusted-band and interior J-probe geometry scaling for FEM probes."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">processing.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_processing_defaults</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_processing_defaults</span>
+
+
+<div class="viewcode-block" id="_require_float">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling._require_float">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_require_float</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Require a named geometry dimension and coerce it to float.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        params: Geometry parameter mapping (e.g. L, R) [m].</span>
+<span class="sd">        name: Required key in ``params``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: Parameter value [m].</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span> <span class="ow">or</span> <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing geometry parameter </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="_resolve_geometry">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling._resolve_geometry">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_geometry</span><span class="p">(</span>
+    <span class="n">geometry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Normalize cylinder/prism/sphere dimensions into length and cross-section radii.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_params: Family-specific dimensions from ``GeometryParams.probe_scaling_params`` [m].</span>
+<span class="sd">        geometry_type: ``cylinder``, ``prism``, or ``sphere``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        tuple[float, float, float, float]: ``(length, radius, width, height)`` analogues [m].</span>
+<span class="sd">    """</span>
+    <span class="n">gtype</span> <span class="o">=</span> <span class="p">(</span><span class="n">geometry_type</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">_require_float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="s2">"R_sphere"</span><span class="p">)</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="n">_require_float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="s2">"R_cap"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">radius</span><span class="p">,</span> <span class="n">cap</span><span class="p">,</span> <span class="n">cap</span><span class="p">,</span> <span class="n">cap</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">_require_float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="s2">"L"</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">_require_float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="s2">"W"</span><span class="p">)</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">_require_float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">length</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"cylinder"</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">_require_float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="s2">"L"</span><span class="p">)</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">_require_float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">length</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span>
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown geometry_type </span><span class="si">{</span><span class="n">geometry_type</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_l_metal_max">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling._l_metal_max">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_l_metal_max</span><span class="p">(</span>
+    <span class="n">geometry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Characteristic metal length used to scale exterior magnetic probe bands.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_params: Geometry dimensions [m].</span>
+<span class="sd">        geometry_type: ``cylinder``, ``prism``, or ``sphere``.</span>
+<span class="sd">        variant: Topology variant; hollow spheres use ``R_sphere`` as the metal length.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        float: ``L_metal_max`` scale length [m].</span>
+<span class="sd">    """</span>
+    <span class="n">length</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">_resolve_geometry</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">)</span>
+    <span class="n">gtype</span> <span class="o">=</span> <span class="n">geometry_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">height</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"hollow"</span> <span class="ow">in</span> <span class="p">(</span><span class="n">variant</span> <span class="ow">or</span> <span class="s2">"full"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">length</span>
+        <span class="k">return</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">length</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">radius</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_magnetic_trusted_band">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling.compute_magnetic_trusted_band">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_magnetic_trusted_band</span><span class="p">(</span>
+    <span class="n">geometry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Compute exterior magnetic trusted radial band and mid-band probe radius.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_params: Geometry dimensions for band scaling [m].</span>
+<span class="sd">        geometry_type: ``cylinder``, ``prism``, or ``sphere``.</span>
+<span class="sd">        variant: Topology variant affecting ``L_metal_max`` for spheres.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        dict[str, float]: ``rho_in_m``, ``rho_out_m``, ``probe_rho_m``, ``L_metal_max_m`` [m].</span>
+<span class="sd">    """</span>
+    <span class="n">bext</span> <span class="o">=</span> <span class="n">load_processing_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">extraction</span><span class="o">.</span><span class="n">bext</span>
+    <span class="n">r_inf</span> <span class="o">=</span> <span class="n">bext</span><span class="o">.</span><span class="n">r_inf_trusted</span>
+    <span class="n">r_sup</span> <span class="o">=</span> <span class="n">bext</span><span class="o">.</span><span class="n">r_sup_trusted</span>
+    <span class="n">band_frac</span> <span class="o">=</span> <span class="n">bext</span><span class="o">.</span><span class="n">probe_band_fraction</span>
+
+    <span class="n">length</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">_resolve_geometry</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">)</span>
+    <span class="n">gtype</span> <span class="o">=</span> <span class="n">geometry_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">lmm</span> <span class="o">=</span> <span class="n">_l_metal_max</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">variant</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="n">r_body</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="n">d_near_max</span> <span class="o">=</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">r_body</span>
+        <span class="n">rho_in</span> <span class="o">=</span> <span class="n">r_body</span> <span class="o">+</span> <span class="n">d_near_max</span>
+        <span class="n">rho_out</span> <span class="o">=</span> <span class="n">r_body</span> <span class="o">+</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">r_body</span>
+        <span class="k">if</span> <span class="n">rho_out</span> <span class="o">&lt;=</span> <span class="n">rho_in</span><span class="p">:</span>
+            <span class="n">rho_out</span> <span class="o">=</span> <span class="n">rho_in</span> <span class="o">*</span> <span class="mf">1.5</span>
+    <span class="k">elif</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+        <span class="n">cross_half</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="n">d_near_max</span> <span class="o">=</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">cross_half</span>
+        <span class="n">mag_d_max</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">cross_half</span>
+        <span class="n">rho_in</span> <span class="o">=</span> <span class="n">height</span> <span class="o">+</span> <span class="n">d_near_max</span>
+        <span class="n">rho_out</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">height</span> <span class="o">+</span> <span class="n">mag_d_max</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">lmm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rho_out</span> <span class="o">&lt;=</span> <span class="n">rho_in</span><span class="p">:</span>
+            <span class="n">rho_out</span> <span class="o">=</span> <span class="n">rho_in</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">cross_half</span><span class="p">,</span> <span class="mf">1.0e-6</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d_near_max</span> <span class="o">=</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">radius</span>
+        <span class="n">rho_in</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">radius</span> <span class="o">+</span> <span class="n">d_near_max</span><span class="p">,</span> <span class="n">r_inf</span> <span class="o">*</span> <span class="n">lmm</span><span class="p">)</span>
+        <span class="n">rho_out</span> <span class="o">=</span> <span class="n">r_sup</span> <span class="o">*</span> <span class="n">lmm</span>
+        <span class="k">if</span> <span class="n">rho_out</span> <span class="o">&lt;=</span> <span class="n">rho_in</span><span class="p">:</span>
+            <span class="n">rho_out</span> <span class="o">=</span> <span class="n">rho_in</span> <span class="o">*</span> <span class="mf">1.25</span>
+
+    <span class="n">probe_rho</span> <span class="o">=</span> <span class="n">rho_in</span> <span class="o">+</span> <span class="n">band_frac</span> <span class="o">*</span> <span class="p">(</span><span class="n">rho_out</span> <span class="o">-</span> <span class="n">rho_in</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"rho_in_m"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">rho_in</span><span class="p">),</span>
+        <span class="s2">"rho_out_m"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">rho_out</span><span class="p">),</span>
+        <span class="s2">"probe_rho_m"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">probe_rho</span><span class="p">),</span>
+        <span class="s2">"L_metal_max_m"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">lmm</span><span class="p">),</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="compute_bext_probe_positions">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling.compute_bext_probe_positions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_bext_probe_positions</span><span class="p">(</span>
+    <span class="n">geometry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">band_override</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Place exterior midplane B-field probes within the trusted magnetic band.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_params: Geometry dimensions [m].</span>
+<span class="sd">        geometry_type: ``cylinder``, ``prism``, or ``sphere``.</span>
+<span class="sd">        variant: Topology variant for band computation.</span>
+<span class="sd">        band_override: Optional ``rho_in_m``/``rho_out_m`` override [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        list[tuple[float, float, float]]: Probe XYZ positions on the midplane (x≈0) [m].</span>
+<span class="sd">    """</span>
+    <span class="n">bext</span> <span class="o">=</span> <span class="n">load_processing_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">extraction</span><span class="o">.</span><span class="n">bext</span>
+    <span class="k">if</span> <span class="n">band_override</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rho_in</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">band_override</span><span class="p">[</span><span class="s2">"rho_in_m"</span><span class="p">])</span>
+        <span class="n">rho_out</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">band_override</span><span class="p">[</span><span class="s2">"rho_out_m"</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">band</span> <span class="o">=</span> <span class="n">compute_magnetic_trusted_band</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">variant</span><span class="p">)</span>
+        <span class="n">rho_in</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">band</span><span class="p">[</span><span class="s2">"rho_in_m"</span><span class="p">])</span>
+        <span class="n">rho_out</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">band</span><span class="p">[</span><span class="s2">"rho_out_m"</span><span class="p">])</span>
+    <span class="n">span</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rho_out</span> <span class="o">-</span> <span class="n">rho_in</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fractions</span> <span class="o">=</span> <span class="n">bext</span><span class="o">.</span><span class="n">probe_band_fractions</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">direction</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bext</span><span class="o">.</span><span class="n">point_directions</span><span class="p">):</span>
+        <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">direction</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">direction</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">direction</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dz</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lat</span> <span class="o">&lt;</span> <span class="mf">1.0e-15</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">uy</span><span class="p">,</span> <span class="n">uz</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dz</span> <span class="o">/</span> <span class="n">lat</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">uz</span><span class="p">,</span> <span class="n">uy</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">phi</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">5.0</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">frac</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fractions</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fractions</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho_in</span> <span class="o">+</span> <span class="n">frac</span> <span class="o">*</span> <span class="n">span</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">uy</span><span class="p">,</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">uz</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">points</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"extraction.bext_defaults.point_directions produced no midplane probes"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">points</span></div>
+
+
+
+<div class="viewcode-block" id="_fmt_coord">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling._fmt_coord">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fmt_coord</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Format a coordinate for HTML probe hints with compact significant digits.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        value: Coordinate or length to display [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Compact numeric text, or ``\"0\"`` for near-zero values.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-15</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"0"</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+
+<div class="viewcode-block" id="_b">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling._b">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_b</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Wrap a formatted coordinate in HTML bold tags for GUI probe hints.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        value: Coordinate or length to emphasize [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: HTML ``&lt;b&gt;...&lt;/b&gt;`` fragment.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;b&gt;</span><span class="si">{</span><span class="n">_fmt_coord</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/b&gt;"</span></div>
+
+
+
+<div class="viewcode-block" id="_abs_le">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling._abs_le">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_abs_le</span><span class="p">(</span><span class="n">axis</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build an absolute-value inequality fragment for interior probe hints.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        axis: Axis symbol (``x``, ``y``, or ``z``).</span>
+<span class="sd">        limit: Half-extent or radius bound [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: HTML text of the form ``abs(axis) ≤ &lt;b&gt;limit&lt;/b&gt;``.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"|</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">| </span><span class="se">\u2264</span><span class="s2"> </span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+
+<div class="viewcode-block" id="_l_metal_detail">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling._l_metal_detail">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_l_metal_detail</span><span class="p">(</span>
+    <span class="n">geometry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Compute ``L_metal_max`` and a human-readable formula detail string.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_params: Geometry dimensions [m].</span>
+<span class="sd">        geometry_type: ``cylinder``, ``prism``, or ``sphere``.</span>
+<span class="sd">        variant: Topology variant. Hollow detail is ``R_sphere``; other spheres use ``2*R_sphere``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        tuple[float, str]: ``(L_metal_max [m], formula detail text)``.</span>
+<span class="sd">    """</span>
+    <span class="n">length</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">_resolve_geometry</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">)</span>
+    <span class="n">lmm</span> <span class="o">=</span> <span class="n">_l_metal_max</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">variant</span><span class="p">)</span>
+    <span class="n">gtype</span> <span class="o">=</span> <span class="n">geometry_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+        <span class="n">detail</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"max(L,2W,2H)=max(</span><span class="si">{</span><span class="n">_fmt_coord</span><span class="p">(</span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">_fmt_coord</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">_fmt_coord</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">height</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"hollow"</span> <span class="ow">in</span> <span class="p">(</span><span class="n">variant</span> <span class="ow">or</span> <span class="s2">"full"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"R_sphere=</span><span class="si">{</span><span class="n">_fmt_coord</span><span class="p">(</span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"2*R_sphere=</span><span class="si">{</span><span class="n">_fmt_coord</span><span class="p">(</span><span class="mf">2.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"max(L,2R)=max(</span><span class="si">{</span><span class="n">_fmt_coord</span><span class="p">(</span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">_fmt_coord</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">radius</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
+    <span class="k">return</span> <span class="n">lmm</span><span class="p">,</span> <span class="n">detail</span></div>
+
+
+
+<span class="n">_RHO_PROBE</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\u03c1</span><span class="s2">=</span><span class="se">\u221a</span><span class="s2">(y</span><span class="se">\u00b2</span><span class="s2">+z</span><span class="se">\u00b2</span><span class="s2">)"</span>
+
+
+<div class="viewcode-block" id="compute_bext_sampling_hint">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling.compute_bext_sampling_hint">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_bext_sampling_hint</span><span class="p">(</span>
+    <span class="n">geometry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build an HTML hint describing the trusted exterior magnetic probe band.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_params: Geometry dimensions [m].</span>
+<span class="sd">        geometry_type: ``cylinder``, ``prism``, or ``sphere``.</span>
+<span class="sd">        variant: Topology variant for band / ``L_metal`` detail.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: HTML sentence with midplane trusted radial band bounds [m].</span>
+<span class="sd">    """</span>
+    <span class="n">band</span> <span class="o">=</span> <span class="n">compute_magnetic_trusted_band</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">variant</span><span class="p">)</span>
+    <span class="n">rho_in</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">band</span><span class="p">[</span><span class="s2">"rho_in_m"</span><span class="p">])</span>
+    <span class="n">rho_out</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">band</span><span class="p">[</span><span class="s2">"rho_out_m"</span><span class="p">])</span>
+    <span class="n">lmm</span><span class="p">,</span> <span class="n">l_detail</span> <span class="o">=</span> <span class="n">_l_metal_detail</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">,</span> <span class="n">variant</span><span class="p">)</span>
+    <span class="n">radial_symbol</span> <span class="o">=</span> <span class="s2">"r"</span> <span class="k">if</span> <span class="n">geometry_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"sphere"</span> <span class="k">else</span> <span class="n">_RHO_PROBE</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"Trusted magnetic band (midplane x</span><span class="se">\u2248</span><span class="s2">0): </span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">rho_in</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="se">\u2264</span><span class="s2"> "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">radial_symbol</span><span class="si">}</span><span class="s2"> </span><span class="se">\u2264</span><span class="s2"> </span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">rho_out</span><span class="p">)</span><span class="si">}</span><span class="s2"> m "</span>
+        <span class="sa">f</span><span class="s2">"(L_metal=</span><span class="si">{</span><span class="n">l_detail</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">lmm</span><span class="p">)</span><span class="si">}</span><span class="s2"> m). "</span>
+        <span class="s2">"Use midplane probes within this band, away from the conductor and far boundary."</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_jint_probe_hint">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling.compute_jint_probe_hint">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_jint_probe_hint</span><span class="p">(</span>
+    <span class="n">geometry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build an HTML hint for allowed interior current-density probe extents.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_params: Geometry dimensions [m].</span>
+<span class="sd">        geometry_type: ``cylinder``, ``prism``, or ``sphere``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: HTML sentence describing the conductor interior box or sphere bounds [m].</span>
+<span class="sd">        A sphere bound is ``r &lt;= R_sphere``.</span>
+<span class="sd">    """</span>
+    <span class="n">length</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">_resolve_geometry</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">)</span>
+    <span class="n">gtype</span> <span class="o">=</span> <span class="n">geometry_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">"Inside conductor: "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'x'</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span><span class="si">}</span><span class="s2"> (L=</span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2">), "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'y'</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2"> (W=</span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">), "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'z'</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">)</span><span class="si">}</span><span class="s2"> (H=</span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">height</span><span class="p">)</span><span class="si">}</span><span class="s2">) m."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Inside metal sphere (R_sphere=</span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2">): "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'x'</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'y'</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'z'</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2"> m, "</span>
+            <span class="sa">f</span><span class="s2">"r </span><span class="se">\u2264</span><span class="s2"> </span><span class="si">{</span><span class="n">_b</span><span class="p">(</span><span class="n">length</span><span class="p">)</span><span class="si">}</span><span class="s2"> m."</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">"Inside conductor: "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'x'</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span><span class="si">}</span><span class="s2"> (|x| </span><span class="se">\u2264</span><span class="s2"> L/2), "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'y'</span><span class="p">,</span><span class="w"> </span><span class="n">radius</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">_abs_le</span><span class="p">(</span><span class="s1">'z'</span><span class="p">,</span><span class="w"> </span><span class="n">radius</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="se">\u221a</span><span class="s2">(y</span><span class="se">\u00b2</span><span class="s2">+z</span><span class="se">\u00b2</span><span class="s2">) </span><span class="se">\u2264</span><span class="s2"> R)."</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_jint_probe_positions">
+<a class="viewcode-back" href="../../api/processing.probe_scaling.html#processing.probe_scaling.compute_jint_probe_positions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_jint_probe_positions</span><span class="p">(</span>
+    <span class="n">geometry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"full"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Place interior J-probe points from dimensionless multipliers and Bext scale.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        geometry_params: Geometry dimensions [m].</span>
+<span class="sd">        geometry_type: ``cylinder``, ``prism``, or ``sphere``.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        list[tuple[float, float, float]]: Interior probe XYZ positions [m].</span>
+<span class="sd">    """</span>
+    <span class="n">jint</span> <span class="o">=</span> <span class="n">load_processing_defaults</span><span class="p">()</span><span class="o">.</span><span class="n">extraction</span><span class="o">.</span><span class="n">jint</span>
+    <span class="n">length</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">_resolve_geometry</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">,</span> <span class="n">geometry_type</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">geometry_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"sphere"</span><span class="p">:</span>
+        <span class="n">radius_body</span> <span class="o">=</span> <span class="n">length</span>
+
+        <span class="k">if</span> <span class="n">variant</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"hollow"</span><span class="p">:</span>
+           <span class="n">wall_thickness</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">])</span>
+           <span class="n">inner_radius</span> <span class="o">=</span> <span class="n">radius_body</span> <span class="o">-</span> <span class="n">wall_thickness</span>
+           <span class="n">probe_radius</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">inner_radius</span> <span class="o">+</span> <span class="n">radius_body</span><span class="p">)</span>
+
+           <span class="n">direction_x</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">13.0</span>
+           <span class="n">direction_z</span> <span class="o">=</span> <span class="mf">12.0</span> <span class="o">/</span> <span class="mf">13.0</span>
+
+           <span class="k">return</span> <span class="p">[</span>
+               <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+               <span class="p">(</span><span class="n">direction_x</span> <span class="o">*</span> <span class="n">probe_radius</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">direction_z</span> <span class="o">*</span> <span class="n">probe_radius</span><span class="p">),</span>
+               <span class="p">(</span><span class="o">-</span><span class="n">direction_x</span> <span class="o">*</span> <span class="n">probe_radius</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">direction_z</span> <span class="o">*</span> <span class="n">probe_radius</span><span class="p">),</span>
+           <span class="p">]</span>
+        
+        <span class="k">if</span> <span class="n">variant</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"layer_over_hollow"</span><span class="p">:</span>
+            <span class="n">t_inner</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">[</span><span class="s2">"T_inner"</span><span class="p">])</span>
+            <span class="n">t_outer</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">])</span>
+
+            <span class="n">r_outer</span> <span class="o">=</span> <span class="n">radius_body</span>
+            <span class="n">r_interface</span> <span class="o">=</span> <span class="n">r_outer</span> <span class="o">-</span> <span class="n">t_outer</span>
+            <span class="n">r_cavity</span> <span class="o">=</span> <span class="n">r_interface</span> <span class="o">-</span> <span class="n">t_inner</span>
+
+            <span class="n">inner_probe_radius</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">r_cavity</span> <span class="o">+</span> <span class="n">r_interface</span><span class="p">)</span>
+            <span class="n">outer_probe_radius</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">r_interface</span> <span class="o">+</span> <span class="n">r_outer</span><span class="p">)</span>
+
+            <span class="n">direction_x</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">13.0</span>
+            <span class="n">direction_z</span> <span class="o">=</span> <span class="mf">12.0</span> <span class="o">/</span> <span class="mf">13.0</span>
+
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="n">direction_x</span> <span class="o">*</span> <span class="n">inner_probe_radius</span><span class="p">,</span>
+                    <span class="mf">0.0</span><span class="p">,</span>
+                    <span class="n">direction_z</span> <span class="o">*</span> <span class="n">inner_probe_radius</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="o">-</span><span class="n">direction_x</span> <span class="o">*</span> <span class="n">outer_probe_radius</span><span class="p">,</span>
+                    <span class="mf">0.0</span><span class="p">,</span>
+                    <span class="o">-</span><span class="n">direction_z</span> <span class="o">*</span> <span class="n">outer_probe_radius</span><span class="p">,</span>
+                <span class="p">),</span>
+           <span class="p">]</span>
+           
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">radius_body</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.60</span> <span class="o">*</span> <span class="n">radius_body</span><span class="p">),</span>
+            <span class="p">(</span><span class="o">-</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">radius_body</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.60</span> <span class="o">*</span> <span class="n">radius_body</span><span class="p">),</span>
+        <span class="p">]</span>
+
+    <span class="n">gtype</span> <span class="o">=</span> <span class="n">geometry_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">variant_key</span> <span class="o">=</span> <span class="n">variant</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">cross_extent</span> <span class="o">=</span> <span class="n">height</span> <span class="k">if</span> <span class="n">gtype</span> <span class="o">==</span> <span class="s2">"prism"</span> <span class="k">else</span> <span class="n">radius</span>
+
+    <span class="k">if</span> <span class="n">variant_key</span> <span class="o">==</span> <span class="s2">"hollow"</span><span class="p">:</span>
+        <span class="n">t_outer</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">])</span>
+        <span class="n">inner_extent</span> <span class="o">=</span> <span class="n">cross_extent</span> <span class="o">-</span> <span class="n">t_outer</span>
+        <span class="n">probe_extent</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">inner_extent</span> <span class="o">+</span> <span class="n">cross_extent</span><span class="p">)</span>
+        <span class="n">z_positive</span> <span class="o">=</span> <span class="n">probe_extent</span>
+        <span class="n">z_negative</span> <span class="o">=</span> <span class="o">-</span><span class="n">probe_extent</span>
+    <span class="k">elif</span> <span class="n">variant_key</span> <span class="o">==</span> <span class="s2">"layer_over_full"</span><span class="p">:</span>
+        <span class="n">t_outer</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">])</span>
+        <span class="n">interface_extent</span> <span class="o">=</span> <span class="n">cross_extent</span> <span class="o">-</span> <span class="n">t_outer</span>
+        <span class="n">z_positive</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">interface_extent</span>
+        <span class="n">z_negative</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">interface_extent</span> <span class="o">+</span> <span class="n">cross_extent</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">variant_key</span> <span class="o">==</span> <span class="s2">"layer_over_hollow"</span><span class="p">:</span>
+        <span class="n">t_inner</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">[</span><span class="s2">"T_inner"</span><span class="p">])</span>
+        <span class="n">t_outer</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">geometry_params</span><span class="p">[</span><span class="s2">"T_outer"</span><span class="p">])</span>
+        <span class="n">interface_extent</span> <span class="o">=</span> <span class="n">cross_extent</span> <span class="o">-</span> <span class="n">t_outer</span>
+        <span class="n">cavity_extent</span> <span class="o">=</span> <span class="n">interface_extent</span> <span class="o">-</span> <span class="n">t_inner</span>
+        <span class="n">z_positive</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">cavity_extent</span> <span class="o">+</span> <span class="n">interface_extent</span><span class="p">)</span>
+        <span class="n">z_negative</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">interface_extent</span> <span class="o">+</span> <span class="n">cross_extent</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">z_positive</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cross_extent</span>
+        <span class="n">z_negative</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">cross_extent</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">z_positive</span><span class="p">),</span>
+        <span class="p">(</span><span class="o">-</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">z_negative</span><span class="p">),</span>
+    <span class="p">]</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.probe_scaling</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

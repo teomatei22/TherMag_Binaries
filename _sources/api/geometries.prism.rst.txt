@@ -1,0 +1,7 @@
+geometries.prism module
+=======================
+
+.. automodule:: geometries.prism
+   :members:
+   :show-inheritance:
+   :undoc-members:

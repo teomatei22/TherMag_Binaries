@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.scripts.current_density_interior &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=1eac167c" />
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.current_density_interior</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.scripts.current_density_interior</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Interior J/T/P probes via shared IDW sampler."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">_this_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">_parent_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_this_dir</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_path</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_parent_dir</span><span class="p">,</span> <span class="n">_this_dir</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_path</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">_this_dir</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">_this_dir</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_this_dir</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">interior_probe_common</span><span class="w"> </span><span class="kn">import</span> <span class="n">InteriorProbeSampler</span><span class="p">,</span> <span class="n">load_jint_probe_points_from_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_csv_float</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">run_integrity</span><span class="w"> </span><span class="kn">import</span> <span class="n">append_run_integrity</span><span class="p">,</span> <span class="n">log_time_coverage</span>
+
+
+<span class="n">SCRIPT_NAME</span> <span class="o">=</span> <span class="s2">"current_density_interior"</span>
+
+
+<div class="viewcode-block" id="CurrentDensityInterior">
+<a class="viewcode-back" href="../../../api/processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.CurrentDensityInterior">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CurrentDensityInterior</span><span class="p">(</span><span class="n">InteriorProbeSampler</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">"""Brief: Interior IDW probe writer for J/T/P CSVs via ``InteriorProbeSampler``.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        (inherited): ``working_dir``, ``verbose``, ``probe_points`` from sampler ctor.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        CurrentDensityInterior: Post-processor writing interior probe CSV suite.</span>
+<span class="sd">    """</span>
+<div class="viewcode-block" id="CurrentDensityInterior.run">
+<a class="viewcode-back" href="../../../api/processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.CurrentDensityInterior.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">write_temperature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">write_potential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Sample interior probes over time; write J/T/P CSVs plus log.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            self: Processor with probe points and VTU inputs.</span>
+<span class="sd">            write_temperature: Also write ``temperature_interior_data.csv``.</span>
+<span class="sd">            write_potential: Also write ``potential_interior_data.csv``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Writes CSVs under ``out_dir`` and integrity/time-coverage evidence.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"[WARN] Truncated interior probes to the first three user/automatic points"</span><span class="p">)</span>
+
+        <span class="n">jint_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="s2">"current_density_interior_data.csv"</span><span class="p">)</span>
+        <span class="n">temperature_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="s2">"temperature_interior_data.csv"</span><span class="p">)</span>
+        <span class="n">potential_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="s2">"potential_interior_data.csv"</span><span class="p">)</span>
+        <span class="n">sampling_log</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"logs"</span> <span class="o">/</span> <span class="s2">"current_density_sampling.log"</span>
+        <span class="n">sampling_log</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">times_written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">temperature_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">potential_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">temperature_writer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">potential_writer</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">jint_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">jint_file</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span>
+                <span class="n">sampling_log</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+                <span class="n">jint_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">jint_file</span><span class="p">)</span>
+                <span class="n">jint_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="s2">"time"</span><span class="p">,</span>
+                        <span class="s2">"point_id"</span><span class="p">,</span>
+                        <span class="s2">"JOhm_mag"</span><span class="p">,</span>
+                        <span class="s2">"JOhm_x"</span><span class="p">,</span>
+                        <span class="s2">"JOhm_y"</span><span class="p">,</span>
+                        <span class="s2">"JOhm_z"</span><span class="p">,</span>
+                        <span class="s2">"JSeebeck_mag"</span><span class="p">,</span>
+                        <span class="s2">"JSeebeck_x"</span><span class="p">,</span>
+                        <span class="s2">"JSeebeck_y"</span><span class="p">,</span>
+                        <span class="s2">"JSeebeck_z"</span><span class="p">,</span>
+                        <span class="s2">"JSource_mag"</span><span class="p">,</span>
+                        <span class="s2">"JSource_x"</span><span class="p">,</span>
+                        <span class="s2">"JSource_y"</span><span class="p">,</span>
+                        <span class="s2">"JSource_z"</span><span class="p">,</span>
+                        <span class="s2">"x"</span><span class="p">,</span>
+                        <span class="s2">"y"</span><span class="p">,</span>
+                        <span class="s2">"z"</span><span class="p">,</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="s2">"time,point_id,mesh_distance_m,idw_neighbors_used,"</span>
+                    <span class="s2">"idw_exact_node_hit,idw_support_radius_m,idw_support_mean_distance_m,"</span>
+                    <span class="s2">"sample_region</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">write_temperature</span><span class="p">:</span>
+                    <span class="n">temperature_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">temperature_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+                    <span class="n">temperature_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">temperature_file</span><span class="p">)</span>
+                    <span class="n">temperature_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="s2">"time"</span><span class="p">,</span>
+                            <span class="s2">"point_id"</span><span class="p">,</span>
+                            <span class="s2">"Temperature"</span><span class="p">,</span>
+                            <span class="s2">"x"</span><span class="p">,</span>
+                            <span class="s2">"y"</span><span class="p">,</span>
+                            <span class="s2">"z"</span><span class="p">,</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">write_potential</span><span class="p">:</span>
+                    <span class="n">potential_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">potential_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+                    <span class="n">potential_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">potential_file</span><span class="p">)</span>
+                    <span class="n">potential_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="s2">"time"</span><span class="p">,</span>
+                            <span class="s2">"point_id"</span><span class="p">,</span>
+                            <span class="s2">"Potential"</span><span class="p">,</span>
+                            <span class="s2">"x"</span><span class="p">,</span>
+                            <span class="s2">"y"</span><span class="p">,</span>
+                            <span class="s2">"z"</span><span class="p">,</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_steady_state</span><span class="p">:</span>
+                    <span class="n">step_files</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">step_files</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">physical_time_for_vtu_index</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">)</span>
+                    <span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">time_val</span><span class="p">,</span> <span class="n">vtu_file</span> <span class="ow">in</span> <span class="n">step_files</span><span class="p">:</span>
+                    <span class="n">times_written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">time_val</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probe_points</span><span class="p">):</span>
+                        <span class="n">tx</span><span class="p">,</span> <span class="n">ty</span><span class="p">,</span> <span class="n">tz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="s2">"z"</span><span class="p">])</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_at_point</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">,</span> <span class="n">vtu_file</span><span class="o">=</span><span class="n">vtu_file</span><span class="p">)</span>
+                        <span class="n">actual</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"nearest_point"</span><span class="p">]</span>
+                        <span class="n">ax</span><span class="p">,</span> <span class="n">ay</span><span class="p">,</span> <span class="n">az</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">actual</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">actual</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">actual</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                        <span class="n">johmx</span><span class="p">,</span> <span class="n">johmy</span><span class="p">,</span> <span class="n">johmz</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JOhmx"</span><span class="p">],</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JOhmy"</span><span class="p">],</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JOhmz"</span><span class="p">],</span>
+                        <span class="p">)</span>
+                        <span class="n">jseebeckx</span><span class="p">,</span> <span class="n">jseebecky</span><span class="p">,</span> <span class="n">jseebeckz</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JSeebeckx"</span><span class="p">],</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JSeebecky"</span><span class="p">],</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JSeebeckz"</span><span class="p">],</span>
+                        <span class="p">)</span>
+                        <span class="n">jsourcex</span><span class="p">,</span> <span class="n">jsourcey</span><span class="p">,</span> <span class="n">jsourcez</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JSourcex"</span><span class="p">],</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JSourcey"</span><span class="p">],</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s2">"JSourcez"</span><span class="p">],</span>
+                        <span class="p">)</span>
+                        <span class="n">jint_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="n">time_val</span><span class="p">,</span>
+                                <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="n">format_csv_float</span><span class="p">((</span><span class="n">johmx</span> <span class="o">*</span> <span class="n">johmx</span> <span class="o">+</span> <span class="n">johmy</span> <span class="o">*</span> <span class="n">johmy</span> <span class="o">+</span> <span class="n">johmz</span> <span class="o">*</span> <span class="n">johmz</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">johmx</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">johmy</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">johmz</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">((</span><span class="n">jseebeckx</span> <span class="o">*</span> <span class="n">jseebeckx</span> <span class="o">+</span> <span class="n">jseebecky</span> <span class="o">*</span> <span class="n">jseebecky</span> <span class="o">+</span> <span class="n">jseebeckz</span> <span class="o">*</span> <span class="n">jseebeckz</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">jseebeckx</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">jseebecky</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">jseebeckz</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">((</span><span class="n">jsourcex</span> <span class="o">*</span> <span class="n">jsourcex</span> <span class="o">+</span> <span class="n">jsourcey</span> <span class="o">*</span> <span class="n">jsourcey</span> <span class="o">+</span> <span class="n">jsourcez</span> <span class="o">*</span> <span class="n">jsourcez</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">jsourcex</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">jsourcey</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">jsourcez</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">ax</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">ay</span><span class="p">),</span>
+                                <span class="n">format_csv_float</span><span class="p">(</span><span class="n">az</span><span class="p">),</span>
+                            <span class="p">]</span>
+                        <span class="p">)</span>
+                        <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">time_val</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'mesh_distance'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">,"</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'idw_neighbors_used'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">,"</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'idw_exact_node_hit'</span><span class="p">,</span><span class="w"> </span><span class="kc">False</span><span class="p">)))</span><span class="si">}</span><span class="s2">,"</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'idw_support_radius_m'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">,"</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'idw_support_mean_distance_m'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">,"</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'sample_region'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">temperature_writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">temperature_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">time_val</span><span class="p">,</span>
+                                    <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                    <span class="n">format_csv_float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"T"</span><span class="p">]),</span>
+                                    <span class="n">format_csv_float</span><span class="p">(</span><span class="n">ax</span><span class="p">),</span>
+                                    <span class="n">format_csv_float</span><span class="p">(</span><span class="n">ay</span><span class="p">),</span>
+                                    <span class="n">format_csv_float</span><span class="p">(</span><span class="n">az</span><span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">potential_writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">potential_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">time_val</span><span class="p">,</span>
+                                    <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                    <span class="n">format_csv_float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"P"</span><span class="p">]),</span>
+                                    <span class="n">format_csv_float</span><span class="p">(</span><span class="n">ax</span><span class="p">),</span>
+                                    <span class="n">format_csv_float</span><span class="p">(</span><span class="n">ay</span><span class="p">),</span>
+                                    <span class="n">format_csv_float</span><span class="p">(</span><span class="n">az</span><span class="p">),</span>
+                                <span class="p">]</span>
+                            <span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">temperature_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">temperature_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">potential_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">potential_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Wrote current_density_interior_data.csv"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">write_temperature</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Wrote temperature_interior_data.csv"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">write_potential</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Wrote potential_interior_data.csv"</span><span class="p">)</span>
+        <span class="n">append_run_integrity</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span>
+            <span class="s2">"current_density_interior_fields"</span><span class="p">,</span>
+            <span class="s2">"required Potential Flux and SourceCurrentX/Y/Z probe fields written; JSeebeck derived as JSource - JOhm (and T/P written when selected)"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">log_time_coverage</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cwd</span><span class="p">,</span>
+            <span class="s2">"current_density_interior"</span><span class="p">,</span>
+            <span class="n">times_written</span><span class="p">,</span>
+            <span class="n">expected_time_dependent</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_steady_state</span><span class="p">,</span>
+            <span class="n">n_steps</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtu_files</span><span class="p">),</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../api/processing.scripts.current_density_interior.html#processing.scripts.current_density_interior.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: CLI entry for interior J/T/P probes; enables CSV writes based on selected scripts.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        None: Parses ``--config`` and ``--run-dir`` from argv.</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        None: Instantiates ``CurrentDensityInterior`` and runs extraction.</span>
+<span class="sd">    """</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Extract interior current density probes"</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--config"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"results/processing_config.json"</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--run-dir"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"."</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">run_dir</span><span class="p">)</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">probe_points</span> <span class="o">=</span> <span class="n">load_jint_probe_points_from_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="p">(</span><span class="n">SCRIPT_NAME</span><span class="p">,))</span>
+
+    <span class="n">selected_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"scripts"</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span> <span class="p">[]:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">script</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">selected_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">CurrentDensityInterior</span><span class="p">(</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">probe_points</span><span class="o">=</span><span class="n">probe_points</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">processor</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="n">write_temperature</span><span class="o">=</span><span class="s2">"temperature_interior"</span> <span class="ow">in</span> <span class="n">selected_names</span><span class="p">,</span>
+        <span class="n">write_potential</span><span class="o">=</span><span class="s2">"potential_interior"</span> <span class="ow">in</span> <span class="n">selected_names</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.scripts.current_density_interior</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

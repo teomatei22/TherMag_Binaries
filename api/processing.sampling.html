@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.sampling module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="simulations package" href="simulations.html" />
+    <link rel="prev" title="processing.run_integrity module" href="processing.run_integrity.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="simulations.html" title="simulations package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.run_integrity.html" title="processing.run_integrity module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" accesskey="U">processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.sampling module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.sampling">
+<span id="processing-sampling-module"></span><h1>processing.sampling module<a class="headerlink" href="#module-processing.sampling" title="Link to this heading">¶</a></h1>
+<p>Shared IDW / mesh sampling helpers for production probe scripts.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.sampling.idw_interpolate_vectors">
+<span class="sig-prename descclassname"><span class="pre">processing.sampling.</span></span><span class="sig-name descname"><span class="pre">idw_interpolate_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_node_epsilon</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/sampling.html#idw_interpolate_vectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.sampling.idw_interpolate_vectors" title="Link to this definition">¶</a></dt>
+<dd><p>Inverse-distance-weight interpolate scalar or vector field values at a probe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> – Per-node field samples (scalar or 3-vector components) [field units].</p></li>
+<li><p><strong>distances</strong> – Probe-to-node distances matching <code class="docutils literal notranslate"><span class="pre">values</span></code> rows [m].</p></li>
+<li><p><strong>k</strong> – Number of nearest neighbors for the IDW stencil.</p></li>
+<li><p><strong>epsilon</strong> – Softening length for IDW weights [m].</p></li>
+<li><p><strong>on_node_epsilon</strong> – Exact-hit distance threshold [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(interpolated_value,</span> <span class="pre">diagnostics)</span></code> with IDW support metadata.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>distances</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>k</strong> (<em>int</em>)</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>)</p></li>
+<li><p><strong>on_node_epsilon</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[<em>ndarray</em>, dict[str, <em>Any</em>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.sampling.idw_weights">
+<span class="sig-prename descclassname"><span class="pre">processing.sampling.</span></span><span class="sig-name descname"><span class="pre">idw_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distances</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_node_epsilon</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/sampling.html#idw_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.sampling.idw_weights" title="Link to this definition">¶</a></dt>
+<dd><p>Build IDW weights or detect an exact mesh-node hit for probe sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distances</strong> – Neighbor distances from probe to mesh nodes [m].</p></li>
+<li><p><strong>epsilon</strong> – Softening length added to distance before squaring [m].</p></li>
+<li><p><strong>on_node_epsilon</strong> – Distance below which the probe is treated as on-node [m].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> – <code class="docutils literal notranslate"><span class="pre">(weights,</span> <span class="pre">exact_local_index,</span> <span class="pre">diagnostics)</span></code>; weights is <code class="docutils literal notranslate"><span class="pre">None</span></code> on exact hit.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distances</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>)</p></li>
+<li><p><strong>on_node_epsilon</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[<em>ndarray</em> | None, int | None, dict[str, <em>Any</em>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.sampling.select_nearest_indices">
+<span class="sig-prename descclassname"><span class="pre">processing.sampling.</span></span><span class="sig-name descname"><span class="pre">select_nearest_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distances</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/sampling.html#select_nearest_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.sampling.select_nearest_indices" title="Link to this definition">¶</a></dt>
+<dd><p>Select the <code class="docutils literal notranslate"><span class="pre">k</span></code> nearest mesh-neighbor indices for IDW support.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distances</strong> – Full set of probe-to-node distances [m].</p></li>
+<li><p><strong>k</strong> – Requested neighbor count (clamped to available nodes).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>np.ndarray</strong> – Local indices of the <code class="docutils literal notranslate"><span class="pre">k</span></code> nearest neighbors (unordered partition).</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distances</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>k</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.sampling module</a><ul>
+<li><a class="reference internal" href="#processing.sampling.idw_interpolate_vectors"><code class="docutils literal notranslate"><span class="pre">idw_interpolate_vectors()</span></code></a></li>
+<li><a class="reference internal" href="#processing.sampling.idw_weights"><code class="docutils literal notranslate"><span class="pre">idw_weights()</span></code></a></li>
+<li><a class="reference internal" href="#processing.sampling.select_nearest_indices"><code class="docutils literal notranslate"><span class="pre">select_nearest_indices()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.run_integrity.html"
+                          title="previous chapter">processing.run_integrity module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="simulations.html"
+                          title="next chapter">simulations package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.sampling.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="simulations.html" title="simulations package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.run_integrity.html" title="processing.run_integrity module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.sampling module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

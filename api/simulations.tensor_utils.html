@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>simulations.tensor_utils module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="simulations.material_params module" href="simulations.material_params.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="simulations.material_params.html" title="simulations.material_params module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="simulations.html" accesskey="U">simulations package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.tensor_utils module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-simulations.tensor_utils">
+<span id="simulations-tensor-utils-module"></span><h1>simulations.tensor_utils module<a class="headerlink" href="#module-simulations.tensor_utils" title="Link to this heading">¶</a></h1>
+<p>Build Elmer MATC anisotropic conductivity/Seebeck tensor blocks by shape.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils._add">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils._add" title="Link to this definition">¶</a></dt>
+<dd><p>Format a signed addend for inline MATC arithmetic (leading <code class="docutils literal notranslate"><span class="pre">+</span></code>/<code class="docutils literal notranslate"><span class="pre">-</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>v</strong> – Numeric addend [matches property SI unit].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Signed token such as <code class="docutils literal notranslate"><span class="pre">+1.2</span></code> or <code class="docutils literal notranslate"><span class="pre">-3</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils._fmt">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">_fmt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#_fmt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils._fmt" title="Link to this definition">¶</a></dt>
+<dd><p>Format a scalar for compact Elmer MATC expressions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>v</strong> – Numeric value to stringify [matches property SI unit].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Compact decimal or scientific representation without excess digits.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils._matc_cylinder">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">_matc_cylinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#_matc_cylinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils._matc_cylinder" title="Link to this definition">¶</a></dt>
+<dd><p>MATC expression for axial/radial anisotropy about the cylinder axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>par</strong> – Parallel (axial) principal value [SI property unit].</p></li>
+<li><p><strong>perp</strong> – Perpendicular (radial/tangential) principal value [SI property unit].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Single-line MATC body returning a flattened 3x3 tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils._matc_ident">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">_matc_ident</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">parts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#_matc_ident"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils._matc_ident" title="Link to this definition">¶</a></dt>
+<dd><p>Build a safe Elmer MATC function identifier from name fragments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parts</strong> – Fragments such as property name and numeric tokens [dimensionless].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Alphanumeric MATC identifier that does not start with a digit.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parts</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils._matc_prism">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">_matc_prism</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#_matc_prism"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils._matc_prism" title="Link to this definition">¶</a></dt>
+<dd><p>MATC expression for orthotropic prism tensors aligned to axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>par</strong> – Parallel (length-axis) principal value [SI property unit].</p></li>
+<li><p><strong>perp</strong> – Perpendicular (transverse) principal value [SI property unit].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Single-line MATC body returning a diagonal 3x3 tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils._sphere_radial_function_body">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">_sphere_radial_function_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#_sphere_radial_function_body"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils._sphere_radial_function_body" title="Link to this definition">¶</a></dt>
+<dd><p>MATC function body for radially anisotropic spherical tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>par</strong> – Parallel (tangential) principal value [SI property unit].</p></li>
+<li><p><strong>perp</strong> – Perpendicular (radial) principal value [SI property unit].</p></li>
+<li><p><strong>fname</strong> – MATC function name assigned to the return variable [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – MATC function body computing the local radial 3x3 tensor.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils._sub">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">_sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#_sub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils._sub" title="Link to this definition">¶</a></dt>
+<dd><p>Format the difference <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">-</span> <span class="pre">b</span></code> as a compact MATC literal expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – Minuend [matches property SI unit].</p></li>
+<li><p><strong>b</strong> – Subtrahend [matches property SI unit].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Literal difference string embedded in MATC source.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils.generate_cylinder_tensor">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">generate_cylinder_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#generate_cylinder_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils.generate_cylinder_tensor" title="Link to this definition">¶</a></dt>
+<dd><p>Emit an Elmer SIF anisotropic tensor block for cylinder geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>par</strong> – Parallel principal conductivity/Seebeck value [SI].</p></li>
+<li><p><strong>perp</strong> – Perpendicular principal value [SI].</p></li>
+<li><p><strong>prop_name</strong> – Elmer property name such as <code class="docutils literal notranslate"><span class="pre">Heat</span> <span class="pre">Conductivity</span></code> [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – SIF lines defining <code class="docutils literal notranslate"><span class="pre">prop_name(3,3)</span></code> via MATC.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils.generate_prism_tensor">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">generate_prism_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#generate_prism_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils.generate_prism_tensor" title="Link to this definition">¶</a></dt>
+<dd><p>Emit an Elmer SIF anisotropic tensor block for prism geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>par</strong> – Parallel principal conductivity/Seebeck value [SI].</p></li>
+<li><p><strong>perp</strong> – Perpendicular principal value [SI].</p></li>
+<li><p><strong>prop_name</strong> – Elmer property name such as <code class="docutils literal notranslate"><span class="pre">Electric</span> <span class="pre">Conductivity</span></code> [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – SIF lines defining <code class="docutils literal notranslate"><span class="pre">prop_name(3,3)</span></code> via MATC.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils.generate_sphere_tensor">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">generate_sphere_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#generate_sphere_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils.generate_sphere_tensor" title="Link to this definition">¶</a></dt>
+<dd><p>Emit an Elmer SIF anisotropic tensor block for sphere geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>par</strong> – Parallel (tangential) principal conductivity/Seebeck value [SI].</p></li>
+<li><p><strong>perp</strong> – Perpendicular (radial) principal value [SI].</p></li>
+<li><p><strong>prop_name</strong> – Elmer property name such as <code class="docutils literal notranslate"><span class="pre">Seebeck</span> <span class="pre">Coefficient</span></code> [dimensionless].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – SIF <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">function</span></code> plus <code class="docutils literal notranslate"><span class="pre">prop_name(3,3)</span></code> MATC call (≤127 chars).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils.generate_tensor_block">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">generate_tensor_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#generate_tensor_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils.generate_tensor_block" title="Link to this definition">¶</a></dt>
+<dd><p>Dispatch tensor-block generation by conductor geometry shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_shape</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">sphere</span></code>, or other (prism) [dimensionless].</p></li>
+<li><p><strong>prop_name</strong> – Elmer property name for the tensor [dimensionless].</p></li>
+<li><p><strong>par</strong> – Parallel principal value [SI].</p></li>
+<li><p><strong>perp</strong> – Perpendicular principal value [SI].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Shape-appropriate anisotropic SIF property block.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simulations.tensor_utils.generate_tensor_vector_product">
+<span class="sig-prename descclassname"><span class="pre">simulations.tensor_utils.</span></span><span class="sig-name descname"><span class="pre">generate_tensor_vector_product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simulations/tensor_utils.html#generate_tensor_vector_product"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simulations.tensor_utils.generate_tensor_vector_product" title="Link to this definition">¶</a></dt>
+<dd><p>Emit MATC expression with shape-aware Seebeck anisotropy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geometry_shape</strong> – <code class="docutils literal notranslate"><span class="pre">cylinder</span></code>, <code class="docutils literal notranslate"><span class="pre">prism</span></code>, or <code class="docutils literal notranslate"><span class="pre">sphere</span></code> [dimensionless].</p></li>
+<li><p><strong>par</strong> – Parallel Seebeck principal value [V/K].</p></li>
+<li><p><strong>perp</strong> – Perpendicular Seebeck principal value [V/K].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[str, str, str]</strong> – MATC expressions for the three Cartesian product
+components <code class="docutils literal notranslate"><span class="pre">(Jx_seebeck,</span> <span class="pre">Jy_seebeck,</span> <span class="pre">Jz_seebeck)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">simulations.tensor_utils module</a><ul>
+<li><a class="reference internal" href="#simulations.tensor_utils._add"><code class="docutils literal notranslate"><span class="pre">_add()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils._fmt"><code class="docutils literal notranslate"><span class="pre">_fmt()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils._matc_cylinder"><code class="docutils literal notranslate"><span class="pre">_matc_cylinder()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils._matc_ident"><code class="docutils literal notranslate"><span class="pre">_matc_ident()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils._matc_prism"><code class="docutils literal notranslate"><span class="pre">_matc_prism()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils._sphere_radial_function_body"><code class="docutils literal notranslate"><span class="pre">_sphere_radial_function_body()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils._sub"><code class="docutils literal notranslate"><span class="pre">_sub()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils.generate_cylinder_tensor"><code class="docutils literal notranslate"><span class="pre">generate_cylinder_tensor()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils.generate_prism_tensor"><code class="docutils literal notranslate"><span class="pre">generate_prism_tensor()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils.generate_sphere_tensor"><code class="docutils literal notranslate"><span class="pre">generate_sphere_tensor()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils.generate_tensor_block"><code class="docutils literal notranslate"><span class="pre">generate_tensor_block()</span></code></a></li>
+<li><a class="reference internal" href="#simulations.tensor_utils.generate_tensor_vector_product"><code class="docutils literal notranslate"><span class="pre">generate_tensor_vector_product()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="simulations.material_params.html"
+                          title="previous chapter">simulations.material_params module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/simulations.tensor_utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="simulations.material_params.html" title="simulations.material_params module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="simulations.html" >simulations package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">simulations.tensor_utils module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+TherMag 1.0 documentation
+=========================
+
+API reference for the physics/FEM core packages (geometries, simulations,
+processing, materials, domain, config). Docstrings use Brief / Inputs / Outputs.
+
+**Version:** |version|
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   api/modules

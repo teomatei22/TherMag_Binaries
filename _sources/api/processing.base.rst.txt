@@ -1,0 +1,7 @@
+processing.base module
+======================
+
+.. automodule:: processing.base
+   :members:
+   :show-inheritance:
+   :undoc-members:

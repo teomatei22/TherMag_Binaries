@@ -1,0 +1,7 @@
+processing.sampling module
+==========================
+
+.. automodule:: processing.sampling
+   :members:
+   :show-inheritance:
+   :undoc-members:

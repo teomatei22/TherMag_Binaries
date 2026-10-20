@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>processing.sampling &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.sampling</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for processing.sampling</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Shared IDW / mesh sampling helpers for production probe scripts."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+
+<div class="viewcode-block" id="idw_weights">
+<a class="viewcode-back" href="../../api/processing.sampling.html#processing.sampling.idw_weights">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">idw_weights</span><span class="p">(</span><span class="n">distances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">on_node_epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Build IDW weights or detect an exact mesh-node hit for probe sampling.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        distances: Neighbor distances from probe to mesh nodes [m].</span>
+<span class="sd">        epsilon: Softening length added to distance before squaring [m].</span>
+<span class="sd">        on_node_epsilon: Distance below which the probe is treated as on-node [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        tuple: ``(weights, exact_local_index, diagnostics)``; weights is ``None`` on exact hit.</span>
+<span class="sd">    """</span>
+    <span class="n">d_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d_k</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"IDW interpolation requires at least one neighbor."</span><span class="p">)</span>
+    <span class="n">d_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">d_k</span><span class="p">))</span>
+    <span class="n">d_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">d_k</span><span class="p">))</span>
+    <span class="n">d_mean</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">d_k</span><span class="p">))</span>
+    <span class="n">on_eps</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">on_node_epsilon</span><span class="p">),</span> <span class="mf">1.0e-12</span><span class="p">)</span>
+    <span class="n">exact_hits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d_k</span> <span class="o">&lt;=</span> <span class="n">on_eps</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">exact_local</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">exact_hits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">exact_hits</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">diagnostics</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"idw_neighbors_used"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">d_k</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+        <span class="s2">"idw_exact_node_hit"</span><span class="p">:</span> <span class="n">exact_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">"idw_support_radius_m"</span><span class="p">:</span> <span class="n">d_max</span><span class="p">,</span>
+        <span class="s2">"idw_support_mean_distance_m"</span><span class="p">:</span> <span class="n">d_mean</span><span class="p">,</span>
+        <span class="s2">"mesh_distance"</span><span class="p">:</span> <span class="n">d_min</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">exact_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">exact_local</span><span class="p">,</span> <span class="n">diagnostics</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">d_k</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">weights</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">diagnostics</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="select_nearest_indices">
+<a class="viewcode-back" href="../../api/processing.sampling.html#processing.sampling.select_nearest_indices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">select_nearest_indices</span><span class="p">(</span><span class="n">distances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Select the ``k`` nearest mesh-neighbor indices for IDW support.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        distances: Full set of probe-to-node distances [m].</span>
+<span class="sd">        k: Requested neighbor count (clamped to available nodes).</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        np.ndarray: Local indices of the ``k`` nearest neighbors (unordered partition).</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"IDW interpolation requires at least one neighbor."</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">distances</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argpartition</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)[:</span><span class="n">k</span><span class="p">]</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="idw_interpolate_vectors">
+<a class="viewcode-back" href="../../api/processing.sampling.html#processing.sampling.idw_interpolate_vectors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">idw_interpolate_vectors</span><span class="p">(</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">distances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">on_node_epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Brief: Inverse-distance-weight interpolate scalar or vector field values at a probe.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        values: Per-node field samples (scalar or 3-vector components) [field units].</span>
+<span class="sd">        distances: Probe-to-node distances matching ``values`` rows [m].</span>
+<span class="sd">        k: Number of nearest neighbors for the IDW stencil.</span>
+<span class="sd">        epsilon: Softening length for IDW weights [m].</span>
+<span class="sd">        on_node_epsilon: Exact-hit distance threshold [m].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        tuple: ``(interpolated_value, diagnostics)`` with IDW support metadata.</span>
+<span class="sd">    """</span>
+    <span class="n">nn_idx</span> <span class="o">=</span> <span class="n">select_nearest_indices</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">d_k</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span>
+    <span class="n">weights</span><span class="p">,</span> <span class="n">exact_local</span><span class="p">,</span> <span class="n">diagnostics</span> <span class="o">=</span> <span class="n">idw_weights</span><span class="p">(</span>
+        <span class="n">d_k</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">on_node_epsilon</span><span class="o">=</span><span class="n">on_node_epsilon</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">exact_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">[</span><span class="n">exact_local</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">diagnostics</span>
+    <span class="k">assert</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">diagnostics</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">w</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">diagnostics</span></div>
+
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.sampling</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

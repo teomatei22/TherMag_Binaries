@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>processing.base module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing.defaults module" href="processing.defaults.html" />
+    <link rel="prev" title="processing.scripts.temperature_map module" href="processing.scripts.temperature_map.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.defaults.html" title="processing.defaults module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.temperature_map.html" title="processing.scripts.temperature_map module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" accesskey="U">processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.base module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-processing.base">
+<span id="processing-base-module"></span><h1>processing.base module<a class="headerlink" href="#module-processing.base" title="Link to this heading">¶</a></h1>
+<p>Abstract ParaView post-processor base for FEM VTU glyphs, cameras, and exports.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">processing.base.</span></span><span class="sig-name descname"><span class="pre">BasePostProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Shared ParaView pipeline helpers for TherMag FEM result visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_dir</strong> – Optional FEM run directory; defaults to <code class="docutils literal notranslate"><span class="pre">os.getcwd()</span></code>.</p></li>
+<li><p><strong>verbose</strong> – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, print setup and export progress.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>BasePostProcessor</strong> – Abstract base; subclasses implement <code class="docutils literal notranslate"><span class="pre">run()</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_dir</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#processing.base.BasePostProcessor._abc_impl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor._describe_output">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_describe_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor._describe_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor._describe_output" title="Link to this definition">¶</a></dt>
+<dd><p>Human-readable label for a screenshot/animation output stem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – Output file name (e.g. <code class="docutils literal notranslate"><span class="pre">temperature_map.png</span></code>).</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Display label such as <code class="docutils literal notranslate"><span class="pre">temperature</span> <span class="pre">map</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor._discover_files">
+<span class="sig-name descname"><span class="pre">_discover_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor._discover_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor._discover_files" title="Link to this definition">¶</a></dt>
+<dd><p>Discover sorted VTU or PVTU result files under <code class="docutils literal notranslate"><span class="pre">geometry/</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Scans <code class="docutils literal notranslate"><span class="pre">self.in_dir</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[str]</strong> – Sorted <code class="docutils literal notranslate"><span class="pre">.pvtu</span></code> paths if present, else <code class="docutils literal notranslate"><span class="pre">.vtu</span></code> paths.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>List</em>[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor._log_setup">
+<span class="sig-name descname"><span class="pre">_log_setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor._log_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor._log_setup" title="Link to this definition">¶</a></dt>
+<dd><p>Optionally print discovered file type, steady/transient mode, and model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.verbose</span></code>, <code class="docutils literal notranslate"><span class="pre">self.vtu_files</span></code>, <code class="docutils literal notranslate"><span class="pre">self.config</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Prints a one-line setup summary when verbose.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor._parse_result_output_exec_interval">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_parse_result_output_exec_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sif_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor._parse_result_output_exec_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor._parse_result_output_exec_interval" title="Link to this definition">¶</a></dt>
+<dd><p>Read <code class="docutils literal notranslate"><span class="pre">Exec</span> <span class="pre">Intervals</span></code> from the ResultOutput / VTU solver block in a SIF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sif_text</strong> – Full Elmer <code class="docutils literal notranslate"><span class="pre">case.sif</span></code> text.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>int | None</strong> – Exec interval for VTU writes, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sif_text</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.animation_frame_last">
+<span class="sig-name descname"><span class="pre">animation_frame_last</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.animation_frame_last"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.animation_frame_last" title="Link to this definition">¶</a></dt>
+<dd><p>Configure animation for multi-step VTU series and return the last frame index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reader</strong> – ParaView reader proxy for the time series.</p></li>
+<li><p><strong>files</strong> – Ordered VTU/PVTU paths constituting the series.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[bool, int]</strong> – <code class="docutils literal notranslate"><span class="pre">(is_animated,</span> <span class="pre">last_frame_index)</span></code>; steady runs return <code class="docutils literal notranslate"><span class="pre">(False,</span> <span class="pre">0)</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reader</strong> (<em>Any</em>)</p></li>
+<li><p><strong>files</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[bool, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objects</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.cleanup" title="Link to this definition">¶</a></dt>
+<dd><p>Hide and delete temporary ParaView pipeline objects after export.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>objects</strong> – ParaView proxies to hide and delete.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Best-effort cleanup; errors are ignored.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>objects</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.configure_vector_glyph">
+<span class="sig-name descname"><span class="pre">configure_vector_glyph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">glyph</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_by_magnitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sample_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.configure_vector_glyph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.configure_vector_glyph" title="Link to this definition">¶</a></dt>
+<dd><p>Configure orientation, scale mode, and spatial sampling on a Glyph filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>glyph</strong> – ParaView Glyph filter proxy.</p></li>
+<li><p><strong>array_name</strong> – Point-data vector array for orientation (and optional magnitude).</p></li>
+<li><p><strong>scale_factor</strong> – Glyph <code class="docutils literal notranslate"><span class="pre">ScaleFactor</span></code> from <code class="docutils literal notranslate"><span class="pre">vector_glyph_scale_factor</span></code> [m / field].</p></li>
+<li><p><strong>scale_by_magnitude</strong> – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, scale arrows by vector magnitude.</p></li>
+<li><p><strong>max_sample_points</strong> – Cap for uniform sampling; <code class="docutils literal notranslate"><span class="pre">&lt;=0</span></code> uses all points.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Updates <code class="docutils literal notranslate"><span class="pre">glyph</span></code> pipeline settings.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>glyph</strong> (<em>Any</em>)</p></li>
+<li><p><strong>array_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>scale_factor</strong> (<em>float</em>)</p></li>
+<li><p><strong>scale_by_magnitude</strong> (<em>bool</em>)</p></li>
+<li><p><strong>max_sample_points</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.format_csv_float">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">format_csv_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.format_csv_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.format_csv_float" title="Link to this definition">¶</a></dt>
+<dd><p>Format a CSV numeric cell using truncated scientific notation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Coercible numeric value [any].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Truncated scientific string suitable for probe CSV columns.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.get_geometry_glyph_fraction">
+<span class="sig-name descname"><span class="pre">get_geometry_glyph_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.get_geometry_glyph_fraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.get_geometry_glyph_fraction" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve glyph arrow length as a fraction of conductor extent for a field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> – Field key (<code class="docutils literal notranslate"><span class="pre">current_density</span></code> or <code class="docutils literal notranslate"><span class="pre">magnetic</span></code>).</p></li>
+<li><p><strong>override</strong> – Optional explicit fraction replacing the geometry default.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Arrow length fraction of characteristic extent.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> (<em>str</em>)</p></li>
+<li><p><strong>override</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.global_vector_magnitude_hi">
+<span class="sig-name descname"><span class="pre">global_vector_magnitude_hi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_last</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.global_vector_magnitude_hi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.global_vector_magnitude_hi" title="Link to this definition">¶</a></dt>
+<dd><p>Scan all animation frames for the global peak vector magnitude.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – ParaView source exposing the vector point array.</p></li>
+<li><p><strong>array_name</strong> – Point-data vector array name (e.g. current density or B).</p></li>
+<li><p><strong>frame_last</strong> – Inclusive last animation frame index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float | None</strong> – Global max magnitude [field units], or <code class="docutils literal notranslate"><span class="pre">None</span></code> if unavailable.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<em>Any</em>)</p></li>
+<li><p><strong>array_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>frame_last</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.glyph_extent_span">
+<span class="sig-name descname"><span class="pre">glyph_extent_span</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extent_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.glyph_extent_span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.glyph_extent_span" title="Link to this definition">¶</a></dt>
+<dd><p>Characteristic spatial span for glyph scaling from data bounds or geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>extent_source</strong> – Optional ParaView source whose bounds define the span [m].</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Max axis span of bounds, else <code class="docutils literal notranslate"><span class="pre">geometry.characteristic_extent()</span></code> [m].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>extent_source</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.glyph_max_sample_points">
+<span class="sig-name descname"><span class="pre">glyph_max_sample_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.glyph_max_sample_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.glyph_max_sample_points" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum glyph sample points from <code class="docutils literal notranslate"><span class="pre">post_processing_defaults.json</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>field</strong> – Field key used to look up <code class="docutils literal notranslate"><span class="pre">glyph.{field}_max_sample_points</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>int</strong> – Non-negative max sample points (<code class="docutils literal notranslate"><span class="pre">0</span></code> means all points).</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>KeyError</strong> – If the glyph sample-points key is missing from defaults JSON.</p></li>
+<li><p><strong>ValueError</strong> – If the configured value is not a valid integer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>field</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.lock_lut_to_range">
+<span class="sig-name descname"><span class="pre">lock_lut_to_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.lock_lut_to_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.lock_lut_to_range" title="Link to this definition">¶</a></dt>
+<dd><p>Lock a color transfer function to a fixed [0, hi] magnitude range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lut</strong> – ParaView lookup table / color transfer function.</p></li>
+<li><p><strong>hi</strong> – Upper magnitude bound for the LUT [field units].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Disables automatic rescale on <code class="docutils literal notranslate"><span class="pre">lut</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lut</strong> (<em>Any</em>)</p></li>
+<li><p><strong>hi</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.make_reader">
+<span class="sig-name descname"><span class="pre">make_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.make_reader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.make_reader" title="Link to this definition">¶</a></dt>
+<dd><p>Open VTU/PVTU data with configured point/cell arrays for FEM fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – ParaView source display name.</p></li>
+<li><p><strong>files</strong> – Single path or list of VTU/PVTU paths.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Any</strong> – ParaView reader proxy with pipeline updated.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>files</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Any</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.physical_time_for_vtu_index">
+<span class="sig-name descname"><span class="pre">physical_time_for_vtu_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vtu_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.physical_time_for_vtu_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.physical_time_for_vtu_index" title="Link to this definition">¶</a></dt>
+<dd><p>Map a VTU file index to physical simulation time from <code class="docutils literal notranslate"><span class="pre">case.sif</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vtu_index</strong> – Zero-based index among discovered VTU/PVTU files.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Physical time <code class="docutils literal notranslate"><span class="pre">(index</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">*</span> <span class="pre">output_intervals</span> <span class="pre">*</span> <span class="pre">timestep_size</span></code> [s].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vtu_index</strong> (<em>int</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.run">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.run" title="Link to this definition">¶</a></dt>
+<dd><p>Execute the concrete post-processing pipeline (maps, glyphs, or probes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses run state initialized in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Subclass writes results under <code class="docutils literal notranslate"><span class="pre">self.out_dir</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.save_animation">
+<span class="sig-name descname"><span class="pre">save_animation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_or_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.save_animation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.save_animation" title="Link to this definition">¶</a></dt>
+<dd><p>Export a time-series animation (AVI/MP4) of the FEM field visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – Desired animation name under <code class="docutils literal notranslate"><span class="pre">self.out_dir</span></code> (<code class="docutils literal notranslate"><span class="pre">.mp4</span></code> or <code class="docutils literal notranslate"><span class="pre">.avi</span></code>).</p></li>
+<li><p><strong>view_or_layout</strong> – ParaView view or layout to capture.</p></li>
+<li><p><strong>frame_window</strong> – Inclusive <code class="docutils literal notranslate"><span class="pre">[first,</span> <span class="pre">last]</span></code> animation frame indices.</p></li>
+<li><p><strong>fps</strong> – Optional frames per second; defaults to 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes a valid animation file when possible; warns on failure.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>)</p></li>
+<li><p><strong>view_or_layout</strong> (<em>Any</em>)</p></li>
+<li><p><strong>frame_window</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>fps</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.save_image">
+<span class="sig-name descname"><span class="pre">save_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_or_layout</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.save_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.save_image" title="Link to this definition">¶</a></dt>
+<dd><p>Save a still screenshot of the current view into <code class="docutils literal notranslate"><span class="pre">results/</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – Output image name under <code class="docutils literal notranslate"><span class="pre">self.out_dir</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">temperature_map.png</span></code>).</p></li>
+<li><p><strong>view_or_layout</strong> – ParaView view or layout to capture.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes the screenshot file; prints OK/error status.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>)</p></li>
+<li><p><strong>view_or_layout</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.scientific_tick_values">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">scientific_tick_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.scientific_tick_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.scientific_tick_values" title="Link to this definition">¶</a></dt>
+<dd><p>Build evenly spaced truncated tick values for scientific color bars.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower</strong> – Axis/color-bar lower bound [field units].</p></li>
+<li><p><strong>upper</strong> – Axis/color-bar upper bound [field units].</p></li>
+<li><p><strong>count</strong> – Desired tick count.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[float]</strong> – Deduplicated truncated tick positions.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower</strong> (<em>float</em>)</p></li>
+<li><p><strong>upper</strong> (<em>float</em>)</p></li>
+<li><p><strong>count</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.set_threshold_between">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_threshold_between</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.set_threshold_between"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.set_threshold_between" title="Link to this definition">¶</a></dt>
+<dd><p>Configure a ParaView Threshold filter to keep GeometryIds in [lower, upper].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>threshold</strong> – ParaView Threshold filter proxy.</p></li>
+<li><p><strong>lower</strong> – Inclusive lower GeometryIds bound.</p></li>
+<li><p><strong>upper</strong> – Inclusive upper GeometryIds bound.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Sets Between-mode thresholds on <code class="docutils literal notranslate"><span class="pre">threshold</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>threshold</strong> (<em>Any</em>)</p></li>
+<li><p><strong>lower</strong> (<em>float</em>)</p></li>
+<li><p><strong>upper</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.setup_camera">
+<span class="sig-name descname"><span class="pre">setup_camera</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">render_view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.setup_camera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.setup_camera" title="Link to this definition">¶</a></dt>
+<dd><p>Place an isometric parallel camera scaled to the conductor extent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>render_view</strong> – Active ParaView render view.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Sets camera position, focal point, view-up, and parallel scale.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>render_view</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.setup_layout">
+<span class="sig-name descname"><span class="pre">setup_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">render_view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.setup_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.setup_layout" title="Link to this definition">¶</a></dt>
+<dd><p>Assign the render view to a fixed-size ParaView layout for screenshots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>render_view</strong> – Active ParaView render view.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Any</strong> – Layout proxy sized 1560 x 788.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>render_view</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Any</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.style_conductive_surface">
+<span class="sig-name descname"><span class="pre">style_conductive_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">display</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.style_conductive_surface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.style_conductive_surface" title="Link to this definition">¶</a></dt>
+<dd><p>Color conductive bodies by GeometryIds categories (outer/inner material).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>display</strong> – ParaView display representation for the conductive surface.</p></li>
+<li><p><strong>render_view</strong> – Active render view (scalar bar hidden).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Applies categorical GeometryIds coloring for materials.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>display</strong> (<em>Any</em>)</p></li>
+<li><p><strong>render_view</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.truncate_scientific">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">truncate_scientific</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.truncate_scientific"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.truncate_scientific" title="Link to this definition">¶</a></dt>
+<dd><p>Format a float in truncated scientific notation for labels/CSV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Numeric value [any].</p></li>
+<li><p><strong>decimals</strong> – Mantissa digits kept after truncation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>str</strong> – Truncated scientific string from defaults helper.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>float</em>)</p></li>
+<li><p><strong>decimals</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="processing.base.BasePostProcessor.vector_glyph_scale_factor">
+<span class="sig-name descname"><span class="pre">vector_glyph_scale_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitude_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitude_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_by_magnitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/processing/base.html#BasePostProcessor.vector_glyph_scale_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.base.BasePostProcessor.vector_glyph_scale_factor" title="Link to this definition">¶</a></dt>
+<dd><p>Compute ParaView glyph ScaleFactor from extent fraction and optional <a href="#id1"><span class="problematic" id="id2">|V|</span></a> ref.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> – Field key for glyph fraction lookup (<code class="docutils literal notranslate"><span class="pre">current_density</span></code> / <code class="docutils literal notranslate"><span class="pre">magnetic</span></code>).</p></li>
+<li><p><strong>extent_source</strong> – Optional source for spatial span [m].</p></li>
+<li><p><strong>magnitude_source</strong> – Optional source for 99th-percentile magnitude when scaling by <a href="#id3"><span class="problematic" id="id4">|V|</span></a>.</p></li>
+<li><p><strong>array_name</strong> – Point-data vector array name when deriving magnitude ref.</p></li>
+<li><p><strong>magnitude_ref</strong> – Optional explicit magnitude reference [field units].</p></li>
+<li><p><strong>scale_by_magnitude</strong> – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, divide span x fraction by magnitude ref.</p></li>
+<li><p><strong>arrow_fraction</strong> – Optional override of geometry glyph fraction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>float</strong> – Glyph <code class="docutils literal notranslate"><span class="pre">ScaleFactor</span></code> so peak arrows match fraction of extent [m / field].</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> (<em>str</em>)</p></li>
+<li><p><strong>extent_source</strong> (<em>Any</em>)</p></li>
+<li><p><strong>magnitude_source</strong> (<em>Any</em>)</p></li>
+<li><p><strong>array_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>magnitude_ref</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>scale_by_magnitude</strong> (<em>bool</em>)</p></li>
+<li><p><strong>arrow_fraction</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">processing.base module</a><ul>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor</span></code></a><ul>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor._abc_impl"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._abc_impl</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor._describe_output"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._describe_output()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor._discover_files"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._discover_files()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor._log_setup"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._log_setup()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor._parse_result_output_exec_interval"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor._parse_result_output_exec_interval()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.animation_frame_last"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.animation_frame_last()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.cleanup"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.cleanup()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.configure_vector_glyph"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.configure_vector_glyph()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.format_csv_float"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.format_csv_float()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.get_geometry_glyph_fraction"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.get_geometry_glyph_fraction()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.global_vector_magnitude_hi"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.global_vector_magnitude_hi()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.glyph_extent_span"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.glyph_extent_span()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.glyph_max_sample_points"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.glyph_max_sample_points()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.lock_lut_to_range"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.lock_lut_to_range()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.make_reader"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.make_reader()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.physical_time_for_vtu_index"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.physical_time_for_vtu_index()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.run"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.run()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.save_animation"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.save_animation()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.save_image"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.save_image()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.scientific_tick_values"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.scientific_tick_values()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.set_threshold_between"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.set_threshold_between()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.setup_camera"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.setup_camera()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.setup_layout"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.setup_layout()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.style_conductive_surface"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.style_conductive_surface()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.truncate_scientific"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.truncate_scientific()</span></code></a></li>
+<li><a class="reference internal" href="#processing.base.BasePostProcessor.vector_glyph_scale_factor"><code class="docutils literal notranslate"><span class="pre">BasePostProcessor.vector_glyph_scale_factor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="processing.scripts.temperature_map.html"
+                          title="previous chapter">processing.scripts.temperature_map module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.defaults.html"
+                          title="next chapter">processing.defaults module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/processing.base.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.defaults.html" title="processing.defaults module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="processing.scripts.temperature_map.html" title="processing.scripts.temperature_map module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="processing.html" >processing package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">processing.base module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

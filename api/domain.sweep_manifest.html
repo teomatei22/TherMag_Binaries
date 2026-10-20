@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>domain.sweep_manifest module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="geometries package" href="geometries.html" />
+    <link rel="prev" title="domain.sweep module" href="domain.sweep.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geometries.html" title="geometries package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="domain.sweep.html" title="domain.sweep module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="domain.html" accesskey="U">domain package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.sweep_manifest module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-domain.sweep_manifest">
+<span id="domain-sweep-manifest-module"></span><h1>domain.sweep_manifest module<a class="headerlink" href="#module-domain.sweep_manifest" title="Link to this heading">¶</a></h1>
+<p>Sweep project manifest entries linking scaled geometry runs to observables.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.sweep_manifest.</span></span><span class="sig-name descname"><span class="pre">SweepManifest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">swept_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep_manifest.html#SweepManifest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep_manifest.SweepManifest" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Sweep metadata (parameter, base geometry, observables) and per-run entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>swept_param</strong> – Name of the swept geometry parameter (e.g. <code class="docutils literal notranslate"><span class="pre">L</span></code>).</p></li>
+<li><p><strong>observables</strong> – Observable names collected across sweep runs.</p></li>
+<li><p><strong>base_val</strong> – Base absolute value of the swept parameter before scaling [m].</p></li>
+<li><p><strong>L0</strong> – Reference cylinder/sphere length used for scaling [m].</p></li>
+<li><p><strong>R0</strong> – Reference radius used for scaling [m].</p></li>
+<li><p><strong>runs</strong> – Ordered list of per-coefficient <code class="docutils literal notranslate"><span class="pre">SweepRunEntry</span></code> records.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SweepManifest</strong> – Immutable sweep project metadata and run index.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>swept_param</strong> (<em>str</em>)</p></li>
+<li><p><strong>observables</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>base_val</strong> (<em>float</em>)</p></li>
+<li><p><strong>L0</strong> (<em>float</em>)</p></li>
+<li><p><strong>R0</strong> (<em>float</em>)</p></li>
+<li><p><strong>runs</strong> (<em>list</em><em>[</em><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry" title="domain.sweep_manifest.SweepRunEntry"><em>SweepRunEntry</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest.L0">
+<span class="sig-name descname"><span class="pre">L0</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.sweep_manifest.SweepManifest.L0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest.R0">
+<span class="sig-name descname"><span class="pre">R0</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.sweep_manifest.SweepManifest.R0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest.base_val">
+<span class="sig-name descname"><span class="pre">base_val</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.sweep_manifest.SweepManifest.base_val" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep_manifest.html#SweepManifest.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep_manifest.SweepManifest.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize a sweep manifest from a mapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – Mapping with <code class="docutils literal notranslate"><span class="pre">swept_param</span></code>, <code class="docutils literal notranslate"><span class="pre">base_val</span></code>, <code class="docutils literal notranslate"><span class="pre">L0</span></code>, <code class="docutils literal notranslate"><span class="pre">R0</span></code>, and <code class="docutils literal notranslate"><span class="pre">runs</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SweepManifest</strong> – Immutable sweep manifest.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.sweep_manifest.SweepManifest" title="domain.sweep_manifest.SweepManifest"><em>SweepManifest</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest.observables">
+<span class="sig-name descname"><span class="pre">observables</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#domain.sweep_manifest.SweepManifest.observables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest.runs">
+<span class="sig-name descname"><span class="pre">runs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry" title="domain.sweep_manifest.SweepRunEntry"><span class="pre">SweepRunEntry</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#domain.sweep_manifest.SweepManifest.runs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest.swept_param">
+<span class="sig-name descname"><span class="pre">swept_param</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#domain.sweep_manifest.SweepManifest.swept_param" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepManifest.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep_manifest.html#SweepManifest.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep_manifest.SweepManifest.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize the sweep manifest for JSON persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – JSON-serializable sweep manifest mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepRunEntry">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">domain.sweep_manifest.</span></span><span class="sig-name descname"><span class="pre">SweepRunEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swept_param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep_manifest.html#SweepRunEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep_manifest.SweepRunEntry" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>One scaled FEM run in a parameter sweep (coefficient, value, and run directory).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coeff</strong> – Multiplicative sweep coefficient applied to the base parameter.</p></li>
+<li><p><strong>param_val</strong> – Absolute geometric parameter value after scaling [m].</p></li>
+<li><p><strong>swept_param</strong> – Name of the swept geometry parameter (e.g. <code class="docutils literal notranslate"><span class="pre">L</span></code>).</p></li>
+<li><p><strong>run_dir</strong> – Path string to this coefficient’s run directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SweepRunEntry</strong> – Immutable per-coefficient sweep run locator.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coeff</strong> (<em>float</em>)</p></li>
+<li><p><strong>param_val</strong> (<em>float</em>)</p></li>
+<li><p><strong>swept_param</strong> (<em>str</em>)</p></li>
+<li><p><strong>run_dir</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepRunEntry.coeff">
+<span class="sig-name descname"><span class="pre">coeff</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.sweep_manifest.SweepRunEntry.coeff" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepRunEntry.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep_manifest.html#SweepRunEntry.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep_manifest.SweepRunEntry.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Deserialize a sweep run entry from a mapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – Mapping with <code class="docutils literal notranslate"><span class="pre">coeff</span></code>, <code class="docutils literal notranslate"><span class="pre">param_val</span></code>, <code class="docutils literal notranslate"><span class="pre">run_dir</span></code>, optional <code class="docutils literal notranslate"><span class="pre">swept_param</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SweepRunEntry</strong> – Immutable sweep run entry.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry" title="domain.sweep_manifest.SweepRunEntry"><em>SweepRunEntry</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepRunEntry.param_val">
+<span class="sig-name descname"><span class="pre">param_val</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#domain.sweep_manifest.SweepRunEntry.param_val" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepRunEntry.resolve_run_dir">
+<span class="sig-name descname"><span class="pre">resolve_run_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manifest_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep_manifest.html#SweepRunEntry.resolve_run_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep_manifest.SweepRunEntry.resolve_run_dir" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve the on-disk run directory relative to the sweep manifest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>manifest_dir</strong> – Directory containing the sweep manifest file.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Path</strong> – Existing run directory when found; otherwise the stored <code class="docutils literal notranslate"><span class="pre">run_dir</span></code> path.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>manifest_dir</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Path</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepRunEntry.run_dir">
+<span class="sig-name descname"><span class="pre">run_dir</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#domain.sweep_manifest.SweepRunEntry.run_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepRunEntry.swept_param">
+<span class="sig-name descname"><span class="pre">swept_param</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#domain.sweep_manifest.SweepRunEntry.swept_param" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="domain.sweep_manifest.SweepRunEntry.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/domain/sweep_manifest.html#SweepRunEntry.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#domain.sweep_manifest.SweepRunEntry.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Serialize this sweep run entry for manifest persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses fields on <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, Any]</strong> – JSON-serializable run-entry mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">domain.sweep_manifest module</a><ul>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest"><code class="docutils literal notranslate"><span class="pre">SweepManifest</span></code></a><ul>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest.L0"><code class="docutils literal notranslate"><span class="pre">SweepManifest.L0</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest.R0"><code class="docutils literal notranslate"><span class="pre">SweepManifest.R0</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest.base_val"><code class="docutils literal notranslate"><span class="pre">SweepManifest.base_val</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest.from_dict"><code class="docutils literal notranslate"><span class="pre">SweepManifest.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest.observables"><code class="docutils literal notranslate"><span class="pre">SweepManifest.observables</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest.runs"><code class="docutils literal notranslate"><span class="pre">SweepManifest.runs</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest.swept_param"><code class="docutils literal notranslate"><span class="pre">SweepManifest.swept_param</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepManifest.to_dict"><code class="docutils literal notranslate"><span class="pre">SweepManifest.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry</span></code></a><ul>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry.coeff"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.coeff</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry.from_dict"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry.param_val"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.param_val</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry.resolve_run_dir"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.resolve_run_dir()</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry.run_dir"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.run_dir</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry.swept_param"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.swept_param</span></code></a></li>
+<li><a class="reference internal" href="#domain.sweep_manifest.SweepRunEntry.to_dict"><code class="docutils literal notranslate"><span class="pre">SweepRunEntry.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="domain.sweep.html"
+                          title="previous chapter">domain.sweep module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="geometries.html"
+                          title="next chapter">geometries package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/domain.sweep_manifest.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geometries.html" title="geometries package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="domain.sweep.html" title="domain.sweep module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="domain.html" >domain package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">domain.sweep_manifest module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

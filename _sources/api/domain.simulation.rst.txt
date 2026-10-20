@@ -1,0 +1,7 @@
+domain.simulation module
+========================
+
+.. automodule:: domain.simulation
+   :members:
+   :show-inheritance:
+   :undoc-members:

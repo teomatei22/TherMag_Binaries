@@ -1,0 +1,132 @@
+/* Light tweaks on top of Sphinx sphinxdoc. */
+
+:root {
+    /* TOC / right sidebar: fraction of the document width (not a fixed px). */
+    --thermag-toc-width: 25%;
+}
+
+div.bodywrapper {
+    margin: 0 var(--thermag-toc-width) 0 0 !important;
+}
+
+div.sphinxsidebar {
+    width: var(--thermag-toc-width) !important;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+}
+
+div.sphinxsidebarwrapper {
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+}
+
+/* TOC entries use <span class="pre"> which Sphinx sets to nowrap —
+   long dotted pathnames then clip the right sidebar. Allow wrapping. */
+div.sphinxsidebar a,
+div.sphinxsidebar li,
+div.sphinxsidebar code,
+div.sphinxsidebar span.pre {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+dl.field-list > dt {
+    font-weight: 600;
+}
+
+/*
+ * Signature hierarchy: Sphinx basic.css sizes every .sig-name the same
+ * (1.1em), so short attribute names read larger than the class header.
+ * Prefer class > member.
+ */
+dl.py.class > dt.sig .sig-name,
+dl.py.exception > dt.sig .sig-name,
+dl.py.function > dt.sig .sig-name,
+dl.py.data > dt.sig .sig-name {
+    font-size: 1.35em;
+}
+
+dl.py.class dl.py.attribute > dt.sig .sig-name,
+dl.py.class dl.py.method > dt.sig .sig-name,
+dl.py.class dl.py.property > dt.sig .sig-name,
+dl.py.class dl.py.classmethod > dt.sig .sig-name,
+dl.py.class dl.py.staticmethod > dt.sig .sig-name,
+dl.py.class dl.py.data > dt.sig .sig-name,
+dl.py.exception dl.py.attribute > dt.sig .sig-name,
+dl.py.exception dl.py.method > dt.sig .sig-name {
+    font-size: 1em;
+    font-weight: 600;
+}
+
+/* Keep nested member signatures compact. */
+dl.py.class dl.py.attribute > dt.sig,
+dl.py.class dl.py.method > dt.sig,
+dl.py.class dl.py.property > dt.sig,
+dl.py.class dl.py.classmethod > dt.sig,
+dl.py.class dl.py.staticmethod > dt.sig {
+    font-size: 0.95em;
+    margin-top: 0.6em;
+}
+
+dl.py.class dl.py.attribute > dt.sig .sig-paren,
+dl.py.class dl.py.method > dt.sig .sig-paren {
+    font-size: 1em;
+}
+
+/*
+ * Full-viewport source views:
+ * - viewcode pages ("Source code for …" + highlight block)
+ * Works for sphinxdoc and leftover alabaster layouts.
+ */
+body:has(.body > h1 + .highlight) div.sphinxsidebar {
+    display: none !important;
+}
+
+body:has(.body > h1 + .highlight) div.document,
+body:has(.body > h1 + .highlight) div.documentwrapper,
+body:has(.body > h1 + .highlight) div.bodywrapper,
+body:has(.body > h1 + .highlight) div.body {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    float: none !important;
+    border: none !important;
+    box-sizing: border-box;
+}
+
+body:has(.body > h1 + .highlight) div.body {
+    padding: 0.75em 1.5em 1.5em;
+}
+
+body:has(.body > h1 + .highlight) div.highlight {
+    width: 100%;
+    max-width: none;
+}
+
+body:has(.body > h1 + .highlight) div.highlight pre {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+/* Raw "Show Source" .rst.txt pages (browser text/plain): monospace full bleed */
+html:has(body > pre),
+body:has(> pre) {
+    margin: 0;
+    width: 100%;
+}
+
+body > pre {
+    margin: 0;
+    padding: 1em 1.25em;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}

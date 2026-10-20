@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geometries.registry &#8212; TherMag</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1eac167c" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.registry</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for geometries.registry</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Brief: Discover and resolve Gmsh geometry templates by name or variant."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cylinder</span><span class="w"> </span><span class="kn">import</span> <span class="n">CylinderGeometry</span><span class="p">,</span> <span class="n">CylinderVariant</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.prism</span><span class="w"> </span><span class="kn">import</span> <span class="n">PrismGeometry</span><span class="p">,</span> <span class="n">PrismVariant</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.sphere</span><span class="w"> </span><span class="kn">import</span> <span class="n">SphereGeometry</span><span class="p">,</span> <span class="n">SphereVariant</span>
+
+
+<div class="viewcode-block" id="GeometryRegistry">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GeometryRegistry</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Catalog of available geometry variants keyed by template stem.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        templates_dir: Optional directory of ``.geo`` templates [path].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryRegistry: Instance with discovered geometries and lookup APIs.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">templates_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Brief: Set templates directory and discover present geometry files.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            templates_dir: Override path to ``.geo`` templates [path].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Constructs registry with populated ``_geometries``.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span> <span class="o">=</span> <span class="n">templates_dir</span> <span class="ow">or</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"templates"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BaseGeometry</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_discover_geometries</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GeometryRegistry._discover_geometries">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry._discover_geometries">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_discover_geometries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Register all cylinder, prism, and sphere variants if files exist.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: reads ``self.templates_dir``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Mutates ``self._geometries``.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_cylinder_variants</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_prism_variants</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_sphere_variants</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GeometryRegistry._register_cylinder_variants">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry._register_cylinder_variants">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_cylinder_variants</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Add cylinder variants whose template files are present on disk.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: iterates ``CylinderVariant`` against ``templates_dir``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Inserts matching entries into ``self._geometries``.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">variant</span> <span class="ow">in</span> <span class="n">CylinderVariant</span><span class="p">:</span>
+            <span class="n">geometry</span> <span class="o">=</span> <span class="n">CylinderGeometry</span><span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">geometry</span><span class="o">.</span><span class="n">template_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span><span class="p">[</span><span class="n">geometry</span><span class="o">.</span><span class="n">template_file</span><span class="o">.</span><span class="n">stem</span><span class="p">]</span> <span class="o">=</span> <span class="n">geometry</span></div>
+
+
+<div class="viewcode-block" id="GeometryRegistry._register_prism_variants">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry._register_prism_variants">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_prism_variants</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Add prism variants whose template files are present on disk.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: iterates ``PrismVariant`` against ``templates_dir``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Inserts matching entries into ``self._geometries``.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">variant</span> <span class="ow">in</span> <span class="n">PrismVariant</span><span class="p">:</span>
+            <span class="n">geometry</span> <span class="o">=</span> <span class="n">PrismGeometry</span><span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">geometry</span><span class="o">.</span><span class="n">template_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span><span class="p">[</span><span class="n">geometry</span><span class="o">.</span><span class="n">template_file</span><span class="o">.</span><span class="n">stem</span><span class="p">]</span> <span class="o">=</span> <span class="n">geometry</span></div>
+
+
+<div class="viewcode-block" id="GeometryRegistry._register_sphere_variants">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry._register_sphere_variants">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_sphere_variants</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Add sphere variants whose template files are present on disk.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: iterates ``SphereVariant`` against ``templates_dir``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            None: Inserts matching entries into ``self._geometries``.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">variant</span> <span class="ow">in</span> <span class="n">SphereVariant</span><span class="p">:</span>
+            <span class="n">geometry</span> <span class="o">=</span> <span class="n">SphereGeometry</span><span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">geometry</span><span class="o">.</span><span class="n">template_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span><span class="p">[</span><span class="n">geometry</span><span class="o">.</span><span class="n">template_file</span><span class="o">.</span><span class="n">stem</span><span class="p">]</span> <span class="o">=</span> <span class="n">geometry</span></div>
+
+
+<div class="viewcode-block" id="GeometryRegistry.get_geometry">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry.get_geometry">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseGeometry</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Look up a registered geometry by template-stem key.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: Registry key such as ``full_cylinder`` [dimensionless].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            BaseGeometry | None: Matching geometry or ``None`` if unknown.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GeometryRegistry.resolve_key">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry.resolve_key">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_key</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">template_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Normalize user-facing names to a concrete registry key.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            name: Requested geometry name or stem [dimensionless].</span>
+<span class="sd">            template_file: Optional ``.geo`` path whose stem may match [path].</span>
+<span class="sd">            geometry_type: Shape family hint such as ``prism`` [dimensionless].</span>
+<span class="sd">            variant: Topology hint such as ``hollow`` [dimensionless].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            str: Resolved registry key, or original ``name`` if unresolved.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">resolve_geometry_registry_key</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">geometries</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span><span class="p">,</span>
+            <span class="n">template_file</span><span class="o">=</span><span class="n">template_file</span><span class="p">,</span>
+            <span class="n">geometry_type</span><span class="o">=</span><span class="n">geometry_type</span><span class="p">,</span>
+            <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GeometryRegistry.air_sphere_radius_m">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry.air_sphere_radius_m">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">air_sphere_radius_m</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geometry_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Brief: Compute air-sphere radius for a named registered geometry.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            geometry_name: Registry key for the geometry [dimensionless].</span>
+<span class="sd">            params: Geometry parameter values [m / deg as applicable].</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            float: Surrounding air domain radius [m].</span>
+<span class="sd">        """</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_geometry</span><span class="p">(</span><span class="n">geometry_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown geometry: </span><span class="si">{</span><span class="n">geometry_name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">geometry</span><span class="o">.</span><span class="n">air_sphere_radius_m</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GeometryRegistry.get_geometry_names">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.GeometryRegistry.get_geometry_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_geometry_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Brief: List all registered geometry template-stem keys.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            None: reads ``self._geometries``.</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            list[str]: Sorted-order-independent list of registry keys.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="resolve_geometry_registry_key">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.resolve_geometry_registry_key">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_geometry_registry_key</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">geometries</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BaseGeometry</span><span class="p">],</span>
+    <span class="n">template_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">geometry_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Resolve ambiguous geometry identifiers onto a registry key.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        name: Direct key, display name, or slug [dimensionless].</span>
+<span class="sd">        geometries: Mapping of known registry keys to geometry objects.</span>
+<span class="sd">        template_file: Optional template path for stem matching [path].</span>
+<span class="sd">        geometry_type: Optional shape family filter [dimensionless].</span>
+<span class="sd">        variant: Optional topology filter [dimensionless].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        str: Matching registry key, or ``name`` when no better match exists.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">name</span>
+
+    <span class="k">if</span> <span class="n">template_file</span><span class="p">:</span>
+        <span class="n">stem</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">template_file</span><span class="p">))</span><span class="o">.</span><span class="n">stem</span>
+        <span class="k">if</span> <span class="n">stem</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">stem</span>
+
+    <span class="n">gt</span> <span class="o">=</span> <span class="p">(</span><span class="n">geometry_type</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="p">(</span><span class="n">variant</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">gt</span> <span class="ow">and</span> <span class="n">var</span><span class="p">:</span>
+        <span class="n">candidate</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">gt</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">candidate</span>
+
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">name_l</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">geo</span> <span class="ow">in</span> <span class="n">geometries</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">geo</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name_l</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">gt</span> <span class="ow">or</span> <span class="n">geo</span><span class="o">.</span><span class="n">geometry_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">gt</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">geo</span><span class="p">,</span> <span class="s2">"variant"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">"value"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="o">==</span> <span class="n">var</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">key</span>
+        <span class="n">slug</span> <span class="o">=</span> <span class="n">name_l</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">slug</span>
+
+    <span class="k">return</span> <span class="n">name</span></div>
+
+
+
+<span class="n">_registry</span><span class="p">:</span> <span class="n">GeometryRegistry</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="get_geometry_registry">
+<a class="viewcode-back" href="../../api/geometries.registry.html#geometries.registry.get_geometry_registry">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_geometry_registry</span><span class="p">(</span><span class="n">templates_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeometryRegistry</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Brief: Return the process-wide geometry registry singleton.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        templates_dir: If set, rebuilds the registry from that directory [path].</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        GeometryRegistry: Shared or freshly constructed registry instance.</span>
+<span class="sd">    """</span>
+    <span class="k">global</span> <span class="n">_registry</span>
+    <span class="k">if</span> <span class="n">_registry</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">templates_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_registry</span> <span class="o">=</span> <span class="n">GeometryRegistry</span><span class="p">(</span><span class="n">templates_dir</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_registry</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TherMag</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">geometries.registry</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

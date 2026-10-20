@@ -1,0 +1,7 @@
+geometries.defaults module
+==========================
+
+.. automodule:: geometries.defaults
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>materials.repository module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="processing package" href="processing.html" />
+    <link rel="prev" title="materials.database module" href="materials.database.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.html" title="processing package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="materials.database.html" title="materials.database module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="materials.html" accesskey="U">materials package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">materials.repository module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-materials.repository">
+<span id="materials-repository-module"></span><h1>materials.repository module<a class="headerlink" href="#module-materials.repository" title="Link to this heading">¶</a></h1>
+<p>JSON repository for loading and saving FEM material definitions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="materials.repository.MaterialRepository">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">materials.repository.</span></span><span class="sig-name descname"><span class="pre">MaterialRepository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configs_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/repository.html#MaterialRepository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.repository.MaterialRepository" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Load and persist material JSON files from a configuration directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>configs_dir</strong> – Directory containing <code class="docutils literal notranslate"><span class="pre">*.json</span></code> material definition files.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MaterialRepository</strong> – Repository for loading and saving material JSON files.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>configs_dir</strong> (<em>Path</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.repository.MaterialRepository._load_file">
+<span class="sig-name descname"><span class="pre">_load_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/repository.html#MaterialRepository._load_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.repository.MaterialRepository._load_file" title="Link to this definition">¶</a></dt>
+<dd><p>Parse one JSON file as a single material or a list of materials.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>json_file</strong> – Path to a material JSON file (object or array root).</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[Material]</strong> – One or more materials deserialized from the file.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>json_file</strong> (<em>Path</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="materials.database.html#materials.database.Material" title="materials.database.Material">Material</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.repository.MaterialRepository.load_all">
+<span class="sig-name descname"><span class="pre">load_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/repository.html#MaterialRepository.load_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.repository.MaterialRepository.load_all" title="Link to this definition">¶</a></dt>
+<dd><p>Load every material definition found under <code class="docutils literal notranslate"><span class="pre">configs_dir</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Reads <code class="docutils literal notranslate"><span class="pre">*.json</span></code> files from <code class="docutils literal notranslate"><span class="pre">self.configs_dir</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[Material]</strong> – Materials from all JSON files (empty if directory missing).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="materials.database.html#materials.database.Material" title="materials.database.Material">Material</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="materials.repository.MaterialRepository.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">material</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/materials/repository.html#MaterialRepository.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#materials.repository.MaterialRepository.save" title="Link to this definition">¶</a></dt>
+<dd><p>Persist a material to JSON, creating parent directories as needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>material</strong> – Material instance to write.</p></li>
+<li><p><strong>file_path</strong> – Destination JSON path.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Writes the file and updates the material’s <code class="docutils literal notranslate"><span class="pre">source_file</span></code> via <code class="docutils literal notranslate"><span class="pre">save</span></code>.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>material</strong> (<a class="reference internal" href="materials.database.html#materials.database.Material" title="materials.database.Material"><em>Material</em></a>)</p></li>
+<li><p><strong>file_path</strong> (<em>Path</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">materials.repository module</a><ul>
+<li><a class="reference internal" href="#materials.repository.MaterialRepository"><code class="docutils literal notranslate"><span class="pre">MaterialRepository</span></code></a><ul>
+<li><a class="reference internal" href="#materials.repository.MaterialRepository._load_file"><code class="docutils literal notranslate"><span class="pre">MaterialRepository._load_file()</span></code></a></li>
+<li><a class="reference internal" href="#materials.repository.MaterialRepository.load_all"><code class="docutils literal notranslate"><span class="pre">MaterialRepository.load_all()</span></code></a></li>
+<li><a class="reference internal" href="#materials.repository.MaterialRepository.save"><code class="docutils literal notranslate"><span class="pre">MaterialRepository.save()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="materials.database.html"
+                          title="previous chapter">materials.database module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="processing.html"
+                          title="next chapter">processing package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/materials.repository.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="processing.html" title="processing package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="materials.database.html" title="materials.database module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="materials.html" >materials package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">materials.repository module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>config.settings module &#8212; TherMag 1.0</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=21111a2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1eac167c" />
+    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="domain package" href="domain.html" />
+    <link rel="prev" title="config.defaults module" href="config.defaults.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.html" title="domain package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="config.defaults.html" title="config.defaults module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="config.html" accesskey="U">config package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">config.settings module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-config.settings">
+<span id="config-settings-module"></span><h1>config.settings module<a class="headerlink" href="#module-config.settings" title="Link to this heading">¶</a></h1>
+<p>Runtime settings, tool discovery, and dependency checks for TherMag.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="config.settings.Settings">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">config.settings.</span></span><span class="sig-name descname"><span class="pre">Settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tools</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_runs_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_processing_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Process-wide settings including tool paths, runs directory, and timeouts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>platform</strong> – OS platform string (e.g. <code class="docutils literal notranslate"><span class="pre">linux</span></code>, <code class="docutils literal notranslate"><span class="pre">win32</span></code>).</p></li>
+<li><p><strong>tools</strong> – Resolved paths to Gmsh, Elmer, MPI, and ParaView tools.</p></li>
+<li><p><strong>default_runs_dir</strong> – Default directory for simulation run outputs.</p></li>
+<li><p><strong>default_threads</strong> – Default worker/thread count from application defaults.</p></li>
+<li><p><strong>post_processing_timeout</strong> – Post-processing stage timeout [s].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Settings</strong> – Process-wide runtime settings with detected tool paths.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>platform</strong> (<em>str</em>)</p></li>
+<li><p><strong>tools</strong> (<a class="reference internal" href="#config.settings.ToolPaths" title="config.settings.ToolPaths"><em>ToolPaths</em></a>)</p></li>
+<li><p><strong>default_runs_dir</strong> (<em>Path</em>)</p></li>
+<li><p><strong>default_threads</strong> (<em>int</em>)</p></li>
+<li><p><strong>post_processing_timeout</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings._bundled_candidates">
+<span class="sig-name descname"><span class="pre">_bundled_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings._bundled_candidates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings._bundled_candidates" title="Link to this definition">¶</a></dt>
+<dd><p>List bundled <code class="docutils literal notranslate"><span class="pre">bin/</span></code> locations for a tool under the package tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Tool base name used to form executable filenames.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[Path]</strong> – Candidate paths under the application <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<em>Path</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings._detect_tools">
+<span class="sig-name descname"><span class="pre">_detect_tools</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings._detect_tools"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings._detect_tools" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve paths for Gmsh, Elmer, MPI, and ParaView executables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Operates on <code class="docutils literal notranslate"><span class="pre">self</span></code> and the environment.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – Assigns discovered paths onto <code class="docutils literal notranslate"><span class="pre">self.tools</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings._executable_names">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_executable_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings._executable_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings._executable_names" title="Link to this definition">¶</a></dt>
+<dd><p>Build candidate executable names including Windows <code class="docutils literal notranslate"><span class="pre">.exe</span></code> variants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Tool base name or already-suffixed executable name.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple[str, …]</strong> – Ordered candidate executable names.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[str, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings._find_pvpython">
+<span class="sig-name descname"><span class="pre">_find_pvpython</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings._find_pvpython"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings._find_pvpython" title="Link to this definition">¶</a></dt>
+<dd><p>Locate ParaView’s <code class="docutils literal notranslate"><span class="pre">pvpython</span></code> for post-processing scripts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses env vars, bundled bin, PATH, and platform install paths.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Path | None</strong> – Absolute path to <code class="docutils literal notranslate"><span class="pre">pvpython</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Path</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings._find_tool">
+<span class="sig-name descname"><span class="pre">_find_tool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings._find_tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings._find_tool" title="Link to this definition">¶</a></dt>
+<dd><p>Locate a named executable via env override, bundle, PATH, or platform paths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Tool base name (e.g. <code class="docutils literal notranslate"><span class="pre">gmsh</span></code>, <code class="docutils literal notranslate"><span class="pre">ElmerSolver</span></code>).</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Path | None</strong> – Absolute path to the executable, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Path</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings._first_file">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_first_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings._first_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings._first_file" title="Link to this definition">¶</a></dt>
+<dd><p>Return the first existing file among candidate paths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>candidates</strong> – Iterable of <code class="docutils literal notranslate"><span class="pre">Path</span></code> candidates to test with <code class="docutils literal notranslate"><span class="pre">is_file()</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Path | None</strong> – First existing file path, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Path</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings._get_default_runs_dir">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_get_default_runs_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings._get_default_runs_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings._get_default_runs_dir" title="Link to this definition">¶</a></dt>
+<dd><p>Choose the default directory for simulation run outputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses platform and optional Windows <code class="docutils literal notranslate"><span class="pre">config.ini</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Path</strong> – Default runs directory for the current platform.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Path</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings._platform_candidates">
+<span class="sig-name descname"><span class="pre">_platform_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings._platform_candidates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings._platform_candidates" title="Link to this definition">¶</a></dt>
+<dd><p>List OS-specific fallback install locations for a tool.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Tool base name (uses Windows MPI and <code class="docutils literal notranslate"><span class="pre">ELMER_HOME</span></code> when applicable).</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[Path]</strong> – Platform-specific candidate executable paths.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<em>Path</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings.check_dependencies">
+<span class="sig-name descname"><span class="pre">check_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings.check_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings.check_dependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Report whether required external FEM tools were discovered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Reads <code class="docutils literal notranslate"><span class="pre">self.tools</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict[str, bool]</strong> – Availability flags keyed by tool group name.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, bool]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.Settings.default_runs_dir">
+<span class="sig-name descname"><span class="pre">default_runs_dir</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></span><a class="headerlink" href="#config.settings.Settings.default_runs_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.Settings.default_threads">
+<span class="sig-name descname"><span class="pre">default_threads</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#config.settings.Settings.default_threads" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings.get_file_manager_command">
+<span class="sig-name descname"><span class="pre">get_file_manager_command</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings.get_file_manager_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings.get_file_manager_command" title="Link to this definition">¶</a></dt>
+<dd><p>Return the platform command used to open a folder in a file manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">self.platform</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[str]</strong> – Command argv (e.g. <code class="docutils literal notranslate"><span class="pre">explorer</span></code> or <code class="docutils literal notranslate"><span class="pre">xdg-open</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="config.settings.Settings.get_missing_tools">
+<span class="sig-name descname"><span class="pre">get_missing_tools</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#Settings.get_missing_tools"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.Settings.get_missing_tools" title="Link to this definition">¶</a></dt>
+<dd><p>List tool groups that are unavailable on this machine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Uses <code class="docutils literal notranslate"><span class="pre">check_dependencies</span></code>.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>list[str]</strong> – Names of missing dependency groups.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.Settings.platform">
+<span class="sig-name descname"><span class="pre">platform</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#config.settings.Settings.platform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.Settings.post_processing_timeout">
+<span class="sig-name descname"><span class="pre">post_processing_timeout</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#config.settings.Settings.post_processing_timeout" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.Settings.tools">
+<span class="sig-name descname"><span class="pre">tools</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#config.settings.ToolPaths" title="config.settings.ToolPaths"><span class="pre">ToolPaths</span></a></span><a class="headerlink" href="#config.settings.Settings.tools" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="config.settings.ToolPaths">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">config.settings.</span></span><span class="sig-name descname"><span class="pre">ToolPaths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmsh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elmergrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elmersolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elmersolver_mpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpiexec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pvpython</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#ToolPaths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.ToolPaths" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Resolved filesystem paths to external FEM and post-processing tools.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gmsh</strong> – Path to the Gmsh executable, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p></li>
+<li><p><strong>elmergrid</strong> – Path to ElmerGrid, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p></li>
+<li><p><strong>elmersolver</strong> – Path to serial ElmerSolver, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p></li>
+<li><p><strong>elmersolver_mpi</strong> – Path to MPI ElmerSolver, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p></li>
+<li><p><strong>mpiexec</strong> – Path to <code class="docutils literal notranslate"><span class="pre">mpiexec</span></code>/<code class="docutils literal notranslate"><span class="pre">mpirun</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p></li>
+<li><p><strong>pvpython</strong> – Path to ParaView <code class="docutils literal notranslate"><span class="pre">pvpython</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not found.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ToolPaths</strong> – Container of discovered external tool executable paths.</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gmsh</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>elmergrid</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>elmersolver</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>elmersolver_mpi</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>mpiexec</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>pvpython</strong> (<em>Path</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.ToolPaths.elmergrid">
+<span class="sig-name descname"><span class="pre">elmergrid</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#config.settings.ToolPaths.elmergrid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.ToolPaths.elmersolver">
+<span class="sig-name descname"><span class="pre">elmersolver</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#config.settings.ToolPaths.elmersolver" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.ToolPaths.elmersolver_mpi">
+<span class="sig-name descname"><span class="pre">elmersolver_mpi</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#config.settings.ToolPaths.elmersolver_mpi" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.ToolPaths.gmsh">
+<span class="sig-name descname"><span class="pre">gmsh</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#config.settings.ToolPaths.gmsh" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.ToolPaths.mpiexec">
+<span class="sig-name descname"><span class="pre">mpiexec</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#config.settings.ToolPaths.mpiexec" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.settings.ToolPaths.pvpython">
+<span class="sig-name descname"><span class="pre">pvpython</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#config.settings.ToolPaths.pvpython" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="config.settings.get_settings">
+<span class="sig-prename descclassname"><span class="pre">config.settings.</span></span><span class="sig-name descname"><span class="pre">get_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/config/settings.html#get_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.settings.get_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Return the process-wide singleton <code class="docutils literal notranslate"><span class="pre">Settings</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Inputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N/A</strong> – Initializes global <code class="docutils literal notranslate"><span class="pre">_settings</span></code> on first call.</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Settings</strong> – Shared settings object with detected tool paths.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#config.settings.Settings" title="config.settings.Settings"><em>Settings</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">config.settings module</a><ul>
+<li><a class="reference internal" href="#config.settings.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li><a class="reference internal" href="#config.settings.Settings._bundled_candidates"><code class="docutils literal notranslate"><span class="pre">Settings._bundled_candidates()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings._detect_tools"><code class="docutils literal notranslate"><span class="pre">Settings._detect_tools()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings._executable_names"><code class="docutils literal notranslate"><span class="pre">Settings._executable_names()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings._find_pvpython"><code class="docutils literal notranslate"><span class="pre">Settings._find_pvpython()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings._find_tool"><code class="docutils literal notranslate"><span class="pre">Settings._find_tool()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings._first_file"><code class="docutils literal notranslate"><span class="pre">Settings._first_file()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings._get_default_runs_dir"><code class="docutils literal notranslate"><span class="pre">Settings._get_default_runs_dir()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings._platform_candidates"><code class="docutils literal notranslate"><span class="pre">Settings._platform_candidates()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings.check_dependencies"><code class="docutils literal notranslate"><span class="pre">Settings.check_dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings.default_runs_dir"><code class="docutils literal notranslate"><span class="pre">Settings.default_runs_dir</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings.default_threads"><code class="docutils literal notranslate"><span class="pre">Settings.default_threads</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings.get_file_manager_command"><code class="docutils literal notranslate"><span class="pre">Settings.get_file_manager_command()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings.get_missing_tools"><code class="docutils literal notranslate"><span class="pre">Settings.get_missing_tools()</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings.platform"><code class="docutils literal notranslate"><span class="pre">Settings.platform</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings.post_processing_timeout"><code class="docutils literal notranslate"><span class="pre">Settings.post_processing_timeout</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.Settings.tools"><code class="docutils literal notranslate"><span class="pre">Settings.tools</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#config.settings.ToolPaths"><code class="docutils literal notranslate"><span class="pre">ToolPaths</span></code></a><ul>
+<li><a class="reference internal" href="#config.settings.ToolPaths.elmergrid"><code class="docutils literal notranslate"><span class="pre">ToolPaths.elmergrid</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.ToolPaths.elmersolver"><code class="docutils literal notranslate"><span class="pre">ToolPaths.elmersolver</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.ToolPaths.elmersolver_mpi"><code class="docutils literal notranslate"><span class="pre">ToolPaths.elmersolver_mpi</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.ToolPaths.gmsh"><code class="docutils literal notranslate"><span class="pre">ToolPaths.gmsh</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.ToolPaths.mpiexec"><code class="docutils literal notranslate"><span class="pre">ToolPaths.mpiexec</span></code></a></li>
+<li><a class="reference internal" href="#config.settings.ToolPaths.pvpython"><code class="docutils literal notranslate"><span class="pre">ToolPaths.pvpython</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#config.settings.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="config.defaults.html"
+                          title="previous chapter">config.defaults module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="domain.html"
+                          title="next chapter">domain package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/config.settings.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="domain.html" title="domain package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="config.defaults.html" title="config.defaults module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TherMag 1.0</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="config.html" >config package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">config.settings module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2026, TherMag.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
