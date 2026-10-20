@@ -40,7 +40,7 @@ Typical run:
 
 ### Windows (Installer)
 
-1. Download `TherMag_Setup.exe` from the [GitHub release](https://github.com/teomatei22/ESA_wrapper_binaries/releases).
+1. Download `TherMag_Setup.exe` from the [GitHub release](https://github.com/teomatei22/TherMag_Binaries/releases).
 2. Run the installer and launch from the desktop shortcut.
 
 The installer places the app under `C:\Program Files\TherMag`, bundles Gmsh / Elmer / ParaView under `bin\`, and defaults new runs to the user Documents folder (the Generate dialog chooses the parent).
@@ -112,7 +112,7 @@ Materials live in `materials/default_materials.json`. Each entry can classify:
 ### External tools
 
 - **GMSH**, **ElmerFEM 9.0**, **ParaView** (pvpython)
-- Windows installer and binaries: [`TherMag_Setup.exe`] in the [ESA_wrapper_binaries]([https://teomatei22.github.io/TherMag_Binaries/releases](https://teomatei22.github.io/TherMag_Binaries)) repo
+- Windows installer and binaries: [`TherMag_Setup.exe`](https://github.com/teomatei22/TherMag_Binaries/releases) in the [TherMag_Binaries](https://github.com/teomatei22/TherMag_Binaries) repo
 
 ## License
 
