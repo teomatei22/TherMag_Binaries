@@ -97,7 +97,7 @@ Materials live in `materials/default_materials.json`. Each entry can classify:
 
 ## Documentation
 
-- **Technical documentation (API):** open **[TherMag API](https://teomatei22.github.io/ESA_wrapper_binaries/)** in a browser (click the link).
+- **Technical documentation (API):** open **[TherMag API](https://teomatei22.github.io/TherMag_Binaries/)** in a browser (click the link).
 
 - User manual: `docs/user_manual/user_manual.tex`
 - In-app Help: control reference from the manual (preview **? Help** button)
@@ -112,7 +112,7 @@ Materials live in `materials/default_materials.json`. Each entry can classify:
 ### External tools
 
 - **GMSH**, **ElmerFEM 9.0**, **ParaView** (pvpython)
-- Windows installer and binaries: [`TherMag_Setup.exe`](https://github.com/teomatei22/ESA_wrapper_binaries/releases) in the [ESA_wrapper_binaries]([https://teomatei22.github.io/TherMag_Binaries/](https://teomatei22.github.io/TherMag_Binaries/)) repo
+- Windows installer and binaries: [`TherMag_Setup.exe`] in the [ESA_wrapper_binaries]([https://teomatei22.github.io/TherMag_Binaries/releases](https://teomatei22.github.io/TherMag_Binaries)) repo
 
 ## License
 
